@@ -1,0 +1,133 @@
+﻿using Jobs.Domain.Common;
+using Jobs.Domain.Entities;
+using Jobs.Domain.Events.Company_Events;
+using Jobs.Domain.Events.JobEvents;
+using Jobs.Domain.Rules;
+using Jobs.Domain.Rules.CompanyRoles;
+using Jobs.Domain.ValueObjects.YourProject.Domain.ValueObjects;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Text;
+using System.Xml.Linq;
+
+namespace Jobs.Domain.Entities
+{
+    public class Company : AggregateRoot
+	{
+		// ========== Properties ==========
+		public string Name { get; private set; }
+        public string Industry { get; private set; }
+        public Address CompanyAddress { get; private set; }
+        public string Description { get; private set; } = string.Empty;
+		public string LogoUrl { get; private set; } = string.Empty;
+
+		private readonly List<User> _employees = new();
+		public IReadOnlyCollection<User> Employees => _employees;
+
+
+		private readonly  List<Job> _jobs = new();
+		//if you don't wrirte AsReadOnly(), the consumer can cast it back to List<Job> and modify it.
+		public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
+
+
+		
+
+		// ========== Constructor ==========
+		private Company()
+		{
+		}
+
+		public Company(string name, Address address, string description, string industry, string logoUrl)
+		{
+			CheckRule(new NotEmptyRule(name, nameof(name)));
+			CheckRule(new NotEmptyRule(industry, nameof(industry)));
+			CheckRule(new NotNullRule<Address>(address ));
+
+			Name = name;
+			CompanyAddress = address;
+			Description = description ?? string.Empty;
+			Industry = industry;
+			LogoUrl = logoUrl ?? string.Empty;
+			CreatedAt = DateTime.UtcNow;
+			UpdatedAt = CreatedAt;
+
+			AddEvent(new CompanyCreatedEvent(this));
+		}
+
+		// ========== Behaviors ==========
+
+		public void UpdateInfo(string description, string industry, string logoUrl)
+		{
+			if (!string.IsNullOrWhiteSpace(industry))
+				CheckRule(new NotEmptyRule(industry, nameof(industry)));
+
+			Description = description ?? Description;
+
+			if (!string.IsNullOrWhiteSpace(industry))
+				Industry = industry;
+
+			if (!string.IsNullOrWhiteSpace(logoUrl))
+				LogoUrl = logoUrl;
+
+			Touch();
+
+			AddEvent(new CompanyInfoUpdatedEvent(this.Id));
+		}
+		public void UpdateDescription(string description)
+		{
+			Description = description ?? string.Empty;
+			Touch();
+		}
+
+
+		public void UpdateAddress(Address address)
+		{
+			CheckRule(new NotNullRule<Address>(address));
+
+			CompanyAddress = address;
+			Touch();
+		}
+		public void AddEmployee(User user)
+		{
+			CheckRule(new NotNullRule<User>(user ));
+			
+			if (!_employees.Contains(user))
+			{
+				_employees.Add(user);
+				Touch();
+			}
+		}
+
+		public void RemoveEmployee(User user)
+		{
+			CheckRule(new NotNullRule<User>(user));
+
+			if (_employees.Contains(user))
+			{
+				_employees.Remove(user);
+				Touch();
+			}
+		}
+
+		public void AddJob(Job job)
+		{
+			CheckRule(new NotNullRule<Job>(job));
+			CheckRule(new CompanyCannotPostMoreThanNJobsRule(this));
+
+			_jobs.Add(job);
+
+			Touch();
+			AddEvent(new JobCreatedEvent(job));
+		}
+		
+		
+	}
+
+}
+
+
+
+
+
+
