@@ -1,5 +1,6 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Events;
+using Jobs.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -14,8 +15,7 @@ namespace Jobs.Domain.Common
 		public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
 		public DateTime? UpdatedAt { get; protected set; }
 
-		public bool IsDeleted { get; protected set; }
-		public DateTime? DeletedAt { get; protected set; }
+		
 
 		protected static void CheckRule(IBusinessRule rule)
 		{
@@ -23,7 +23,7 @@ namespace Jobs.Domain.Common
 				throw new BusinessRuleViolationException(rule);
 		}
 
-		// 2. تطبيق منطق المساواة بناءً على الـ ID
+
 		public override bool Equals(object obj)
 		{
 			if (obj is not BaseEntity other)
@@ -43,7 +43,6 @@ namespace Jobs.Domain.Common
 			return Id.GetHashCode();
 		}
 
-		// 3. Operator Overloading
 		public static bool operator ==(BaseEntity left, BaseEntity right)
 		{
 			if (Equals(left, null))
@@ -56,10 +55,6 @@ namespace Jobs.Domain.Common
 		{
 			return !(left == right);
 		}
-
-		
-
-		
 
 		protected void Touch() => UpdatedAt = DateTime.UtcNow;
 		

@@ -5,8 +5,8 @@ using Jobs.Domain.Rules;
 
 namespace Jobs.Domain.Entities
 {
-    public class CVJobRecommendation :AggregateRoot
-    {
+    public class CVJobRecommendation :AggregateRoot , ISoftDelete
+	{
 
 		// ======== Properties ========
 		public Guid CvId { get; }
@@ -19,6 +19,9 @@ namespace Jobs.Domain.Entities
 
         public bool IsActive { get; private set; }
 		public DateTime? DeactivatedAt { get; private set; }
+
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
 
 		// ======== Constructors ========
 
@@ -41,7 +44,7 @@ namespace Jobs.Domain.Entities
 		}
 
 
-
+		// ======== Behaviors ========
 		public void Deactivate()
 		{
 			if (!IsActive)
@@ -53,6 +56,11 @@ namespace Jobs.Domain.Entities
 			AddEvent(new CVRecommendationDeactivatedEvent(this));
 		}
 
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
+		}
 	}
 
 }

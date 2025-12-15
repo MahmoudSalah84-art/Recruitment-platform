@@ -10,8 +10,8 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class JobApplication : AggregateRoot
-    {
+    public class JobApplication : AggregateRoot , ISoftDelete
+	{
 		// ========= Properties =========
 
 		public Guid ApplicantId { get; private set; }
@@ -28,7 +28,8 @@ namespace Jobs.Domain.Entities
 
 		public StatusHistory StatusHistory { get; private set; } //oldStatus , newStatus , timestamp
 
-
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
 
 		// ========= Constructors =========
 		private JobApplication() { }
@@ -61,7 +62,13 @@ namespace Jobs.Domain.Entities
 
 			Touch();
 			AddEvent(new ApplicationStatusChangedEvent(this, oldStatus, newStatus));
-		}	
+		}
+
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
+		}
 	}
 }
 

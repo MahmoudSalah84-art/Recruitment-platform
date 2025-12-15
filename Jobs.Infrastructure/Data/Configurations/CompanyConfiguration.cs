@@ -31,6 +31,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 
 			builder.Property(c => c.LogoUrl)
 				.HasMaxLength(1000);
+
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
 		}
 	}
 }

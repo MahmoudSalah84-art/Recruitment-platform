@@ -40,6 +40,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.Navigation(u => u.CVs).HasField("_cvs");
 			builder.Navigation(u => u.Skills).HasField("_skills");
 			builder.Navigation(u => u.Applications).HasField("_applications");
+
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
 		}
 	}
 }

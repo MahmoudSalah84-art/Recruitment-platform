@@ -7,24 +7,28 @@ using System.Text;
 
 namespace Jobs.Domain.Common
 {
-	public abstract class AggregateRoot : BaseEntity
+	public abstract class AggregateRoot : BaseEntity 
 	{
-		[Timestamp]
-		public byte[] RowVersion { get; set; }
 
 		// ===== Domain Events =====
 		private readonly List<DomainEvent> _events = new();
 		public IReadOnlyCollection<DomainEvent> Events => _events.AsReadOnly();
-		protected void AddEvent(DomainEvent @event) => _events.Add(@event);
+
+
+        protected void AddEvent(DomainEvent @event) => _events.Add(@event);
 		public void ClearEvents() => _events.Clear();
 
 
-		// ===== Soft Delete =====
-		public virtual void SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-			AddEvent(new EntitySoftDeletedEvent(Id));
-		}
+		
+
+
+
+		// in future
+
+		// 5. (اختياري) إدارة التزامن Optimistic Concurrency
+		// [ConcurrencyCheck]
+		// public byte[] RowVersion { get; set; }
+		//[Timestamp]
+		//public byte[] RowVersion { get; set; }
 	}
 }

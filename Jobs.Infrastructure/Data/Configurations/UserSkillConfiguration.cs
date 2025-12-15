@@ -30,6 +30,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 
 			builder.HasIndex(us => new { us.UserId, us.SkillId })
 				   .IsUnique();
+
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
 		}
 	}
 }

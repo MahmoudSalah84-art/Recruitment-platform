@@ -6,8 +6,8 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class UserSkill : BaseEntity
-    {
+    public class UserSkill : BaseEntity , ISoftDelete
+	{
 		// ========== Properties ==========
 		public Guid UserId { get; private set; }
 		public User User { get; private set; }
@@ -15,6 +15,8 @@ namespace Jobs.Domain.Entities
 		public Guid SkillId { get; private set; }
 		public Skill Skill { get; private set; }
 
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
 
 		// ========== Constructor ==========
 		private UserSkill() { }
@@ -26,6 +28,12 @@ namespace Jobs.Domain.Entities
 
 			UserId = userId;
 			SkillId = skillId;
+		}
+
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
 		}
 	}
 }

@@ -12,7 +12,7 @@ using System.Xml.Linq;
 
 namespace Jobs.Domain.Entities
 {
-    public class User : AggregateRoot
+    public class User : AggregateRoot , ISoftDelete
     {
 		// ========= Properties =========
 		public string FullName { get; private set; }
@@ -40,6 +40,8 @@ namespace Jobs.Domain.Entities
 		public IReadOnlyCollection<JobApplication> Applications => _applications.AsReadOnly();
 
 
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
 		// ========= Constructors =========
 		private User() { }
 		public User(string fullName, Email email, UserRole role , Func<string, bool> emailExists)
@@ -117,9 +119,11 @@ namespace Jobs.Domain.Entities
 			Touch();
 		}
 
-		
-
-
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
+		}
 
 	}
 }

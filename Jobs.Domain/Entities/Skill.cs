@@ -6,10 +6,17 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class Skill :BaseEntity
-    {
+    public class Skill :BaseEntity , ISoftDelete
+	{
+		// ========== Properties ==========
 		public string Name { get; private set; }
 
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
+
+
+
+		// ========== Constructor ==========
 		private Skill() { }
 		public Skill(string name)
 		{
@@ -27,6 +34,12 @@ namespace Jobs.Domain.Entities
 
 			Name = newName.Trim();
 			Touch();
+		}
+
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
 		}
 	}
 }

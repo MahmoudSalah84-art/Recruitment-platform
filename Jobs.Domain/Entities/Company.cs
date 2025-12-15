@@ -5,15 +5,10 @@ using Jobs.Domain.Events.JobEvents;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.CompanyRoles;
 using Jobs.Domain.ValueObjects.YourProject.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Jobs.Domain.Entities
 {
-    public class Company : AggregateRoot
+    public class Company : AggregateRoot , ISoftDelete
 	{
 		// ========== Properties ==========
 		public string Name { get; private set; }
@@ -31,7 +26,9 @@ namespace Jobs.Domain.Entities
 		public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
 
 
-		
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
+
 
 		// ========== Constructor ==========
 		private Company()
@@ -116,15 +113,26 @@ namespace Jobs.Domain.Entities
 			CheckRule(new CompanyCannotPostMoreThanNJobsRule(this));
 
 			_jobs.Add(job);
-
+			
 			Touch();
 			AddEvent(new JobCreatedEvent(job));
 		}
 		
 		
-	}
-
+        void ISoftDelete.SoftDelete()
+        {
+            IsDeleted = true;
+            DeletedAt = DateTime.UtcNow;
+        }
+    }
 }
+
+
+
+
+
+
+
 
 
 

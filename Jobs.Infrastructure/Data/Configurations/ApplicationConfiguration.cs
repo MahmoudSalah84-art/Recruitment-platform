@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -44,6 +45,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.WithMany()
 				.HasForeignKey(a => a.ApplicantId)
 				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
 		}
 
        

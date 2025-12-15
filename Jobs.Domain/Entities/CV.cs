@@ -5,7 +5,7 @@ using Jobs.Domain.ValueObjects;
 
 namespace Jobs.Domain.Entities
 {
-    public class CV : AggregateRoot
+    public class CV : AggregateRoot , ISoftDelete
 	{
 
 		// ========== Properties ==========
@@ -17,6 +17,9 @@ namespace Jobs.Domain.Entities
 		public string? SummaryText { get; private set; }
 
 		public ParsedData? ParsedData { get; private set; }
+
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
 
 		// ========== Constructor ==========
 		private CV() { }
@@ -50,6 +53,12 @@ namespace Jobs.Domain.Entities
 		{
 			SummaryText = summary;
 			Touch();
+		}
+
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
 		}
 	}
 }

@@ -17,6 +17,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.Property(s => s.Name).HasMaxLength(200).IsRequired();
 
 			builder.HasIndex(s => s.Name).IsUnique();
+
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
 		}
 	}
 }

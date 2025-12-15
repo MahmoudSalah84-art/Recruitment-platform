@@ -34,6 +34,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.HasForeignKey(j => j.CompanyId)
 				.OnDelete(DeleteBehavior.Restrict);
 
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
+
 			// required skills as separate table configured in JobSkillConfiguration
 		}
 	}

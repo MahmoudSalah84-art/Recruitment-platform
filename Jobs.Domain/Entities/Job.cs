@@ -11,8 +11,8 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class Job : AggregateRoot
-    {
+    public class Job : AggregateRoot , ISoftDelete
+	{
 
 		// ========= Properties =========
 		public Guid CompanyId { get; private set; }
@@ -39,7 +39,8 @@ namespace Jobs.Domain.Entities
 		public IReadOnlyCollection<JobSkill> RequiredSkills => _requiredSkills.AsReadOnly();
 
 
-
+		public bool IsDeleted { get; set; }
+		public DateTime? DeletedAt { get; set; }
 
 		// ========= Constructors =========
 		private Job() { }
@@ -100,6 +101,11 @@ namespace Jobs.Domain.Entities
 
 			_requiredSkills.Add(skill);
 			Touch();
+		}
+		void ISoftDelete.SoftDelete()
+		{
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
 		}
 	}
 }

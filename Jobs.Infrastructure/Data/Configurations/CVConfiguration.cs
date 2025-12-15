@@ -33,6 +33,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.WithMany(u => u.CVs)
 				.HasForeignKey("UserId")
 				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.HasQueryFilter(p => !p.IsDeleted);
+
 		}
 	}
 }
