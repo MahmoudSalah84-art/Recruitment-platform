@@ -13,43 +13,45 @@ namespace Jobs.Infrastructure.Data.Configurations
 	{
 		public void Configure(EntityTypeBuilder<JobApplication> builder)
 		{
-			builder.ToTable("Applications");
+			builder.ToTable("JobApplications");
 
-			builder.HasKey(a => a.Id);
-			builder.Property(a => a.Id).ValueGeneratedNever();
+			builder.HasKey(x => x.Id);
+			builder.Property(x => x.Id)
+				   .ValueGeneratedNever();
 
-			builder.Property(a => a.MatchScore).HasPrecision(5, 4);
+			builder.Property(x => x.CreatedAt)
+				   .IsRequired();
+			builder.Property(x => x.UpdatedAt)
+				   .IsRequired(false);
 
-			builder.Property<string>("Status") // map enum or string
-				.HasMaxLength(50)
-				.IsRequired();
+			builder.Property(x => x.MatchScore)
+				   .IsRequired();
+			builder.ToTable(t => t.HasCheckConstraint("CK_JobApplication_MatchScore", "[MatchScore] >= 0 AND [MatchScore] <= 100"));
 
-			builder.OwnsOne(a => a.StatusHistory, sh =>
-			{
-				sh.Property(p => p.OldStatus)
-				  .HasColumnName("OldStatus");
+			builder.Property(x => x.Status)
+				   .HasConversion<string>()
+				   .HasMaxLength(50);
 
-				sh.Property(p => p.NewStatus)
-				  .HasColumnName("NewStatus");
+			builder.Property(x => x.StatusHistory)
+				   .IsRequired(false);
 
-				sh.Property(p => p.ChangedAt)
-				  .HasColumnName("StatusChangedAt");
-			});
+			builder.HasOne(x => x.Applicant)
+				   .WithMany() 
+				   .HasForeignKey(x => x.ApplicantId)
+				   .OnDelete(DeleteBehavior.Restrict); // forbidden delete if there are related applications
 
-			builder.HasOne<Job>()
-				.WithMany()
-				.HasForeignKey(a => a.JobId)
-				.OnDelete(DeleteBehavior.Restrict);
+			builder.HasOne(x => x.Job)
+				   .WithMany()
+				   .HasForeignKey(x => x.JobId)
+				   .OnDelete(DeleteBehavior.Restrict);
 
-			builder.HasOne<User>()
-				.WithMany()
-				.HasForeignKey(a => a.ApplicantId)
-				.OnDelete(DeleteBehavior.Restrict);
+			builder.HasOne(x => x.CV)
+				   .WithMany()
+				   .HasForeignKey(x => x.CvId)
+				   .IsRequired(false)
+				   .OnDelete(DeleteBehavior.SetNull);
 
 			builder.HasQueryFilter(p => !p.IsDeleted);
-
 		}
-
-       
     }
 }

@@ -24,12 +24,12 @@ namespace Jobs.Domain.Entities
 		public CV CV { get; private set; }
 
 		public int MatchScore { get; private set; } // 0..100
-		public ApplicationStatus Status { get; private set; }
+		public ApplicationStatus Status { get; private set; } // Pending, Accepted, Rejected
 
-		public StatusHistory StatusHistory { get; private set; } //oldStatus , newStatus , timestamp
-
+		public DateTime StatusHistory { get; private set; } 
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
+
 
 		// ========= Constructors =========
 		private JobApplication() { }
@@ -52,13 +52,13 @@ namespace Jobs.Domain.Entities
 
 		// ========= Behaviors =========
 
-		public void ChangeStatus(ApplicationStatus newStatus, StatusHistory? history = null)
+		public void ChangeStatus(ApplicationStatus newStatus)
 		{
 			CheckRule(new ApplicationStatusTransitionRule(Status, newStatus));
 
 			var oldStatus = Status;
 			Status = newStatus;
-			StatusHistory = history ?? StatusHistory.Create(oldStatus, newStatus);
+			StatusHistory = DateTime.UtcNow;
 
 			Touch();
 			AddEvent(new ApplicationStatusChangedEvent(this, oldStatus, newStatus));
