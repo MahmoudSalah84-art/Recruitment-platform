@@ -20,11 +20,9 @@ namespace Jobs.Domain.Entities
 		private readonly List<User> _employees = new();
 		public IReadOnlyCollection<User> Employees => _employees;
 
-
 		private readonly  List<Job> _jobs = new();
 		//if you don't wrirte AsReadOnly(), the consumer can cast it back to List<Job> and modify it.
 		public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
-
 
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
