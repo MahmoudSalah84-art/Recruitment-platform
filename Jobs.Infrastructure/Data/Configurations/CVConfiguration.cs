@@ -13,29 +13,45 @@ namespace Jobs.Infrastructure.Data.Configurations
 		{
 			builder.ToTable("CVs");
 
-			builder.HasKey(c => c.Id);
-			builder.Property(c => c.Id).ValueGeneratedNever();
+			builder.HasKey(cv => cv.Id);
+			builder.Property(cv => cv.Id)
+				   .ValueGeneratedNever();
 
-			builder.Property(c => c.Title).HasMaxLength(300).IsRequired();
-			builder.Property(c => c.SummaryText).HasMaxLength(4000);
+			builder.Property(cv => cv.Title)
+				   .HasMaxLength(200)
+				   .IsRequired();
 
-			builder.OwnsOne(c => c.FilePath, f =>
-			{
-				f.Property(p => p.Value).HasColumnName("FilePath").HasMaxLength(2000);
-			});
-
-			builder.OwnsOne(c => c.ParsedData, pd =>
-			{
-				pd.Property(p => p.Json).HasColumnName("ParsedJson");
-			});
+			builder.Property(cv => cv.SummaryText)
+				   .HasMaxLength(2000);
 
 			builder.HasOne<User>()
-				.WithMany(u => u.CVs)
-				.HasForeignKey("UserId")
-				.OnDelete(DeleteBehavior.Cascade);
+				   .WithMany(u => u.CVs)
+				   .HasForeignKey(cv => cv.UserId)
+				   .OnDelete(DeleteBehavior.Cascade);
 
-			builder.HasQueryFilter(p => !p.IsDeleted);
+			builder.OwnsOne(cv => cv.FilePath, fp =>
+			{
+				fp.Property(f => f.Value)
+					.HasColumnName("FilePath")
+					.HasMaxLength(500)
+					.IsRequired();
+				fp.WithOwner(); // tell EF Core that FilePath is owned by CV , if you remove this line, it will create a separate table for FilePath
+			});
 
+			
+			builder.OwnsOne(cv => cv.ParsedData, parsed =>
+			{
+				parsed.Property(p => p.Json)
+					  .HasColumnName("ParsedJson")
+					  .HasColumnType("nvarchar(max)");
+				parsed.WithOwner();
+			});
+
+			// ===== Soft Delete =====
+			builder.Property(cv => cv.IsDeleted)
+				   .HasDefaultValue(false);
+			builder.Property(cv => cv.DeletedAt);
+			builder.HasQueryFilter(cv => !cv.IsDeleted);
 		}
 	}
 }
