@@ -14,11 +14,23 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.ToTable("Skills");
 
 			builder.HasKey(s => s.Id);
-			builder.Property(s => s.Name).HasMaxLength(200).IsRequired();
+			builder.Property(s => s.Id)
+				   .ValueGeneratedNever();
 
-			builder.HasIndex(s => s.Name).IsUnique();
+			builder.Property(s => s.Name)
+				   .HasMaxLength(150)
+				   .IsRequired();
 
-			builder.HasQueryFilter(p => !p.IsDeleted);
+			builder.Property(s => s.IsDeleted)
+				   .HasDefaultValue(false);
+
+			builder.Property(s => s.DeletedAt);
+
+			builder.HasQueryFilter(s => !s.IsDeleted);
+
+			// ===== Indexes =====
+			builder.HasIndex(s => s.Name)
+				   .IsUnique();
 
 		}
 	}
