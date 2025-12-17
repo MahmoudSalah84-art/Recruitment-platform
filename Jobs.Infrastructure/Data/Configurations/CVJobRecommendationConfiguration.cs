@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Jobs.Infrastructure.Data.Configurations
 {
-	public class RecommendationConfiguration : IEntityTypeConfiguration<CVJobRecommendation>
+	public class CVJobRecommendationConfiguration : IEntityTypeConfiguration<CVJobRecommendation>
 	{
 		public void Configure(EntityTypeBuilder<CVJobRecommendation> builder)
 		{
