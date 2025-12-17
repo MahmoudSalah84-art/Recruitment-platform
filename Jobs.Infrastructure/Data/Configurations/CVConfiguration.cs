@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Jobs.Infrastructure.Data.Configurations
 {
-    public class CVConfiguration
+    public class CVConfiguration : IEntityTypeConfiguration<CV>
     {
 		public void Configure(EntityTypeBuilder<CV> builder)
 		{
