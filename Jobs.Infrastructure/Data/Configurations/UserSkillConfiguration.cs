@@ -14,12 +14,11 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.ToTable("UserSkills");
 
 			builder.HasKey(us => us.Id);
-
 			builder.Property(us => us.Id)
 				   .ValueGeneratedNever();
 
 			builder.HasOne(us => us.User)
-				   .WithMany(u => u.Skills)
+				   .WithMany("_skills")
 				   .HasForeignKey(us => us.UserId)
 				   .OnDelete(DeleteBehavior.Cascade);
 
@@ -28,10 +27,16 @@ namespace Jobs.Infrastructure.Data.Configurations
 				   .HasForeignKey(us => us.SkillId)
 				   .OnDelete(DeleteBehavior.Cascade);
 
+			builder.Property(us => us.IsDeleted)
+				   .HasDefaultValue(false);
+
+			builder.Property(us => us.DeletedAt);
+
+			builder.HasQueryFilter(us => !us.IsDeleted);
+
+			//===== indexes =====
 			builder.HasIndex(us => new { us.UserId, us.SkillId })
 				   .IsUnique();
-
-			builder.HasQueryFilter(p => !p.IsDeleted);
 
 		}
 	}
