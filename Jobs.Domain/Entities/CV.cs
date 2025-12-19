@@ -45,14 +45,13 @@ namespace Jobs.Domain.Entities
 			CheckRule(new NotNullRule<ParsedData>(parsed));
 
 			ParsedData = parsed ;
-			Touch();
 			AddEvent(new CvParsedEvent(this));
 		}
 		
 		public void SetSummary(string summary)
 		{
 			SummaryText = summary;
-			Touch();
+			
 		}
 
 		void ISoftDelete.SoftDelete()

@@ -74,7 +74,7 @@ namespace Jobs.Domain.Entities
 				return;
 
 			IsPublished = true;
-			Touch();
+
 
 			AddEvent(new JobPostedEvent(this));
 		}
@@ -90,7 +90,6 @@ namespace Jobs.Domain.Entities
 			ExperienceLevel = expLevel;
 			Salary = salary;
 
-			Touch();
 			AddEvent(new JobUpdatedEvent(this));
 		}
 
@@ -100,7 +99,7 @@ namespace Jobs.Domain.Entities
 			CheckRule(new SkillAlreadyAddedRule(this));
 
 			_requiredSkills.Add(skill);
-			Touch();
+
 		}
 		void ISoftDelete.SoftDelete()
 		{

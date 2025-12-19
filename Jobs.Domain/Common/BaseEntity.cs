@@ -12,7 +12,7 @@ namespace Jobs.Domain.Common
 	{
         public Guid Id { get; protected set; } = Guid.NewGuid();
 
-		public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
+		public DateTime CreatedAt { get; protected set; } 
 		public DateTime? UpdatedAt { get; protected set; }
 
 		
@@ -55,11 +55,6 @@ namespace Jobs.Domain.Common
 		{
 			return !(left == right);
 		}
-
-		protected void Touch() => UpdatedAt = DateTime.UtcNow;
-		
-
-
 	}
 }
 

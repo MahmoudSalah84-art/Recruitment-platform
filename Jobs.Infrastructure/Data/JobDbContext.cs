@@ -1,13 +1,8 @@
 ﻿using Jobs.Domain.Entities;
 using Jobs.Infrastructure.Data.Configurations;
+using Jobs.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.Infrastructure.Data
 {
@@ -17,7 +12,9 @@ namespace Jobs.Infrastructure.Data
 		private readonly IOutboxPublisher? _outboxPublisher;
 		private readonly SaveChangesInterceptor? _interceptor;
 
-		public JobDbContext(DbContextOptions<JobDbContext> options, IOutboxPublisher? outboxPublisher = null, SaveChangesInterceptor? interceptor = null): base(options)
+		public JobDbContext(DbContextOptions<JobDbContext> options,
+			IOutboxPublisher? outboxPublisher = null,
+			SaveChangesInterceptor? interceptor = null): base(options)
 		{
 			_outboxPublisher = outboxPublisher;
 			_interceptor = interceptor;
@@ -34,11 +31,12 @@ namespace Jobs.Infrastructure.Data
 		public DbSet<User> Users => Set<User>();
 		public DbSet<UserSkill> UserSkills => Set<UserSkill>();
 
-	
+		public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
+
+
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
-			// Apply entity configurations from the Infrastructure assembly
 			modelBuilder.ApplyConfiguration(new UserConfiguration());
 			modelBuilder.ApplyConfiguration(new CompanyConfiguration());
 			modelBuilder.ApplyConfiguration(new JobConfiguration());
@@ -46,14 +44,15 @@ namespace Jobs.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new SkillConfiguration());
 			modelBuilder.ApplyConfiguration(new UserSkillConfiguration());
 			modelBuilder.ApplyConfiguration(new JobSkillConfiguration());
+			modelBuilder.ApplyConfiguration(new CVJobRecommendationConfiguration());
 			modelBuilder.ApplyConfiguration(new CVConfiguration());
-			modelBuilder.ApplyConfiguration(new RecommendationConfiguration());
 
-			// Outbox table configuration
 			modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 
 			base.OnModelCreating(modelBuilder);
 		}
+
+
 
 		public override int SaveChanges()
 		{

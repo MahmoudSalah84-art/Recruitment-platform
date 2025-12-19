@@ -60,7 +60,6 @@ namespace Jobs.Domain.Entities
 			Status = newStatus;
 			StatusHistory = DateTime.UtcNow;
 
-			Touch();
 			AddEvent(new ApplicationStatusChangedEvent(this, oldStatus, newStatus));
 		}
 

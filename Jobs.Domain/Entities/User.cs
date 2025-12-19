@@ -77,19 +77,17 @@ namespace Jobs.Domain.Entities
 			CheckRule(new UserEmailMustBeUniqueRule(emailExists, newEmail.Value));
 
 			Email = newEmail;
-			Touch();
 		}
         public void UpdatePhoneNumber(PhoneNumber phoneNumber)
         {
             PhoneNumber = phoneNumber;
-			Touch();
+			
 		}
 
 		public void UpdateProfile(string bio, string profileImage)
 		{
 			Bio = bio ?? Bio;
 			ProfileImage = profileImage ?? ProfileImage;
-			Touch();
 		}
 
 		public void AddSkill(UserSkill skill)
@@ -99,14 +97,12 @@ namespace Jobs.Domain.Entities
 				return;
 
 			_skills.Add(skill);
-			Touch();
 		}
 
 		public void AddCV(CV cv)
 		{
 			CheckRule(new NotNullRule<CV>(cv));
 			_cvs.Add(cv);
-			Touch();
 		}
 
 		public void AddApplication(JobApplication application)
@@ -116,7 +112,6 @@ namespace Jobs.Domain.Entities
 			CheckRule(new CannotApplyToExpiredJobRule(application.Job));
 
 			_applications.Add(application);
-			Touch();
 		}
 
 		void ISoftDelete.SoftDelete()

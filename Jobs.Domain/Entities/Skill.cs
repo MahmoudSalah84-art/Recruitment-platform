@@ -33,7 +33,6 @@ namespace Jobs.Domain.Entities
 			CheckRule(new StringLengthRule(newName));
 
 			Name = newName.Trim();
-			Touch();
 		}
 
 		void ISoftDelete.SoftDelete()

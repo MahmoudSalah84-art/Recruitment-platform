@@ -65,23 +65,19 @@ namespace Jobs.Domain.Entities
 			if (!string.IsNullOrWhiteSpace(logoUrl))
 				LogoUrl = logoUrl;
 
-			Touch();
-
 			AddEvent(new CompanyInfoUpdatedEvent(this.Id));
 		}
 		public void UpdateDescription(string description)
 		{
 			Description = description ?? string.Empty;
-			Touch();
 		}
 
-
+		
 		public void UpdateAddress(Address address)
 		{
 			CheckRule(new NotNullRule<Address>(address));
 
 			CompanyAddress = address;
-			Touch();
 		}
 		public void AddEmployee(User user)
 		{
@@ -90,7 +86,6 @@ namespace Jobs.Domain.Entities
 			if (!_employees.Contains(user))
 			{
 				_employees.Add(user);
-				Touch();
 			}
 		}
 
@@ -101,7 +96,6 @@ namespace Jobs.Domain.Entities
 			if (_employees.Contains(user))
 			{
 				_employees.Remove(user);
-				Touch();
 			}
 		}
 
@@ -112,7 +106,6 @@ namespace Jobs.Domain.Entities
 
 			_jobs.Add(job);
 			
-			Touch();
 			AddEvent(new JobCreatedEvent(job));
 		}
 		
