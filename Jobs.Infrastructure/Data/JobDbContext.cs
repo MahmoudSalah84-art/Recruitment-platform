@@ -9,16 +9,10 @@ namespace Jobs.Infrastructure.Data
     public class JobDbContext : DbContext
 	{
 
-		private readonly IOutboxPublisher? _outboxPublisher;
 		private readonly SaveChangesInterceptor? _interceptor;
 
-		public JobDbContext(DbContextOptions<JobDbContext> options,
-			IOutboxPublisher? outboxPublisher = null,
-			SaveChangesInterceptor? interceptor = null): base(options)
-		{
-			_outboxPublisher = outboxPublisher;
-			_interceptor = interceptor;
-		}
+		public JobDbContext(DbContextOptions<JobDbContext> options) : base(options) { }
+		
 
 
 		public DbSet<Company> Companies => Set<Company>();
@@ -32,8 +26,6 @@ namespace Jobs.Infrastructure.Data
 		public DbSet<UserSkill> UserSkills => Set<UserSkill>();
 
 		public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
-
-
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
@@ -52,22 +44,16 @@ namespace Jobs.Infrastructure.Data
 			base.OnModelCreating(modelBuilder);
 		}
 
-
-
 		public override int SaveChanges()
 		{
 			UpdateTimestamps();
-			var result = base.SaveChanges();
-			DispatchOutboxAsync().GetAwaiter().GetResult();
-			return result;
+			return base.SaveChanges();
 		}
 
 		public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 		{
 			UpdateTimestamps();
-			var result = await base.SaveChangesAsync(cancellationToken);
-			await DispatchOutboxAsync(cancellationToken);
-			return result;
+			return base.SaveChanges();
 		}
 
 		private void UpdateTimestamps()
@@ -86,31 +72,6 @@ namespace Jobs.Infrastructure.Data
 				}
 				propUpdated?.CurrentValue = DateTime.UtcNow;
 			}
-		}
-
-		private async Task DispatchOutboxAsync(CancellationToken ct = default)
-		{
-			if (_outboxPublisher == null) return;
-
-			var messages = await OutboxMessages
-				.Where(m => !m.Processed)
-				.OrderBy(m => m.OccurredOn)
-				.ToListAsync(ct);
-
-			foreach (var msg in messages)
-			{
-				try
-				{
-					await _outboxPublisher.PublishAsync(msg, ct);
-					msg.MarkProcessed();
-				}
-				catch
-				{
-					// Logging / retry handled by outbox publisher
-				}
-			}
-
-			await base.SaveChangesAsync(ct);
 		}
 	}
 }

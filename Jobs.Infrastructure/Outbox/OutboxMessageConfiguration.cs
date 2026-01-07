@@ -13,10 +13,18 @@ namespace Jobs.Infrastructure.Outbox
 			builder.ToTable("OutboxMessages");
 
 			builder.HasKey(o => o.Id);
-			builder.Property(o => o.Type).HasMaxLength(500).IsRequired();
-			builder.Property(o => o.Content).HasColumnType("nvarchar(max)").IsRequired();
-			builder.Property(o => o.OccurredOn).HasDefaultValueSql("GETUTCDATE()");
-			builder.Property(o => o.Processed).HasDefaultValue(false);
+			builder.Property(o => o.Type)
+				   .HasMaxLength(500)
+				   .IsRequired();
+			builder.Property(o => o.Content)
+				   .HasColumnType("nvarchar(max)")
+				   .IsRequired();
+			builder.Property(o => o.OccurredOn)
+				   .HasDefaultValueSql("GETUTCDATE()");
+			builder.Property(o => o.Processed)
+				   .HasDefaultValue(false);
+			builder.Property(o => o.Error)
+				   .HasColumnType("nvarchar(400)");
 		}
 	}
 }

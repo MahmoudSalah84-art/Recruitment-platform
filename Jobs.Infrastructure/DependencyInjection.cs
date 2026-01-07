@@ -1,4 +1,5 @@
 ﻿using Jobs.Domain.IRepository.IRepo;
+using Jobs.Infrastructure.BackgroundJobs;
 using Jobs.Infrastructure.Data;
 using Jobs.Infrastructure.Data.Interceptors;
 using Jobs.Infrastructure.Identity;
@@ -58,8 +59,6 @@ namespace Jobs.Infrastructure
 			// Unit of Work
 			services.AddScoped<IUnitOfWork, Jobs.Infrastructure.UnitOfWork.UnitOfWork>();
 
-			// Outbox
-			services.AddScoped<IOutboxPublisher, OutboxPublisher>();
 
 			// Rules
 			services.AddScoped<IUniqueEmailRule, UniqueEmailRule>();
@@ -84,6 +83,11 @@ namespace Jobs.Infrastructure
 			// Interceptors
 			services.AddScoped<SaveChangesInterceptor, SoftDeleteInterceptor>();
 			services.AddSingleton<SaveChangesInterceptor , ConvertDomainEventsToOutboxMessagesInterceptor>();
+
+
+			// Background Service
+			services.AddHostedService<OutboxProcessor>();
+
 
 			return services;
 		}
