@@ -1,15 +1,17 @@
-﻿using Jobs.Infrastructure.Data;
+﻿using Jobs.Domain.IRepository.IRepo;
+using Jobs.Infrastructure.Data;
+using Jobs.Infrastructure.Data.Interceptors;
 using Jobs.Infrastructure.Identity;
 using Jobs.Infrastructure.Outbox;
+using Jobs.Infrastructure.Repositories;
 using Jobs.Infrastructure.Repositories.Repo;
 using Jobs.Infrastructure.Rules;
 using Jobs.Infrastructure.Services;
 using Jobs.Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Infrastructure
 {
@@ -18,12 +20,17 @@ namespace Jobs.Infrastructure
 		public static IServiceCollection AddInfrastructure(this IServiceCollection services, string jobDbConnectionString, string identityDbConnectionString, Action<EmailServiceOptions>? configureEmail = null)
 		{
 			// EF Core context for domain data
-			services.AddDbContext<JobDbContext>(options =>
+			services.AddDbContext<JobDbContext>((sp, options) =>
 			{
+				// 1. جلب النسخ من الـ Service Provider (sp)
+				var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+				var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+
 				options.UseSqlServer(jobDbConnectionString, sql =>
 				{
 					sql.EnableRetryOnFailure();
-				});
+				})
+				.AddInterceptors(softDeleteInterceptor, outboxInterceptor);
 			});
 
 			// Identity DB (separate)
@@ -36,7 +43,7 @@ namespace Jobs.Infrastructure
 			});
 
 			// Identity
-			services.AddIdentity<ApplicationUser, Microsoft.AspNetCore.Identity.IdentityRole<Guid>>()
+			services.AddIdentity<AppUser, Microsoft.AspNetCore.Identity.IdentityRole<Guid>>()
 				.AddEntityFrameworkStores<IdentityDbContext>()
 				.AddDefaultTokenProviders();
 
@@ -44,12 +51,12 @@ namespace Jobs.Infrastructure
 			services.AddScoped(typeof(BaseRepository<>));
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<ICompanyRepository, CompanyRepository>();
-			services.AddScoped<IJobRepository, JobRepository>();
+			services.AddScoped<IJobRepository,JobRepository>();
 			services.AddScoped<IApplicationRepository, ApplicationRepository>();
 			services.AddScoped<ICVRepository, CVRepository>();
 
 			// Unit of Work
-			services.AddScoped<IUnitOfWork, UnitOfWork>();
+			services.AddScoped<IUnitOfWork, Jobs.Infrastructure.UnitOfWork.UnitOfWork>();
 
 			// Outbox
 			services.AddScoped<IOutboxPublisher, OutboxPublisher>();
@@ -76,6 +83,7 @@ namespace Jobs.Infrastructure
 
 			// Interceptors
 			services.AddScoped<SaveChangesInterceptor, SoftDeleteInterceptor>();
+			services.AddSingleton<SaveChangesInterceptor , ConvertDomainEventsToOutboxMessagesInterceptor>();
 
 			return services;
 		}

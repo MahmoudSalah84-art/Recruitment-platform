@@ -14,9 +14,24 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		{
 		}
 
-		public async Task<Company?> GetByNameAsync(string name)
+        public Task AddAsync(Company company, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Company?> GetByIdAsync(Guid id, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<Company?> GetByNameAsync(string name)
 		{
 			return await _set.AsNoTracking().FirstOrDefaultAsync(c => c.Name == name);
 		}
-	}
+
+        public Task UpdateAsync(Company company, CancellationToken ct = default)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

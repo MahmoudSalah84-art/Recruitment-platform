@@ -9,7 +9,7 @@ using System.Text;
 
 namespace Jobs.Infrastructure.Repositories
 {
-    public class BaseRepository<TEntity> : IRepository<TEntity>
+    public class BaseRepository<TEntity> : IRepository<TEntity> 
 		where TEntity : AggregateRoot
 	{
 		protected readonly DbSet<TEntity> _set;

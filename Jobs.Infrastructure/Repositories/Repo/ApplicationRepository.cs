@@ -1,5 +1,6 @@
 ﻿using Jobs.Domain.Entities;
 using Jobs.Domain.Interfaces;
+using Jobs.Domain.IRepository.IRepo;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
