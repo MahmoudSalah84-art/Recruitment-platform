@@ -1,5 +1,8 @@
 <Solution>
-  <Project Path="Jobs.API/Jobs.API.csproj" />
-  <Project Path="Jobs.Domain/Jobs.Domain.csproj" Id="175aa1de-62de-480d-ad58-ba1c5dd705ed" />
-  <Project Path="Jobs.Infrastructure/Jobs.Infrastructure.csproj" Id="fdb54d2a-0398-4def-964e-b73dcf7e1060" />
+  <Folder Name="/src/">
+    <Project Path="Jobs.API/Jobs.API.csproj" />
+    <Project Path="Jobs.Application/Jobs.Application.csproj" Id="69278c54-95dc-469f-9431-87d7a1bcca64" />
+    <Project Path="Jobs.Domain/Jobs.Domain.csproj" Id="175aa1de-62de-480d-ad58-ba1c5dd705ed" />
+    <Project Path="Jobs.Infrastructure/Jobs.Infrastructure.csproj" Id="fdb54d2a-0398-4def-964e-b73dcf7e1060" />
+  </Folder>
 </Solution>

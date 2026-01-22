@@ -1,14 +1,9 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Entities;
 using Jobs.Domain.Enums;
 using Jobs.Domain.Events.Events;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.UserRules;
 using Jobs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml.Linq;
 
 namespace Jobs.Domain.Entities
 {
@@ -19,8 +14,11 @@ namespace Jobs.Domain.Entities
         public Email Email { get; private set; }
         public UserRole Role { get; private set; }
         public PhoneNumber? PhoneNumber { get; private set; }
-        public string ProfileImage { get; private set; } = string.Empty;
+        public string ProfilePictureUrl { get; private set; } = string.Empty;
 		public string Bio { get; private set; } = string.Empty;
+		public string? LinkedInUrl { get; private set; }
+		public string? GitHubUrl { get; private set; }
+		public string? PortfolioUrl { get; private set; }
 
 		public Guid? CompanyId { get; private set; }
         public Company Company { get; private set; }
@@ -38,6 +36,10 @@ namespace Jobs.Domain.Entities
 
 		private readonly List<JobApplication> _applications = new();
 		public IReadOnlyCollection<JobApplication> Applications => _applications.AsReadOnly();
+
+
+		private readonly List<UserExperience> _experience = new();
+		public IReadOnlyCollection<UserExperience> Experience => _experience.AsReadOnly();
 
 
 		public bool IsDeleted { get; set; }
@@ -84,10 +86,13 @@ namespace Jobs.Domain.Entities
 			
 		}
 
-		public void UpdateProfile(string bio, string profileImage)
+		public void UpdateProfile(string fullName, String email, String phoneNumber, string bio, string profilePictureUrl)
 		{
+			FullName = fullName;
+			Email.Create(email);
+			PhoneNumber.Create(phoneNumber);
 			Bio = bio ?? Bio;
-			ProfileImage = profileImage ?? ProfileImage;
+			ProfilePictureUrl = profilePictureUrl ?? ProfilePictureUrl;
 		}
 
 		public void AddSkill(UserSkill skill)

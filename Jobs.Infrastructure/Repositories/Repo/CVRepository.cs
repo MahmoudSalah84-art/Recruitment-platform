@@ -1,6 +1,6 @@
 ﻿using Jobs.Domain.Entities;
 using Jobs.Domain.Interfaces;
-using Jobs.Domain.IRepository.IRepo;
+using Jobs.Domain.IRepository;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -9,30 +9,22 @@ using System.Text;
 
 namespace Jobs.Infrastructure.Repositories.Repo
 {
-	public class CVRepository : BaseRepository<CV>, ICVRepository
+	public class CVRepository : Repository<CV>, ICVRepository
 	{
-		public CVRepository(JobDbContext context) : base(context)
+		public CVRepository(JobDbContext context) : base(context) { }
+
+		/// <summary>
+		/// Retrieves a CV by its Id including the parsed details.
+		/// </summary>
+		/// <param name="id">The Id of the CV.</param>
+		/// <param name="ct">Cancellation token to cancel the operation.</param>
+		/// <returns>The CV entity with parsed details if found, otherwise null.</returns>
+		public async Task<CV?> GetByIdWithParsedAsync(Guid id, CancellationToken ct = default)
 		{
+			return await _set
+				.AsNoTracking()
+				.Include(cv => cv.ParsedData)
+				.FirstOrDefaultAsync(cv => cv.Id == id, ct);
 		}
-
-        public Task AddAsync(CV cv, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<CV?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<CV?> GetByIdWithParsedAsync(Guid id)
-		{
-			return await _set.AsNoTracking().FirstOrDefaultAsync(c => c.Id == id);
-		}
-
-        public Task UpdateAsync(CV cv, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

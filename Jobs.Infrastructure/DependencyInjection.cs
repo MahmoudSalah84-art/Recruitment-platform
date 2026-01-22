@@ -1,14 +1,11 @@
-﻿using Jobs.Domain.IRepository.IRepo;
+﻿using Jobs.Domain.IRepository;
 using Jobs.Infrastructure.BackgroundJobs;
 using Jobs.Infrastructure.Data;
 using Jobs.Infrastructure.Data.Interceptors;
 using Jobs.Infrastructure.Identity;
-using Jobs.Infrastructure.Outbox;
-using Jobs.Infrastructure.Repositories;
 using Jobs.Infrastructure.Repositories.Repo;
-using Jobs.Infrastructure.Rules;
+using Jobs.Infrastructure.Repositories.UnitOfWork;
 using Jobs.Infrastructure.Services;
-using Jobs.Infrastructure.UnitOfWork;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -24,14 +21,14 @@ namespace Jobs.Infrastructure
 			services.AddDbContext<JobDbContext>((sp, options) =>
 			{
 				// 1. جلب النسخ من الـ Service Provider (sp)
-				var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
-				var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+				//var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+				//var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
 
 				options.UseSqlServer(jobDbConnectionString, sql =>
 				{
 					sql.EnableRetryOnFailure();
-				})
-				.AddInterceptors(softDeleteInterceptor, outboxInterceptor);
+				});
+				//.AddInterceptors(softDeleteInterceptor, outboxInterceptor);
 			});
 
 			// Identity DB (separate)
@@ -49,19 +46,14 @@ namespace Jobs.Infrastructure
 				.AddDefaultTokenProviders();
 
 			// Repositories
-			services.AddScoped(typeof(BaseRepository<>));
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<ICompanyRepository, CompanyRepository>();
 			services.AddScoped<IJobRepository,JobRepository>();
 			services.AddScoped<IApplicationRepository, ApplicationRepository>();
 			services.AddScoped<ICVRepository, CVRepository>();
-
 			// Unit of Work
-			services.AddScoped<IUnitOfWork, Jobs.Infrastructure.UnitOfWork.UnitOfWork>();
+			services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-
-			// Rules
-			services.AddScoped<IUniqueEmailRule, UniqueEmailRule>();
 
 			// Services
 			services.AddSingleton<IFileStorageService>(_ => new LocalFileStorageService("files"));

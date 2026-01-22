@@ -1,56 +1,46 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Interfaces;
-using Jobs.Domain.IRepository.IRepo;
+using Jobs.Domain.IRepository;
 using Jobs.Infrastructure.Data;
-using Jobs.Infrastructure.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Infrastructure.Repositories.Repo
 {
-	public class UserRepository : BaseRepository<User>, IUserRepository
+	public class UserRepository : Repository<User>, IUserRepository
 	{
-		public UserRepository(JobDbContext context) : base(context)
+        public UserRepository(JobDbContext context) : base(context) { }
+
+
+		/// <summary>
+		/// Retrieves a user by email if exists.
+		/// </summary>
+		/// <param name="email">The email of the user.</param>
+		/// <param name="ct">Cancellation token to cancel the operation.</param>
+		/// <returns>The user entity if found, otherwise null.</returns>
+		public Task<User?> GetByEmailAsync(string email, CancellationToken ct = default)
 		{
+			if(string.IsNullOrWhiteSpace(email))
+				throw new ArgumentException("Email must be provided.", nameof(email));
+
+			return _set
+				.AsNoTracking()
+				.FirstOrDefaultAsync(u => u.Email.Value == email, ct);
 		}
 
-        public Task AddAsync(User user, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
 
-        public async Task<bool> EmailExistsAsync(string email)
+		/// <summary>
+		/// Checks if a user with the specified email exists in the database.
+		/// </summary>
+		/// <param name="email">The email to check for existence.</param>
+		/// <param name="ct">Cancellation token to cancel the operation.</param>
+		/// <returns>True if a user with the given email exists, otherwise false.</returns>
+		public async Task<bool> EmailExistsAsync(string email, CancellationToken ct = default)
 		{
-			if (string.IsNullOrWhiteSpace(email)) return false;
+			if (string.IsNullOrWhiteSpace(email))
+				throw new ArgumentException("Email must be provided.", nameof(email));
+
 			return await _set
 				.AsNoTracking()
-				.Where(u => EF.Property<string>(u, "Email") == email)
-				.AnyAsync();
+				.AnyAsync(u => u.Email.Value == email, ct);
 		}
-
-        public Task<User?> GetByEmailAsync(string email, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<User?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<User?> GetByIdentityIdAsync(Guid identityUserId)
-		{
-			return await _set
-				.AsNoTracking()
-				.Where(u => EF.Property<Guid?>(u, "IdentityUserId") == identityUserId)
-				.FirstOrDefaultAsync();
-		}
-
-        public Task UpdateAsync(User user, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-    }
+	}
 }

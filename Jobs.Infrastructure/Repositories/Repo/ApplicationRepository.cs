@@ -1,44 +1,27 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Interfaces;
-using Jobs.Domain.IRepository.IRepo;
+using Jobs.Domain.IRepository;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 
 namespace Jobs.Infrastructure.Repositories.Repo
 {
-	public class ApplicationRepository : BaseRepository<JobApplication>, IApplicationRepository
+	public class ApplicationRepository : Repository<JobApplication>, IApplicationRepository
 	{
-		public ApplicationRepository(JobDbContext context) : base(context)
+        public ApplicationRepository(JobDbContext context) : base(context) { }
+
+
+		/// <summary>
+		/// Checks if an applicant has applied for a specific job.
+		/// </summary>
+		/// <param name="jobId">The ID of the job to check.</param>
+		/// <param name="applicantId">The ID of the applicant.</param>
+		/// <param name="ct">Cancellation token to cancel the operation.</param>
+		/// <returns>True if the applicant has applied for the job, otherwise false.</returns>
+		public async Task<bool> ExistsForApplicantAsync(Guid jobId, Guid applicantId, CancellationToken ct = default)
 		{
+			return await _set
+				.AsNoTracking()
+				.AnyAsync(ja => ja.JobId == jobId && ja.ApplicantId == applicantId, ct);
 		}
-
-        public Task AddAsync(JobApplication application, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<bool> ExistsForApplicantAsync(Guid jobId, Guid applicantId)
-		{
-			return await _set.AsNoTracking().AnyAsync(a => a.JobId == jobId && a.ApplicantId == applicantId);
-		}
-
-        public Task<bool> ExistsForApplicantAsync(Guid jobId, Guid applicantId, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<JobApplication?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateAsync(JobApplication application, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-    }
+	}
 }

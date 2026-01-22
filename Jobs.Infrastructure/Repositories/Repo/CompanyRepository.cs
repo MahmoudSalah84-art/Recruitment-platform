@@ -1,37 +1,27 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.IRepository.IRepo;
+using Jobs.Domain.IRepository;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Infrastructure.Repositories.Repo
 {
-	public class CompanyRepository : BaseRepository<Company>, ICompanyRepository
-	{
-		public CompanyRepository(JobDbContext context) : base(context)
+    public class CompanyRepository : Repository<Company>, ICompanyRepository
+    {
+        public CompanyRepository(JobDbContext context) : base(context) { }
+
+
+		/// <summary>
+		/// Retrieves a Company by its name.
+		/// </summary>
+		/// <param name="name">The name of the company.</param>
+		/// <param name="ct">Cancellation token to cancel the operation.</param>
+		/// <returns>The Company entity if found, otherwise null.</returns>
+		public async Task<Company?> GetByNameAsync(string name, CancellationToken ct = default)
 		{
+			return await _set
+				.AsNoTracking()
+				.FirstOrDefaultAsync(c => c.Name == name, ct);
 		}
 
-        public Task AddAsync(Company company, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Company?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task<Company?> GetByNameAsync(string name)
-		{
-			return await _set.AsNoTracking().FirstOrDefaultAsync(c => c.Name == name);
-		}
-
-        public Task UpdateAsync(Company company, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
-        }
-    }
+	}
 }
