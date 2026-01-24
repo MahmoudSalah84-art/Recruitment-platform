@@ -1,24 +1,48 @@
-﻿using MediatR;
+﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.Application.Features.Applications.Commands.ApplyForJob;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Users
 {
-	public class UserApplicationsController : ControllerBase
+	public class UserApplicationsController : ApiController
 	{
-		private readonly IMediator _mediator;
-		public UserApplicationsController(IMediator mediator) => _mediator = mediator;
-
+		// POST: api/UserApplications/{jobId}
 		[HttpPost("{jobId}")]
-		public async Task<IActionResult> Apply(Guid jobId)
+		public async Task<IActionResult> ApplyForJob(Guid jobId)
 		{
-			var result = await _mediator.Send(new ApplyToJobCommand(jobId));
+			var result = await Sender.Send(new ApplyForJobCommand(jobId));
+			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+		}
+
+		// GET: api/UserApplications/{Id}
+		[HttpGet("{Id}")]
+		public async Task<IActionResult> GetApplicationById(Guid jobId)
+		{
+			var result = await Sender.Send(new GetApplicationByIdQuiry(jobId));
+			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+		}
+
+		// GET: api/UserApplications
+		[HttpGet]
+		public async Task<IActionResult> GetAllApplications()
+		{
+			var result = await Sender.Send(new GetAllUserApplicationsQuiry());
+			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+		}
+
+		// DELETE: api/UserApplications/{id}
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> WithdrawApplication(Guid id)
+		{
+			var result = await Sender.Send(new WithdrawApplicationCommand(id));
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
 		}
 	}
 }
 
 //Method, Route, Description
-//GET,/api/my-applications,"عرض كل الوظائف التي تقدمت إليها وحالة كل طلب (Pending, Accepted...)."
-//GET,/api/my-applications/{id},جلب تفاصيل طلب توظيف معين ومتابعة الـ Feedback عليه.
-//POST,/api/my-applications/{jobId},التقديم على وظيفة جديدة باستخدام الـ JobId.
-//DELETE,/api/my-applications/{id},سحب طلب التقديم (Withdraw Application).
+//GET,/api/UserApplications,"عرض كل الوظائف التي تقدمت إليها وحالة كل طلب (Pending, Accepted...)."
+//GET,/api/UserApplications/{id},جلب تفاصيل طلب توظيف معين ومتابعة الـ Feedback عليه.
+//POST,/api/UserApplications/{jobId},التقديم على وظيفة جديدة باستخدام الـ JobId.
+//DELETE,/api/UserApplications/{id},سحب طلب التقديم (Withdraw Application).

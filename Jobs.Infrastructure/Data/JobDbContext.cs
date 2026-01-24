@@ -24,7 +24,7 @@ namespace Jobs.Infrastructure.Data
 		public DbSet<Skill> Skills => Set<Skill>();
 		public DbSet<User> Users => Set<User>();
 		public DbSet<UserSkill> UserSkills => Set<UserSkill>();
-
+		public DbSet<UserExperience> UserExperations => Set<UserExperience>();
 		public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,6 +38,7 @@ namespace Jobs.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new JobSkillConfiguration());
 			modelBuilder.ApplyConfiguration(new CVJobRecommendationConfiguration());
 			modelBuilder.ApplyConfiguration(new CVConfiguration());
+			modelBuilder.ApplyConfiguration(new UserExperienceConfiguration());
 
 			modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 

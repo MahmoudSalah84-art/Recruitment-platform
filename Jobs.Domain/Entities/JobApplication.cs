@@ -33,16 +33,14 @@ namespace Jobs.Domain.Entities
 
 		// ========= Constructors =========
 		private JobApplication() { }
-		public JobApplication(Guid applicantId, Guid jobId, Guid? cvId, int matchScore)
+		public JobApplication(Guid applicantId, Guid jobId, Guid? cvId)
 		{
 			CheckRule(new NotEmptyGuidRule(applicantId));
 			CheckRule(new NotEmptyGuidRule(jobId));
-			CheckRule(new ScoreRangeRule(matchScore));
 
 			ApplicantId = applicantId;
 			JobId = jobId;
 			CvId = cvId;
-			MatchScore = matchScore;
 
 			Status = ApplicationStatus.Pending;
 			CreatedAt = DateTime.UtcNow;

@@ -2,7 +2,6 @@
 
 namespace Jobs.Application.Abstractions.Messaging
 {
-
 	public interface ICommandHandler<TCommand> : IRequestHandler<TCommand, Result>
 	where TCommand : ICommand
 	{

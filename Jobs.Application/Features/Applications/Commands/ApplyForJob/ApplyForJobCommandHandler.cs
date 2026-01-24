@@ -1,41 +1,42 @@
-﻿//using Jobs.Application.Abstractions.Messaging;
+﻿using Jobs.Application.Abstractions.Messaging;
+using Jobs.Domain.Entities;
+using Jobs.Infrastructure.Repositories.UnitOfWork;
+using Microsoft.AspNetCore.Http;
+using System.Security.Claims;
 
+namespace Jobs.Application.Features.Applications.Commands.ApplyForJob
+{
+	public class ApplyForJobCommandHandler: ICommandHandler<ApplyForJobCommand, Guid>
+	{
+		private readonly IUnitOfWork _unitOfWork;
+		private readonly IHttpContextAccessor _httpContextAcc;
+		public ApplyForJobCommandHandler(IUnitOfWork unitOfWork , IHttpContextAccessor httpContextAcc)
+		{
+			_unitOfWork = unitOfWork;
+			_httpContextAcc = httpContextAcc;
+		}
 
-//namespace Jobs.Application.Features.Applications.Commands.ApplyForJob
-//{
-//	public class ApplyForJobCommandHandler
-//		: ICommandHandler<ApplyForJobCommand, Guid>
-//	{
-//		private readonly IJobRepository _jobRepository;
-//		private readonly IUserRepository _userRepository;
-//		private readonly IApplicationRepository _applicationRepository;
+		public async Task<Result<Guid>> Handle(ApplyForJobCommand command, CancellationToken cancellationToken)
+		{
+			var userId = Guid.Parse(_httpContextAcc.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
-//		public ApplyForJobCommandHandler(
-//			IJobRepository jobRepository,
-//			IUserRepository userRepository,
-//			IApplicationRepository applicationRepository)
-//		{
-//			_jobRepository = jobRepository;
-//			_userRepository = userRepository;
-//			_applicationRepository = applicationRepository;
-//		}
+			var job = await _unitOfWork.Jobs.GetByIdAsync(command.JobId);
+			if (job is null )
+				return Result<Guid>.Failure("Job not found");
 
-//		public async Task<Guid> Handle(ApplyForJobCommand command, CancellationToken cancellationToken)
-//		{
-//			var job = await _jobRepository.GetByIdAsync(command.JobId)
-//				?? throw new BusinessException("Job not found");
+			var cv = await _unitOfWork.CVs.GetByIdAsync(command.CvId);
+			if (cv is null)
+				return Result<Guid>.Failure("cv not found");
 
-//			var user = await _userRepository.GetByIdAsync(command.UserId)
-//				?? throw new BusinessException("User not found");
+			var application = new JobApplication(
+				userId,
+				job.Id,
+				command.CvId
+			);
+				
+			_unitOfWork.Applications.Add(application);
 
-//			var application = JobApplication.Create(
-//				job.Id,
-//				user.Id,
-//				command.CoverLetter);
-
-//			_applicationRepository.Add(application);
-
-//			return application.Id;
-//		}
-//	}
-//}
+			return Result<Guid>.Success(application.Id);
+		}
+    }
+}

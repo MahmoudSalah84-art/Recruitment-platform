@@ -19,7 +19,7 @@ namespace Jobs.Domain.Entities
 		public User User { get; private set; }
 
 		public Guid CompanyId { get; private set; }
-		public Job Company { get; private set; }
+		public Company Company { get; private set; }
 
 		public string JobTitle { get; private set; }
 		public EmploymentType EmploymentType { get; private set; }

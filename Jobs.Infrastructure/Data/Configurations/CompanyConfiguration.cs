@@ -66,6 +66,13 @@ namespace Jobs.Infrastructure.Data.Configurations
 				   .OnDelete(DeleteBehavior.Cascade);
 			builder.Navigation("_jobs")
 				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+			builder.HasMany<UserExperience>("_experience")
+			   .WithOne(u => u.Company)
+			   .HasForeignKey(a => a.CompanyId)
+			   .OnDelete(DeleteBehavior.Cascade);
+			builder.Navigation("_experience")
+				   .UsePropertyAccessMode(PropertyAccessMode.Field);
 		}
 	}
 }

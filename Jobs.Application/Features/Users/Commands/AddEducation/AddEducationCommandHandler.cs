@@ -2,10 +2,8 @@
 using Jobs.Infrastructure.Repositories.UnitOfWork;
 using MediatR;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Text;
+
 
 namespace Jobs.Application.Features.Users.Commands.AddEducation
 {

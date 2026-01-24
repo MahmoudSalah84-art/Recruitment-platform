@@ -16,10 +16,4 @@
     <ProjectReference Include="..\Jobs.Infrastructure\Jobs.Infrastructure.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-    <Folder Include="HealthChecks\" />
-    <Folder Include="Middlewares\" />
-  </ItemGroup>
-
 </Project>

@@ -30,7 +30,7 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.Property(u => u.Role)
 				   .IsRequired();
 
-			builder.Property(u => u.ProfileImage)
+			builder.Property(u => u.ProfilePictureUrl)
 				   .HasMaxLength(500);
 
 			builder.Property(u => u.Bio)
@@ -83,6 +83,13 @@ namespace Jobs.Infrastructure.Data.Configurations
 				   .HasForeignKey(a => a.ApplicantId)
 				   .OnDelete(DeleteBehavior.Cascade);
 			builder.Navigation("_applications")
+				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+			builder.HasMany<UserExperience>("_experience")
+				   .WithOne(a => a.User)
+				   .HasForeignKey(a => a.UserId)
+				   .OnDelete(DeleteBehavior.Cascade);
+			builder.Navigation("_experience")
 				   .UsePropertyAccessMode(PropertyAccessMode.Field);
 
 			builder.Property(u => u.IsDeleted)
