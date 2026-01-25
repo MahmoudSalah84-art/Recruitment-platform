@@ -1,12 +1,9 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Entities;
+using Jobs.Domain.Enums;
 using Jobs.Domain.Events.JobEvents;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.SkillRules;
 using Jobs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 
 namespace Jobs.Domain.Entities
@@ -24,6 +21,7 @@ namespace Jobs.Domain.Entities
 		public string Title { get; private set; }
 		public string Description { get; private set; }
 		public string Requirements { get; private set; }
+		public EmploymentType EmploymentType { get; private set; }
 
 		public int ExperienceLevel { get; private set; } //0 to 20 years
 		public SalaryRange? Salary { get; private set; }

@@ -1,6 +1,8 @@
 ﻿using Jobs.Domain.Common;
+using Jobs.Domain.Specifications;
 using Jobs.Infrastructure.Data;
 using Jobs.Infrastructure.Repositories.IRepository;
+using Jobs.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Jobs.Infrastructure.Repositories.Repo
@@ -47,6 +49,17 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// Returns a queryable for the entity set, allowing further filtering or projection.
 		/// </summary>
 		/// <returns>An IQueryable of TEntity.</returns>
-		public virtual IQueryable<TEntity> Query() => _set.AsNoTracking().AsQueryable();
+		public virtual IQueryable<TEntity> Query() 
+			=> _set.AsNoTracking().AsQueryable();
+
+
+
+		public async Task<List<TEntity>> ListWithSpecAsync(ISpecification<TEntity> spec)
+			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).ToListAsync();
+		
+
+		public async Task<int> CountAsync(ISpecification<TEntity> spec)
+			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).CountAsync();
+		
 	}
 }

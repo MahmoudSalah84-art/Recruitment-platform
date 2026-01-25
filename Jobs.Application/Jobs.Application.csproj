@@ -15,4 +15,11 @@
     <ProjectReference Include="..\Jobs.Infrastructure\Jobs.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Applications\EventHandlers\" />
+    <Folder Include="Features\Companies\EventHandlers\" />
+    <Folder Include="Features\Jobs\EventHandlers\" />
+    <Folder Include="Features\Users\EventHandlers\" />
+  </ItemGroup>
+
 </Project>
