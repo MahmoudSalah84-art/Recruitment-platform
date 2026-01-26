@@ -2,14 +2,16 @@
 using Jobs.Domain.Entities;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Jobs.Application.Features.Applications.Commands.ApplyForJob
 {
-	public class ApplyForJobCommandHandler: ICommandHandler<ApplyForJobCommand, Guid>
+    public class ApplyForJobCommandHandler : ICommandHandler<ApplyForJobCommand, Guid>
 	{
 		private readonly IUnitOfWork _unitOfWork;
 		private readonly IHttpContextAccessor _httpContextAcc;
+
 		public ApplyForJobCommandHandler(IUnitOfWork unitOfWork , IHttpContextAccessor httpContextAcc)
 		{
 			_unitOfWork = unitOfWork;
@@ -24,17 +26,24 @@ namespace Jobs.Application.Features.Applications.Commands.ApplyForJob
 			if (job is null )
 				return Result<Guid>.Failure("Job not found");
 
-			var cv = await _unitOfWork.CVs.GetByIdAsync(command.CvId);
-			if (cv is null)
-				return Result<Guid>.Failure("cv not found");
+			var user = await _unitOfWork.Users.GetByIdAsync(userId);
+			if (user!.CV is null)
+				return Result<Guid>.Failure("You Don't Have CV");
+
+			var alreadyApplied = await _unitOfWork.Applications.Query()
+				.AnyAsync(a => a.JobId == command.JobId && a.ApplicantId == userId, cancellationToken);
+			if (alreadyApplied)
+				return Result<Guid>.Failure("Alrready you Applied For This Job.");
 
 			var application = new JobApplication(
 				userId,
 				job.Id,
-				command.CvId
+				user!.CV.Id
 			);
 				
 			_unitOfWork.Applications.Add(application);
+
+
 
 			return Result<Guid>.Success(application.Id);
 		}

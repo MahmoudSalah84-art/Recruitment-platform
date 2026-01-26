@@ -24,9 +24,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.Property(cv => cv.SummaryText)
 				   .HasMaxLength(2000);
 
-			builder.HasOne<User>()
-				   .WithMany(u => u.CVs)
-				   .HasForeignKey(cv => cv.UserId)
+			builder.HasOne(c => c.User)
+				   .WithOne(u => u.CV)
+				   .HasForeignKey<CV>(c => c.UserId)
 				   .OnDelete(DeleteBehavior.Cascade);
 
 			builder.OwnsOne(cv => cv.FilePath, fp =>

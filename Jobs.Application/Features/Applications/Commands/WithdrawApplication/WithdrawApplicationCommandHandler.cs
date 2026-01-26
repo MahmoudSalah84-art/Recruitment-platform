@@ -1,6 +1,8 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
+using Jobs.Application.Features.Applications.Commands.WithdrawApplication;
 using Jobs.Domain.Enums;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
@@ -20,12 +22,16 @@ namespace Jobs.Application.Features.Applications.Commands.WithdrawApplication
         public async Task<Result> Handle(WithdrawApplicationCommand request, CancellationToken cancellationToken)
         {
             var userId = Guid.Parse(_httpContextAcc.HttpContext!.User.FindFirstValue(ClaimTypes.NameIdentifier)!);
-            var application = await _unitOfWork.Applications.GetByIdAsync(request.ApplicationId, cancellationToken);
+            
+			var application = await _unitOfWork.Applications.GetByIdAsync(request.ApplicationId, cancellationToken);
 
-            if (application is null || application.ApplicantId != userId)
+            if (application is null)
                 return Result.Failure("Application not found.");
 
-            if (application.Status != ApplicationStatus.Pending)
+			if (application.ApplicantId != userId)
+				return Result<Unit>.Failure("you don't have athourization for this application.");
+
+			if (application.Status != ApplicationStatus.Pending)
                 return Result.Failure("Cannot withdraw an application that has already been processed.");
 
             _unitOfWork.Applications.Remove(application);

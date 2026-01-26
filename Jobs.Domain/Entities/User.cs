@@ -29,9 +29,8 @@ namespace Jobs.Domain.Entities
 		private readonly List<UserSkill> _skills = new();
 		public IReadOnlyCollection<UserSkill> Skills => _skills.AsReadOnly();
 
-
-		public readonly List<CV> _cvs = new();
-		public IReadOnlyCollection<CV> CVs => _cvs.AsReadOnly();
+		public Guid? CVId { get; private set; }
+		public CV CV { get; private set; }
 
 
 		private readonly List<JobApplication> _applications = new();
@@ -107,7 +106,7 @@ namespace Jobs.Domain.Entities
 		public void AddCV(CV cv)
 		{
 			CheckRule(new NotNullRule<CV>(cv));
-			_cvs.Add(cv);
+			CVId = cv.Id;
 		}
 
 		public void AddApplication(JobApplication application)

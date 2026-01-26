@@ -1,6 +1,8 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.Application.Features.Applications.Commands.ApplyForJob;
-using MediatR;
+using Jobs.Application.Features.Applications.Commands.WithdrawApplication;
+using Jobs.Application.Features.Applications.Queries.GetApplicationById;
+using Jobs.Application.Features.Applications.Queries.GetMyApplications;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Users
@@ -19,7 +21,7 @@ namespace Jobs.API.Controllers.Users
 		[HttpGet("{Id}")]
 		public async Task<IActionResult> GetApplicationById(Guid jobId)
 		{
-			var result = await Sender.Send(new GetApplicationByIdQuiry(jobId));
+			var result = await Sender.Send(new GetUserApplicationDetailsQuery(jobId));
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
 		}
 
@@ -27,7 +29,7 @@ namespace Jobs.API.Controllers.Users
 		[HttpGet]
 		public async Task<IActionResult> GetAllApplications()
 		{
-			var result = await Sender.Send(new GetAllUserApplicationsQuiry());
+			var result = await Sender.Send(new GetUserApplicationsQuery());
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
 		}
 

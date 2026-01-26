@@ -10,7 +10,7 @@ namespace Jobs.Domain.Entities
 
 		// ========== Properties ==========
 		public Guid UserId { get; private set; }
-		private User User { get; set; }
+		public User User { get; set; }
 
         public string Title { get; private set; } = string.Empty;
 		public FilePath FilePath { get; private set; }

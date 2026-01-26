@@ -71,12 +71,22 @@ namespace Jobs.Infrastructure.Data.Configurations
 			builder.Navigation("_skills")
 				   .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-			builder.HasMany<CV>("_cvs")
-				   .WithOne()
-				   .HasForeignKey(cv => cv.UserId)
+			builder.HasOne(u => u.CV)
+				   .WithOne(c => c.User)
+				   .HasForeignKey<User>(u => u.CVId)
 				   .OnDelete(DeleteBehavior.Cascade);
-			builder.Navigation("_cvs")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			 
+
+			//builder.HasOne(u => u.Company)
+			//	   .WithMany("_employees")
+			//	   .HasForeignKey(u => u.CompanyId)
+			//	   .OnDelete(DeleteBehavior.Restrict);
+			//builder.Navigation("_employees")
+			//	   .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+
+
+
 
 			builder.HasMany<JobApplication>("_applications")
 				   .WithOne(a => a.Applicant)

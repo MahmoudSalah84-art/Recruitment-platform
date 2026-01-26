@@ -1,6 +1,8 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Features.Users.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Jobs.API.Controllers.Users
 {
@@ -21,10 +23,10 @@ namespace Jobs.API.Controllers.Users
 
 		//GET: /api/Users
 		[HttpGet()]
-		public async Task<IActionResult> GetAllUsersProfilesById()
+		public async Task<IActionResult> GetAllUsersProfiles()
 		{
-			var usersProfiles = await Sender.send
-
+			var usersProfiles = await Sender.Send();
+			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
 		}
 	}
 }
