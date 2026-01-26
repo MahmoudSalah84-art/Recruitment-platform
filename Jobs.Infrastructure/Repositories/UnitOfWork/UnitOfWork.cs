@@ -17,21 +17,19 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 			_serviceProvider = serviceProvider;
 		}
 
-
 		public IJobRepository Jobs => GetRepository<IJobRepository>();
 		public IUserRepository Users => GetRepository<IUserRepository>();
 		public ICompanyRepository Companies => GetRepository<ICompanyRepository>();
 		public IApplicationRepository Applications => GetRepository<IApplicationRepository>();
 		public ICVRepository CVs => GetRepository<ICVRepository>();
+        public IExperienceRepository Experiences => GetRepository<IExperienceRepository>();
+		public ISkillRepository Skills => GetRepository<ISkillRepository>();
 
-		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 			=> await _context.SaveChangesAsync(cancellationToken);
 
 		public int SaveChanges()
 			=> _context.SaveChanges();
-
-		public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
-			=> await _context.Database.BeginTransactionAsync(cancellationToken);
 
 		private T GetRepository<T>() where T : notnull
 		{

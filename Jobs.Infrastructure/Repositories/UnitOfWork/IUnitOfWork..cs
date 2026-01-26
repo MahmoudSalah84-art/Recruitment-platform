@@ -12,8 +12,10 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		ICompanyRepository Companies { get; }
 		ICVRepository CVs { get; }
 		IUserRepository Users { get; }
+		IExperienceRepository Experiences { get; }
+		ISkillRepository Skills { get; }
+
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
-		Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default);
 	}
 }

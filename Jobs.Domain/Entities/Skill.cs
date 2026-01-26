@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class Skill :BaseEntity , ISoftDelete
+    public class Skill :AggregateRoot , ISoftDelete
 	{
 		// ========== Properties ==========
 		public string Name { get; private set; }
