@@ -33,18 +33,12 @@ namespace Jobs.API.Controllers.Users
 		}
 
 
-
-
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(Guid id)
 		{
-			var result = await Sender.Send(new DeleteExperienceCommand(id));
+			var result = await Sender.Send(DeleteExperienceCommand(id));
 			return result.IsSuccess ? NoContent() : BadRequest(result.Error);
 		}
-
-
-
-
 	}
 }
 //Method, Route, Description

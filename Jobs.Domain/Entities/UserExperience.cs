@@ -41,7 +41,7 @@ namespace Jobs.Domain.Entities
 			DateTime startDate,
 			DateTime? endDate,
 			bool isCurrent,
-			string description)
+			string? description)
 		{
 			CheckRule(new NotEmptyRule(jobTitle, nameof(JobTitle)));
 			CheckRule(new ExperienceDateRangeRule(startDate, endDate, isCurrent));

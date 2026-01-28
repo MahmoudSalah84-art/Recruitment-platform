@@ -30,7 +30,7 @@ namespace Jobs.Application.Features.Experiences.Commands.AddUserExperience
 				userId,
 				request.JobTitle,
 				request.CompanyId,
-				Enum.Parse<EmploymentType>(request.EmploymentType),
+				request.EmploymentType,
 				request.StartDate,
 				request.EndDate,
 				request.IsCurrent,

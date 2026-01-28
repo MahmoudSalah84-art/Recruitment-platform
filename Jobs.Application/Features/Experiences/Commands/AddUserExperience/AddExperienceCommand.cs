@@ -11,7 +11,7 @@ namespace Jobs.Application.Features.Experiences.Commands.AddUserExperience
 		public EmploymentType EmploymentType { get; set; }
 		public DateTime StartDate { get; set; }
 		public DateTime? EndDate { get; set; }
-		public bool IsCurrentRole => EndDate == null;
+		public bool IsCurrent => EndDate == null;
 		public string? Description { get; set; }
 	}
 }
