@@ -1,5 +1,4 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
-using Jobs.Application.Features.Applications.Commands.WithdrawApplication;
 using Jobs.Domain.Enums;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
 using MediatR;
