@@ -1,5 +1,6 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.Application.Features.Experiences.Commands.AddUserExperience;
+using Jobs.Application.Features.Experiences.Commands.DeleteUserExperience;
 using Jobs.Application.Features.Experiences.Commands.UpdateExperience;
 using Jobs.Application.Features.Experiences.Queries.GetUserExperiences;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace Jobs.API.Controllers.Users
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> Delete(Guid id)
 		{
-			var result = await Sender.Send(DeleteExperienceCommand(id));
+			var result = await Sender.Send(new DeleteExperienceCommand(id));
 			return result.IsSuccess ? NoContent() : BadRequest(result.Error);
 		}
 	}
