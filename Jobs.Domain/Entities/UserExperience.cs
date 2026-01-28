@@ -33,7 +33,7 @@ namespace Jobs.Domain.Entities
 		// ========= Constructors =========
 		private UserExperience() { }
 
-		internal UserExperience(
+		public UserExperience(
 			Guid userId,
 			string jobTitle,
 			Guid companyId,

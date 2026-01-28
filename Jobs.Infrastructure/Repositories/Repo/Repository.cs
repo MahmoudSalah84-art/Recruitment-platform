@@ -30,6 +30,8 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <param name="entity">The entity to add.</param>
 		public void Add(TEntity entity)
 			=> _set.Add(entity);
+		public async Task AddAsync(TEntity entity, CancellationToken ct = default)
+			=> await _set.AddAsync(entity, ct);
 
 		/// <summary>
 		/// Updates an existing entity in the database context.
@@ -44,7 +46,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <param name="entity">The entity to remove.</param>
 		public void Remove(TEntity entity)
 			=> _set.Remove(entity);
-
+		
 		/// <summary>
 		/// Returns a queryable for the entity set, allowing further filtering or projection.
 		/// </summary>

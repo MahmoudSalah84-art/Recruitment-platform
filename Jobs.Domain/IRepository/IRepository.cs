@@ -10,6 +10,7 @@ namespace Jobs.Infrastructure.Repositories.IRepository
 	{
 		Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
 		void Add(TEntity entity);
+		Task AddAsync(TEntity entity, CancellationToken ct = default);
 		void Update(TEntity entity);
 		void Remove(TEntity entity);
 		IQueryable<TEntity> Query();

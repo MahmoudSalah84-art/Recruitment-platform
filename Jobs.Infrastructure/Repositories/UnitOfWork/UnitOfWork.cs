@@ -1,6 +1,5 @@
 ﻿using Jobs.Domain.IRepository;
 using Jobs.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jobs.Infrastructure.Repositories.UnitOfWork
