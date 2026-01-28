@@ -1,10 +1,4 @@
-﻿using Jobs.Domain.Common;
-using Jobs.Domain.Events;
-using Jobs.Domain.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
-using System.Text;
+﻿using Jobs.Domain.Exceptions;
 
 namespace Jobs.Domain.Common
 {
@@ -24,7 +18,8 @@ namespace Jobs.Domain.Common
 		}
 
 
-		public override bool Equals(object obj)
+		
+		public override bool Equals(object? obj)
 		{
 			if (obj is not BaseEntity other)
 				return false;
@@ -43,7 +38,7 @@ namespace Jobs.Domain.Common
 			return Id.GetHashCode();
 		}
 
-		public static bool operator ==(BaseEntity left, BaseEntity right)
+		public static bool operator ==(BaseEntity? left, BaseEntity? right)
 		{
 			if (Equals(left, null))
 				return Equals(right, null);
