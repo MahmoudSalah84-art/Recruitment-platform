@@ -23,16 +23,16 @@ namespace Jobs.Domain.Entities
 
 		// ========== Constructor ==========
 		private CV() { }
-		public CV(Guid userId, string title, FilePath file)
+		public CV(Guid userId, string title, FilePath file, string summary)
 		{
 			CheckRule(new NotNullRule<Guid>(userId));
 			CheckRule(new NotNullRule<FilePath>(file));
 			CheckRule(new NotEmptyRule(title, title));
-			
 
 			UserId = userId;
 			Title = title;
 			FilePath = file;
+			SummaryText = summary;
 			CreatedAt = DateTime.UtcNow;
 			UpdatedAt = CreatedAt;
 			AddEvent(new CvUploadedEvent(this));
@@ -48,10 +48,13 @@ namespace Jobs.Domain.Entities
 			AddEvent(new CvParsedEvent(this));
 		}
 		
-		public void SetSummary(string summary)
+		public void Update(string title, FilePath file, string summary)
 		{
+			Title = title;
+			FilePath = file;
 			SummaryText = summary;
-			
+			UpdatedAt = DateTime.UtcNow;
+			AddEvent(new CvUploadedEvent(this));
 		}
 
 		void ISoftDelete.SoftDelete()
