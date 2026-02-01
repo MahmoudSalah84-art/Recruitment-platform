@@ -1,5 +1,6 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.Application.Features.CV.Command.CreateOrUpdateResume;
+using Jobs.Application.Features.CV.Query.GetMyResume;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Users
@@ -24,26 +25,9 @@ namespace Jobs.API.Controllers.Users
 			return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
 		}
 
-		// DELETE /api/userResume/me
-		[HttpDelete("me")]
-		public async Task<IActionResult> Delete()
-		{
-			var result = await Sender.Send(new DeleteMyResumeCommand());
-
-			return result.IsSuccess ? NoContent() : NotFound(result.Error);
-		}
 	}
 }
 
-//UserResumeController,
-//, POST,/api/resume, رفع ملف CV جديد.
-//, DELETE,/api/resumes/{id},حذف ملف CV.
-//  GET: api/UserProfile/me
-
-
-//POST / api / userResume / me
-//GET / api / userResume / me 
-//DELETE / api / userResume / me
 
 
 
