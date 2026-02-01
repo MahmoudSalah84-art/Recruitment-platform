@@ -9,7 +9,6 @@ namespace Jobs.API.Controllers.Abstractions
 	{
 		private ISender? _sender;
 
-		// خاصية تجلب الـ Sender تلقائياً عند أول استخدام
 		protected ISender Sender => _sender ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 	}
 }

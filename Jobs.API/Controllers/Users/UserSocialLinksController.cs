@@ -1,5 +1,8 @@
-﻿using MediatR;
+﻿using Jobs.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using System;
 
 namespace Jobs.API.Controllers.Users
 {
@@ -20,3 +23,9 @@ namespace Jobs.API.Controllers.Users
 //Method, Route, Description
 //GET,/api/social-links, جلب روابط التواصل الاجتماعي الخاصة بالمستخدم.
 //PUT,/api/social-links, تحديث الروابط (عادة تكون مجموعة روابط واحدة يتم تحديثها معاً).
+
+
+//GET / api / users / me / social - links
+//POST / api / users / me / social - links
+//PUT / api / users / me / social - links /{ id}
+//DELETE / api / users / me / social - links /{ id}

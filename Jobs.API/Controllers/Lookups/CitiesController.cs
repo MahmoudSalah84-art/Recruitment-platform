@@ -4,3 +4,6 @@
     {
     }
 }
+
+//GET / api / lookups / cities
+//GET / api / lookups / cities ? countryId = 1

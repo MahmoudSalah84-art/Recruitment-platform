@@ -4,3 +4,5 @@
     {
     }
 }
+
+//PUT / api / companies /{ companyId}/ branding

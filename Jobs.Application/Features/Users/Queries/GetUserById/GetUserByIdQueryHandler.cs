@@ -22,7 +22,7 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 			var user = await _unitOfWork.Users.GetByIdAsync(userGuid, cancellationToken);
 
 			if (user is null)
-				return Result<UserResponse?>.Failure("ToDo");
+				return Result<UserResponse?>.Failure("user isn't here");
 			
 
 			UserResponse userResponse = new UserResponse
@@ -35,7 +35,7 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 				Bio = user.Bio,
 				ProfileImage = user.ProfilePictureUrl,
 				Skills = user.Skills,
-				CVs = user.CVs,
+				CV = user.CVId,
 			};
 
 			return Result<UserResponse?>.Success(userResponse);

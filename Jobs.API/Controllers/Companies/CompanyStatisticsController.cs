@@ -4,3 +4,5 @@
     {
     }
 }
+
+//GET / api / companies /{ companyId}/ statistics

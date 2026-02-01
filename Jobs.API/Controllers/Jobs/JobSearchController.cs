@@ -2,6 +2,7 @@
 using Jobs.Application.Common.Models;
 using Jobs.Application.Features.Jobs.Queries.GetJobsWithPagination;
 using Jobs.Application.Features.Jobs.Queries.SearchJobs;
+using Jobs.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Jobs
@@ -16,3 +17,5 @@ namespace Jobs.API.Controllers.Jobs
 		}
 	}
 }
+
+//GET / api / jobs / search

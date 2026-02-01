@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace Jobs.API.Controllers.Security
 {
@@ -6,3 +8,5 @@ namespace Jobs.API.Controllers.Security
     {
     }
 }
+//GET / api / security / devices
+//DELETE / api / security / devices /{ id}

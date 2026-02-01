@@ -47,3 +47,9 @@ namespace Jobs.API.Controllers.Users
 //POST,/api/experiences, إضافة خبرة وظيفية جديدة (شركة، منصب، تاريخ).
 //PUT,/api/experiences/{id},تحديث بيانات خبرة سابقة بواسطة الـ ID الخاص بها.
 //DELETE,/api/experiences/{id},حذف خبرة وظيفية من الملف الشخصي.
+
+
+////GET / api / users / me / experiences
+////POST / api / users / me / experiences
+////PUT / api / users / me / experiences /{ id}
+////DELETE / api / users / me / experiences /{ id}

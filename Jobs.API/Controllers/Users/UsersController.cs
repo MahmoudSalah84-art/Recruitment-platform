@@ -30,3 +30,7 @@ namespace Jobs.API.Controllers.Users
 		}
 	}
 }
+
+
+//GET / api / users /{ id}
+//DELETE / api / users /{ id}

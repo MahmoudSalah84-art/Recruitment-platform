@@ -1,4 +1,5 @@
 ﻿using Jobs.API.Controllers.Applications;
+using Microsoft.Extensions.Hosting;
 
 namespace Jobs.API.Controllers.Files
 {
@@ -6,3 +7,5 @@ namespace Jobs.API.Controllers.Files
     {
     }
 }
+
+//POST / api / files / upload

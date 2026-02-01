@@ -13,6 +13,6 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 		public string? Bio { get; set; }
 		public string? ProfileImage { get; set; } 
 		public IReadOnlyCollection<UserSkill> Skills { get; set; } = default!;
-		public IReadOnlyCollection<CV> CVs { get; set; } = default!;
+		public Guid? CV { get; set; } 
 	}
 }

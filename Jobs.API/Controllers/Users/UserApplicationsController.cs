@@ -3,7 +3,11 @@ using Jobs.Application.Features.Applications.Commands.ApplyForJob;
 using Jobs.Application.Features.Applications.Commands.WithdrawApplication;
 using Jobs.Application.Features.Applications.Queries.GetApplicationById;
 using Jobs.Application.Features.Applications.Queries.GetMyApplications;
+using Jobs.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
+using System;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.API.Controllers.Users
 {
@@ -48,3 +52,7 @@ namespace Jobs.API.Controllers.Users
 //GET,/api/UserApplications/{id},جلب تفاصيل طلب توظيف معين ومتابعة الـ Feedback عليه.
 //POST,/api/UserApplications/{jobId},التقديم على وظيفة جديدة باستخدام الـ JobId.
 //DELETE,/api/UserApplications/{id},سحب طلب التقديم (Withdraw Application).
+
+////GET / api / users / me / applications
+////POST / api / jobs /{ jobId}/ apply
+////DELETE / api / users / me / applications /{ id}

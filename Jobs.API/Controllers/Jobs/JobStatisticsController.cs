@@ -2,9 +2,8 @@
 
 namespace Jobs.API.Controllers.Jobs
 {
-    public class JobSkillsController
+    public class JobStatisticsController
     {
     }
 }
-
-//GET / api / jobs /{ jobId}/ skills
+//GET / api / jobs /{ jobId}/ statistics

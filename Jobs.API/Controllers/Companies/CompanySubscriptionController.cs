@@ -6,3 +6,6 @@ namespace Jobs.API.Controllers.Companies
     {
     }
 }
+
+//GET / api / companies /{ companyId}/ subscription
+//PUT / api / companies /{ companyId}/ subscription
