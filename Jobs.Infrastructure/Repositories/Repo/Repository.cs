@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Jobs.Infrastructure.Repositories.Repo
 {
     public abstract class Repository<TEntity> : IRepository<TEntity> 
-		where TEntity : AggregateRoot
+		where TEntity : BaseEntity
 	{
 		protected readonly DbSet<TEntity> _set;
 		protected Repository(JobDbContext context)=> _set = context.Set<TEntity>();

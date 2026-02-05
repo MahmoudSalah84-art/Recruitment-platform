@@ -23,6 +23,8 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		public ICVRepository CVs => GetRepository<ICVRepository>();
         public IExperienceRepository Experiences => GetRepository<IExperienceRepository>();
 		public ISkillRepository Skills => GetRepository<ISkillRepository>();
+		public IJobSkillRepository JobSkills => GetRepository<IJobSkillRepository>();
+		public IUserSkillRepository UserSkills => GetRepository<IUserSkillRepository>();
 
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 			=> await _context.SaveChangesAsync(cancellationToken);

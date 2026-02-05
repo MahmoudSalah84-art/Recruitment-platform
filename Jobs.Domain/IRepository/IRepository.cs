@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Jobs.Infrastructure.Repositories.IRepository
 {
-	public interface IRepository<TEntity> where TEntity : AggregateRoot
+	public interface IRepository<TEntity> where TEntity : BaseEntity
 	{
 		Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default);
 		void Add(TEntity entity);

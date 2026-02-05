@@ -14,6 +14,8 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		IUserRepository Users { get; }
 		IExperienceRepository Experiences { get; }
 		ISkillRepository Skills { get; }
+		IUserSkillRepository UserSkills { get; }
+		IJobSkillRepository JobSkills { get; }
 
 
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
