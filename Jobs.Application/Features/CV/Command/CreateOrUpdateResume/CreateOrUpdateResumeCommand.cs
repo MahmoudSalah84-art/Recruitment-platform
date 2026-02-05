@@ -1,11 +1,11 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
-using Jobs.Domain.ValueObjects;
+using Microsoft.AspNetCore.Http;
 
 namespace Jobs.Application.Features.CV.Command.CreateOrUpdateResume
 {
 	public record CreateOrUpdateResumeCommand(
 	string Title,
-	FilePath FilePath,
+	IFormFile File,
 	string Summary
 	) : ICommand;
 

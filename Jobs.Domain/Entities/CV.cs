@@ -23,15 +23,15 @@ namespace Jobs.Domain.Entities
 
 		// ========== Constructor ==========
 		private CV() { }
-		public CV(Guid userId, string title, FilePath file, string summary)
+		public CV(Guid userId, string title, string file, string? summary)
 		{
 			CheckRule(new NotNullRule<Guid>(userId));
-			CheckRule(new NotNullRule<FilePath>(file));
+			CheckRule(new NotNullRule<string>(file));
 			CheckRule(new NotEmptyRule(title, title));
 
 			UserId = userId;
 			Title = title;
-			FilePath = file;
+			FilePath.Create(file);
 			SummaryText = summary;
 			CreatedAt = DateTime.UtcNow;
 			UpdatedAt = CreatedAt;
@@ -48,10 +48,10 @@ namespace Jobs.Domain.Entities
 			AddEvent(new CvParsedEvent(this));
 		}
 		
-		public void Update(string title, FilePath file, string summary)
+		public void Update(string title, string file, string summary)
 		{
 			Title = title;
-			FilePath = file;
+			FilePath.Create(file);
 			SummaryText = summary;
 			UpdatedAt = DateTime.UtcNow;
 			AddEvent(new CvUploadedEvent(this));

@@ -26,25 +26,36 @@ namespace Jobs.Application.Features.CV.Command.CreateOrUpdateResume
 			if (string.IsNullOrWhiteSpace(request.Summary))
 				return Result.Failure("Summary is required");
 
+			if (request.File == null || request.File.Length == 0)
+				return Result.Failure("Please upload a valid CV file");
+
 			var cv = await _unitOfWork.CVs.Query()
 				.FirstOrDefaultAsync(r => r.UserId == _currentUser.UserId, cancellationToken);
+
+			var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
+			var filePath = Path.Combine("wwwroot/CVs", fileName);
+
+
+			using (var stream = new FileStream(filePath, FileMode.Create))
+			{
+				await request.File.CopyToAsync(stream);
+			}
 
 			if (cv is null)
 			{
 				cv = new  Domain.Entities.CV(
 					_currentUser.UserId,
 					request.Title,
-					request.FilePath,
+					filePath,
 					request.Summary
 				);
-
 				_unitOfWork.CVs.Add(cv);
 			}
 			else
 			{
 				cv.Update(
 					request.Title,
-					request.FilePath,
+					filePath,
 					request.Summary
 				);
 			}
