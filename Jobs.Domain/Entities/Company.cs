@@ -14,6 +14,7 @@ namespace Jobs.Domain.Entities
 		public string Name { get; private set; }
         public string Industry { get; private set; }
         public Address CompanyAddress { get; private set; }
+        public int EmployeesCount { get; private set; }
         public string Description { get; private set; } = string.Empty;
 		public string LogoUrl { get; private set; } = string.Empty;
 
@@ -34,9 +35,7 @@ namespace Jobs.Domain.Entities
 
 
 		// ========== Constructor ==========
-		private Company()
-		{
-		}
+		private Company(){}
 
 		public Company(string name, Address address, string description, string industry, string logoUrl)
 		{
@@ -56,33 +55,19 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ========== Behaviors ==========
-
-		public void UpdateInfo(string description, string industry, string logoUrl)
+		public void UpdateProfile(string name, string description, string industry, int employeesCount, string logoUrl, Address address)
 		{
-			if (!string.IsNullOrWhiteSpace(industry))
-				CheckRule(new NotEmptyRule(industry, nameof(industry)));
+			CheckRule(new NotEmptyRule(name, nameof(name)));
+			CheckRule(new NotEmptyRule(industry, nameof(industry)));
 
+			Name = name ?? Name;
 			Description = description ?? Description;
-
-			if (!string.IsNullOrWhiteSpace(industry))
-				Industry = industry;
-
-			if (!string.IsNullOrWhiteSpace(logoUrl))
-				LogoUrl = logoUrl;
-
-			AddEvent(new CompanyInfoUpdatedEvent(this.Id));
-		}
-		public void UpdateDescription(string description)
-		{
-			Description = description ?? string.Empty;
-		}
-
-		
-		public void UpdateAddress(Address address)
-		{
-			CheckRule(new NotNullRule<Address>(address));
-
+			Industry = industry ?? Industry;
+			LogoUrl = logoUrl ?? LogoUrl;
 			CompanyAddress = address;
+			EmployeesCount = employeesCount;
+			UpdatedAt = DateTime.UtcNow;
+			AddEvent(new CompanyInfoUpdatedEvent(this.Id));
 		}
 		public void AddEmployee(User user)
 		{
@@ -120,6 +105,8 @@ namespace Jobs.Domain.Entities
             IsDeleted = true;
             DeletedAt = DateTime.UtcNow;
         }
+
+        
     }
 }
 
