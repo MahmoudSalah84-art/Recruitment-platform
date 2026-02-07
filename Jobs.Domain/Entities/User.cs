@@ -1,6 +1,7 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Enums;
 using Jobs.Domain.Events.Events;
+using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.UserRules;
 using Jobs.Domain.ValueObjects;
@@ -59,7 +60,7 @@ namespace Jobs.Domain.Entities
 			Role = role;
 			IsVerified = false;
 			CreatedAt = DateTime.UtcNow;
-
+			UpdatedAt = CreatedAt;
 			AddEvent(new UserRegisteredEvent(this));
 		}
 
@@ -78,11 +79,13 @@ namespace Jobs.Domain.Entities
 			CheckRule(new UserEmailMustBeUniqueRule(emailExists, newEmail.Value));
 
 			Email = newEmail;
+			UpdatedAt = DateTime.UtcNow;
 		}
         public void UpdatePhoneNumber(PhoneNumber phoneNumber)
         {
             PhoneNumber = phoneNumber;
-			
+			UpdatedAt = DateTime.UtcNow;
+
 		}
 
 		public void UpdateProfile(string fullName, String email, String phoneNumber, string bio, string profilePictureUrl)
@@ -92,6 +95,8 @@ namespace Jobs.Domain.Entities
 			PhoneNumber.Create(phoneNumber);
 			Bio = bio ?? Bio;
 			ProfilePictureUrl = profilePictureUrl ?? ProfilePictureUrl;
+			UpdatedAt = DateTime.UtcNow;
+
 		}
 
 		public void AddSkill(UserSkill skill)
@@ -101,12 +106,16 @@ namespace Jobs.Domain.Entities
 				return;
 
 			_skills.Add(skill);
+			UpdatedAt = DateTime.UtcNow;
+
 		}
 
 		public void AddCV(CV cv)
 		{
 			CheckRule(new NotNullRule<CV>(cv));
 			CVId = cv.Id;
+			UpdatedAt = DateTime.UtcNow;
+
 		}
 
 		public void AddApplication(JobApplication application)
@@ -116,6 +125,17 @@ namespace Jobs.Domain.Entities
 			CheckRule(new CannotApplyToExpiredJobRule(application.Job));
 
 			_applications.Add(application);
+			UpdatedAt = DateTime.UtcNow;
+
+		}
+
+		public void UpdateSocialLinks(string? linkedInUrl, string? gitHubUrl, string? portfolioUrl)
+		{
+			LinkedInUrl = linkedInUrl;
+			GitHubUrl = gitHubUrl;
+			PortfolioUrl = portfolioUrl;
+			UpdatedAt = DateTime.UtcNow;
+
 		}
 
 		void ISoftDelete.SoftDelete()
@@ -123,7 +143,30 @@ namespace Jobs.Domain.Entities
 			IsDeleted = true;
 			DeletedAt = DateTime.UtcNow;
 		}
+		public void UpdateSocialLink(string platform, string url)
+		{
+			switch (platform.ToLower())
+			{
+				case "linkedin":
+					LinkedInUrl = url;
+					break;
 
-	}
+				case "github":
+					GitHubUrl = url;
+					break;
+
+				case "portfolio":
+					PortfolioUrl = url;
+					break;
+
+				default:
+					throw new DomainException("Invalid social platform");
+			}
+		}
+		public void RemoveSocialLink(string platform)
+        {
+			UpdateSocialLink(platform, null!);
+		}
+    }
 }
 
