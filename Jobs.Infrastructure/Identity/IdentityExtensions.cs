@@ -2,10 +2,6 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore; 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Infrastructure.Identity
 {
@@ -14,18 +10,27 @@ namespace Jobs.Infrastructure.Identity
 		public static IServiceCollection AddJobSiteIdentity(this IServiceCollection services, string identityConnectionString)
 		{
 			services.AddDbContext<IdentityDbContext>(options =>
-			{
-				options.UseSqlServer(identityConnectionString);
-			});
+				options.UseSqlServer(identityConnectionString) );
 
 			services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
 			{
-				options.User.RequireUniqueEmail = true; 
-				options.Password.RequireNonAlphanumeric = false;
-				options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);// defult 5 minutes
+				// password settings
+				options.Password.RequireDigit = true;
+				options.Password.RequiredLength = 8;
+				options.Password.RequireNonAlphanumeric = true;
+				options.Password.RequireUppercase = true;
+				options.Password.RequireLowercase = true;
+
+				// lockout settings
+				options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(20);
+				options.Lockout.MaxFailedAccessAttempts = 5;
+				options.Lockout.AllowedForNewUsers = true;
+
+				// user settings
+				options.User.RequireUniqueEmail = true;
 			})
-				.AddEntityFrameworkStores<IdentityDbContext>()
-				.AddDefaultTokenProviders();
+			.AddEntityFrameworkStores<IdentityDbContext>()
+			.AddDefaultTokenProviders();
 
 			return services;
 		}
