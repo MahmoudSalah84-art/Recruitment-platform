@@ -1,7 +1,5 @@
-﻿using Jobs.Application.Abstractions.Interfaces;
-using Jobs.Domain.Entities;
-using Jobs.Infrastructure.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Jobs.Application.Common.Interfaces;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,33 +10,20 @@ namespace Jobs.Infrastructure.Services
 {
 	public class JwtTokenService : IJwtTokenService
 	{
-		private readonly IConfiguration _configuration;
-		private readonly string _secretKey;
-		private readonly string _issuer;
-		private readonly string _audience;
-		private readonly int _accessTokenExpirationMinutes;
-		private readonly int _refreshTokenExpirationDays;
+		private readonly JwtSettings _jwtSettings;
 
-		public JwtTokenService(IConfiguration configuration)
+		public JwtTokenService(IOptions<JwtSettings> jwtSettings)
 		{
-			_configuration = configuration;
-			_secretKey = configuration["Jwt:SecretKey"] ?? throw new ArgumentNullException("Jwt:SecretKey");
-			_issuer = configuration["Jwt:Issuer"] ?? "AuthSystem";
-			_audience = configuration["Jwt:Audience"] ?? "AuthSystemUsers";
-			_accessTokenExpirationMinutes = int.Parse(configuration["Jwt:AccessTokenExpirationMinutes"] ?? "60");
-			_refreshTokenExpirationDays = int.Parse(configuration["Jwt:RefreshTokenExpirationDays"] ?? "7");
+			_jwtSettings = jwtSettings.Value;
 		}
 
-		public string GenerateAccessToken(AppUser user, List<string> roles, List<Claim> customClaims)
+		public string GenerateAccessToken(Guid userId, string email , IList<string> roles, IList<Claim>? Claims)
 		{
 			var claims = new List<Claim>
 			{
-				new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-				new Claim(ClaimTypes.Name, user.UserName!),
-				new Claim(ClaimTypes.Email, user.Email!),
-				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-				new Claim("firstName", user.FirstName ?? ""),
-				new Claim("lastName", user.LastName ?? "")
+				new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+				new Claim(JwtRegisteredClaimNames.Email, email),
+				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
 			};
 
 			// Add roles
@@ -47,17 +32,17 @@ namespace Jobs.Infrastructure.Services
 				claims.Add(new Claim(ClaimTypes.Role, role));
 			}
 
-			// Add custom claims
-			claims.AddRange(customClaims);
+			if (Claims != null)
+				claims.AddRange(Claims);
 
-			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
+			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
 			var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 			var token = new JwtSecurityToken(
-				issuer: _issuer,
-				audience: _audience,
+				issuer: _jwtSettings.Issuer,
+				audience: _jwtSettings.Audience,
 				claims: claims,
-				expires: DateTime.UtcNow.AddMinutes(_accessTokenExpirationMinutes),
+				expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
 				signingCredentials: credentials
 			);
 
@@ -67,10 +52,13 @@ namespace Jobs.Infrastructure.Services
 		public string GenerateRefreshToken()
 		{
 			var randomNumber = new byte[64];
+
 			using var rng = RandomNumberGenerator.Create();
 			rng.GetBytes(randomNumber);
+
 			return Convert.ToBase64String(randomNumber);
 		}
+
 
 		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
 		{
@@ -79,24 +67,30 @@ namespace Jobs.Infrastructure.Services
 				ValidateAudience = true,
 				ValidateIssuer = true,
 				ValidateIssuerSigningKey = true,
-				ValidIssuer = _issuer,
-				ValidAudience = _audience,
-				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey)),
-				ValidateLifetime = false // Don't validate lifetime for expired tokens
-			};
+				ValidateLifetime = false,
 
+				ValidIssuer = _jwtSettings.Issuer,
+				ValidAudience = _jwtSettings.Audience,
+				IssuerSigningKey = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(_jwtSettings.SecretKey))
+			};
+			
 			var tokenHandler = new JwtSecurityTokenHandler();
-			var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+			var principal = tokenHandler.ValidateToken(
+				token,
+				tokenValidationParameters,
+				out SecurityToken securityToken);
 
 			if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-				!jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+				!jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+				StringComparison.InvariantCultureIgnoreCase))
 			{
 				throw new SecurityTokenException("Invalid token");
 			}
 
 			return principal;
 		}
-
+		
 		public bool ValidateToken(string token)
 		{
 			try
@@ -106,9 +100,9 @@ namespace Jobs.Infrastructure.Services
 					ValidateAudience = true,
 					ValidateIssuer = true,
 					ValidateIssuerSigningKey = true,
-					ValidIssuer = _issuer,
-					ValidAudience = _audience,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey)),
+					ValidIssuer = _jwtSettings.Issuer,
+					ValidAudience = _jwtSettings.Audience,
+					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
 					ValidateLifetime = true,
 					ClockSkew = TimeSpan.Zero
 				};
@@ -121,6 +115,6 @@ namespace Jobs.Infrastructure.Services
 			{
 				return false;
 			}
-		}
-	}
+		} 
+    }
 }
