@@ -1,4 +1,5 @@
 ﻿using Jobs.Application.Common.Interfaces;
+using Jobs.Infrastructure.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,38 +18,35 @@ namespace Jobs.Infrastructure.Services
 			_jwtSettings = jwtSettings.Value;
 		}
 
-		public string GenerateAccessToken(Guid userId, string email , IList<string> roles, IList<Claim>? Claims)
+
+		public string GenerateAccessToken(string userId, string email, string FirstName, string LastName, IEnumerable<string> roles, IEnumerable<string> permissions)
 		{
 			var claims = new List<Claim>
 			{
-				new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-				new Claim(JwtRegisteredClaimNames.Email, email),
-				new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+				new(JwtRegisteredClaimNames.Sub,   userId),
+				new(JwtRegisteredClaimNames.Email, email!),
+				new(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
+				new("firstName", FirstName),
+				new("lastName",  LastName),
 			};
+			foreach (var role in roles) claims.Add(new Claim(ClaimTypes.Role, role));
 
-			// Add roles
-			foreach (var role in roles)
-			{
-				claims.Add(new Claim(ClaimTypes.Role, role));
-			}
-
-			if (Claims != null)
-				claims.AddRange(Claims);
+			foreach (var perm in permissions) claims.Add(new Claim("Permission", perm));
 
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
-			var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
 			var token = new JwtSecurityToken(
 				issuer: _jwtSettings.Issuer,
 				audience: _jwtSettings.Audience,
 				claims: claims,
 				expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpiryMinutes),
-				signingCredentials: credentials
-			);
+				signingCredentials: creds);
 
 			return new JwtSecurityTokenHandler().WriteToken(token);
 		}
-
+		
 		public string GenerateRefreshToken()
 		{
 			var randomNumber = new byte[64];
@@ -60,53 +58,23 @@ namespace Jobs.Infrastructure.Services
 		}
 
 
-		public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+		
+		
+		public bool ValidateToken(string token)
 		{
 			var tokenValidationParameters = new TokenValidationParameters
 			{
 				ValidateAudience = true,
 				ValidateIssuer = true,
 				ValidateIssuerSigningKey = true,
-				ValidateLifetime = false,
-
 				ValidIssuer = _jwtSettings.Issuer,
 				ValidAudience = _jwtSettings.Audience,
-				IssuerSigningKey = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(_jwtSettings.SecretKey))
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
+				ValidateLifetime = true,
+				ClockSkew = TimeSpan.Zero
 			};
-			
-			var tokenHandler = new JwtSecurityTokenHandler();
-
-			var principal = tokenHandler.ValidateToken(
-				token,
-				tokenValidationParameters,
-				out SecurityToken securityToken);
-
-			if (securityToken is not JwtSecurityToken jwtSecurityToken ||
-				!jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
-				StringComparison.InvariantCultureIgnoreCase))
-			{
-				throw new SecurityTokenException("Invalid token");
-			}
-
-			return principal;
-		}
-		
-		public bool ValidateToken(string token)
-		{
 			try
 			{
-				var tokenValidationParameters = new TokenValidationParameters
-				{
-					ValidateAudience = true,
-					ValidateIssuer = true,
-					ValidateIssuerSigningKey = true,
-					ValidIssuer = _jwtSettings.Issuer,
-					ValidAudience = _jwtSettings.Audience,
-					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
-					ValidateLifetime = true,
-					ClockSkew = TimeSpan.Zero
-				};
-
 				var tokenHandler = new JwtSecurityTokenHandler();
 				tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
 				return true;
@@ -115,6 +83,33 @@ namespace Jobs.Infrastructure.Services
 			{
 				return false;
 			}
-		} 
-    }
+		}
+
+		public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+		{
+			var parameters = new TokenValidationParameters
+			{
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				ValidateLifetime = false,
+				ValidateIssuerSigningKey = true,
+				ValidIssuer = _jwtSettings.Issuer,
+				ValidAudience = _jwtSettings.Audience,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey))
+			};
+			try
+			{
+				var principal = new JwtSecurityTokenHandler().ValidateToken(token, parameters, out var secToken);
+				if (secToken is not JwtSecurityToken jwt ||
+					!jwt.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, 
+						StringComparison.InvariantCultureIgnoreCase))
+					return null;
+
+				return principal;
+			}
+			catch { return null; }
+		}
+
+
+	}
 }

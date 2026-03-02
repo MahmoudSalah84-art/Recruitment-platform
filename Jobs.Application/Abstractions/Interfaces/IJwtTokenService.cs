@@ -1,13 +1,13 @@
-﻿using Jobs.Domain.Entities;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace Jobs.Application.Common.Interfaces
 {
 	public interface IJwtTokenService
 	{
-		string GenerateAccessToken(Guid userId, string email, IList<string> roles, IList<Claim> claims);
+		string GenerateAccessToken(string userId, string email,string FirstName,string LastName , IEnumerable<string> roles, IEnumerable<string> permissions)
 		string GenerateRefreshToken();
-		ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
+		ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
 		bool ValidateToken(string token);
+
 	}
 }
