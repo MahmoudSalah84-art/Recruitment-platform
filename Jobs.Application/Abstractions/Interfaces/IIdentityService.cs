@@ -39,5 +39,7 @@ namespace Jobs.Application.Abstractions.Interfaces
 		// ── Password Reset ────────────────────────────────────────────────────────
 		Task<string> GeneratePasswordResetTokenAsync(string email);
 		Task<Result> ResetPasswordAsync(ResetPasswordRequest request);
+		Task<Result> ChangePasswordAsync(string userId, string currentPassword, string newPassword);
+
 	}
 }

@@ -304,9 +304,19 @@ namespace Jobs.Infrastructure.Services
 				? Result.Success()
 				: Result.Failure(result.Errors.Select(e => e.Description).ToString()!);
 		}
-		
 
+		public async Task<Result> ChangePasswordAsync(string userId,string currentPassword,string newPassword)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null) return Result.Failure("User not found");
 
+			var result = await _userManager.ChangePasswordAsync(user,currentPassword,newPassword);
+
+			if (!result.Succeeded)
+				return Result.Failure(result.Errors.Select(e => e.Description).ToString()!);
+			
+			return Result.Success();
+		}
 
 
 		// ── Helper ────────────────────────────────────────────────────────────────
@@ -316,9 +326,6 @@ namespace Jobs.Infrastructure.Services
 			var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(token));
 			return Convert.ToBase64String(bytes);
 		}
-
-
-
 
 
 
