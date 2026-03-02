@@ -1,5 +1,7 @@
 ﻿
 namespace Jobs.Application.Common.DTOs
 {
-    public record RegisterRequest(string Email, string Password, string UserName ) { }
+    public record RegisterRequest( string FirstName, string LastName,string Email, string Password,string ConfirmPassword)
+    {
+    }
 }
