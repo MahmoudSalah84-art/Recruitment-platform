@@ -30,9 +30,9 @@ namespace Jobs.Application.Features.Users.Commands.UpdateUserProfile
 			user.UpdateProfile(
 				request.FullName,
 				request.Email,
-				request.PhoneNumber ?? string.Empty,
-				request.Bio ?? string.Empty,
-				request.ProfilePictureUrl ?? string.Empty
+				request.PhoneNumber!,
+				request.Bio!,
+				request.ProfilePictureUrl!
 			);
 
 			_unitOfWork.Users.Update(user);

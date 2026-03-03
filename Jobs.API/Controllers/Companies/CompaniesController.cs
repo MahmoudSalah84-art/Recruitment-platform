@@ -1,25 +1,45 @@
-﻿using Jobs.Domain.Entities;
-using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.Application.Features.Companies.Commands.CreateCompany;
+using Jobs.Application.Features.Companies.Commands.DeleteCompany;
+using Jobs.Application.Features.Companies.Queries.GetCompanies;
+using Jobs.Application.Features.Companies.Queries.GetCompanyById;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Companies
 {
-    public class CompaniesController
-    {
-    }
+	[ApiController]
+	public sealed class CompaniesController : ApiController
+	{
+		// GET /api/companies
+		[HttpGet]
+		public async Task<IActionResult> GetAll()
+		{
+			var result = await Sender.Send(new GetCompaniesQuery());
+			return Ok(result);
+		}
+
+		// GET /api/companies/{id}
+		[HttpGet("{id:guid}")]
+		public async Task<IActionResult> GetById(Guid id)
+		{
+			var result = await Sender.Send(new GetCompanyByIdQuery(id));
+			return result is null ? NotFound() : Ok(result);
+		}
+
+		// POST /api/companies
+		[HttpPost]
+		public async Task<IActionResult> Create(CreateCompanyCommand command)
+		{
+			var result = await Sender.Send(command);
+			return CreatedAtAction(nameof(GetById), new { id = result }, null);
+		}
+
+		// DELETE /api/companies/{id}
+		[HttpDelete("{id:guid}")]
+		public async Task<IActionResult> Delete(Guid id)
+		{
+			await Sender.Send(new DeleteCompanyCommand(id));
+			return NoContent();
+		}
+	}
 }
-
-//| Method | Route                       | Description |
-//| ------ | ---------------------      | ------------------- |
-//| GET    | `/ api / companies`        | List companies |
-//| GET    | `/ api / companies /{ id}` | Get company details |
-//| POST   | `/api/companies`           | Create company      |
-//| PUT    | `/api/companies/{id}`      | Update company |
-//| DELETE | `/ api / companies /{ id}` | Delete company |
-
-//GET / api / companies
-//GET / api / companies /{ id}
-//POST / api / companies
-//PUT / api / companies /{ id}

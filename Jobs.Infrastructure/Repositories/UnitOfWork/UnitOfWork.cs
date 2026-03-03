@@ -1,4 +1,5 @@
-﻿using Jobs.Domain.IRepository;
+﻿using Jobs.Domain.Repositories.UnitOfWork;
+using Jobs.Domain.Repository.Repo;
 using Jobs.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 

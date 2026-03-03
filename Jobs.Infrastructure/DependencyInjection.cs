@@ -1,4 +1,6 @@
-﻿using Jobs.Domain.IRepository;
+﻿using Jobs.Application.Abstractions.Interfaces;
+using Jobs.Domain.Repositories.UnitOfWork;
+using Jobs.Domain.Repository.Repo;
 using Jobs.Infrastructure.BackgroundJobs;
 using Jobs.Infrastructure.Data;
 using Jobs.Infrastructure.Data.Interceptors;
@@ -24,10 +26,7 @@ namespace Jobs.Infrastructure
 				//var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
 				//var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
 
-				options.UseSqlServer(jobDbConnectionString, sql =>
-				{
-					sql.EnableRetryOnFailure();
-				});
+				options.UseSqlServer( jobDbConnectionString, sql => sql.EnableRetryOnFailure() );
 				//.AddInterceptors(softDeleteInterceptor, outboxInterceptor);
 			});
 
@@ -40,10 +39,7 @@ namespace Jobs.Infrastructure
 				});
 			});
 
-			// Identity
-			services.AddIdentity<AppUser, Microsoft.AspNetCore.Identity.IdentityRole<Guid>>()
-				.AddEntityFrameworkStores<IdentityDbContext>()
-				.AddDefaultTokenProviders();
+			
 
 			// Repositories
 			services.AddScoped<IUserRepository, UserRepository>();
@@ -51,6 +47,7 @@ namespace Jobs.Infrastructure
 			services.AddScoped<IJobRepository,JobRepository>();
 			services.AddScoped<IApplicationRepository, ApplicationRepository>();
 			services.AddScoped<ICVRepository, CVRepository>();
+
 			// Unit of Work
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -63,14 +60,10 @@ namespace Jobs.Infrastructure
 			services.AddScoped<IEmailService, EmailService>();
 
 			// JWT generator options placeholder
-			services.Configure<JwtOptions>(opts =>
-			{
-				opts.Issuer = "JobSite";
-				opts.Audience = "JobSiteClients";
-				opts.SecretKey = "replace-this-with-secure-long-secret";
-				opts.ExpiryMinutes = 60;
-			});
-			services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+			services.Configure<JwtSettings>(
+						configuration.GetSection("JwtSettings"));
+
+			services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 			// Interceptors
 			services.AddScoped<SaveChangesInterceptor, SoftDeleteInterceptor>();

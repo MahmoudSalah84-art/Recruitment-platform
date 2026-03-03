@@ -1,5 +1,4 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Entities;
 using Jobs.Domain.Events.Company_Events;
 using Jobs.Domain.Events.JobEvents;
 using Jobs.Domain.Rules;
@@ -37,17 +36,19 @@ namespace Jobs.Domain.Entities
 		// ========== Constructor ==========
 		private Company(){}
 
-		public Company(string name, Address address, string description, string industry, string logoUrl)
+		public Company(string name, string? description,
+			string industry, string? logoUrl,string Country, string City,
+			string Street, string BuildingNumber, string PostalCode)
 		{
 			CheckRule(new NotEmptyRule(name, nameof(name)));
 			CheckRule(new NotEmptyRule(industry, nameof(industry)));
-			CheckRule(new NotNullRule<Address>(address ));
 
 			Name = name;
-			CompanyAddress = address;
 			Description = description ?? string.Empty;
 			Industry = industry;
 			LogoUrl = logoUrl ?? string.Empty;
+			CompanyAddress = Address.Create(Country, City, Street, BuildingNumber, PostalCode);
+
 			CreatedAt = DateTime.UtcNow;
 			UpdatedAt = CreatedAt;
 

@@ -1,7 +1,7 @@
 ﻿using Jobs.Domain.Common;
+using Jobs.Domain.Repository.Repo;
 using Jobs.Domain.Specifications;
 using Jobs.Infrastructure.Data;
-using Jobs.Infrastructure.Repositories.IRepository;
 using Jobs.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
 
