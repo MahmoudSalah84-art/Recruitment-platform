@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Jobs.Infrastructure.Services
 {
 	public interface IFileStorageService

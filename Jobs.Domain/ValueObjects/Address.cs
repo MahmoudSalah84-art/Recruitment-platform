@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Jobs.Domain.ValueObjects
 {
     using Jobs.Domain.Common.YourProject.Domain.Common;

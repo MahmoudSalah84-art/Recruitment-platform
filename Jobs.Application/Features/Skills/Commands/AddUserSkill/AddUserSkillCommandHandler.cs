@@ -1,5 +1,5 @@
-﻿using Jobs.Application.Abstractions.Messaging;
-using Jobs.Application.Common.Interfaces;
+﻿using Jobs.Application.Abstractions.Interfaces;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.Entities;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
 

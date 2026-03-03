@@ -1,5 +1,5 @@
-﻿using Jobs.Application.Abstractions.Messaging;
-using Jobs.Application.Common.Interfaces;
+﻿using Jobs.Application.Abstractions.Interfaces;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
 
 namespace Jobs.Application.Features.Users.Commands.UpdateSinglePlatform

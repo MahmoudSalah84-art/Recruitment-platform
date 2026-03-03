@@ -1,8 +1,7 @@
-﻿using Jobs.Application.Abstractions.Messaging;
-using Jobs.Application.Common.Interfaces;
+﻿using Jobs.Application.Abstractions.Interfaces;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Features.Companies.Queries.GetCompanyProfile;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
 
 namespace Jobs.Application.Features.Companies.Queries.GetCompanyDetails
 {
@@ -22,28 +21,27 @@ namespace Jobs.Application.Features.Companies.Queries.GetCompanyDetails
 			if (_currentUser.UserId == Guid.Empty)
 				return Result<CompanyProfileDto>.Failure("User not authenticated");
 
-			var company = await _unitOfWork.Companies.Query()
-				.Where(x => x.Id == _currentUser.UserId)
-				.Select(x => new CompanyProfileDto(
-					x.Id,
-					x.Name,
-					x.Description,
-					x.Industry,
-					x.EmployeesCount,
-					x.LogoUrl,
-
-					x.CompanyAddress.Country,
-					x.CompanyAddress.City,
-					x.CompanyAddress.Street,
-					x.CompanyAddress.BuildingNumber,
-					x.CompanyAddress.PostalCode
-				))
-				.FirstOrDefaultAsync(cancellationToken);
+			var company = await _unitOfWork.Companies.GetByIdAsync(_currentUser.UserId)
 
 			if (company is null)
 				return Result<CompanyProfileDto>.Failure("Company not found");
 
-			return Result<CompanyProfileDto>.Success(company);
+			var dto = new CompanyProfileDto(
+					company.Id,
+					company.Name,
+					company.Description,
+					company.Industry,
+					company.EmployeesCount,
+					company.LogoUrl,
+
+					company.CompanyAddress.Country,
+					company.CompanyAddress.City,
+					company.CompanyAddress.Street,
+					company.CompanyAddress.BuildingNumber,
+					company.CompanyAddress.PostalCode
+			);
+
+			return Result<CompanyProfileDto>.Success(dto);
 		}
 	}
 }

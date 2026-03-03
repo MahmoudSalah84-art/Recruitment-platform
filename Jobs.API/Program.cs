@@ -1,4 +1,4 @@
-﻿
+﻿using Jobs.API.Extensions;
 using Jobs.Application;
 using Jobs.Infrastructure;
 using Jobs.Infrastructure.Data;
@@ -25,6 +25,7 @@ builder.Services.AddDbContext<JobDbContext>(options =>
 //builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails(); // ميزة لدعم عرض الأخطاء بشكل قياسي
 
+builder.Services.AddPermissionPolicies();
 
 
 var app = builder.Build();
