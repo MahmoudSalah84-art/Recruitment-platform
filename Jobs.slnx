@@ -3,4 +3,7 @@
   <Project Path="src/backend/Jobs.Application/Jobs.Application.csproj" />
   <Project Path="src/backend/Jobs.Domain/Jobs.Domain.csproj" />
   <Project Path="src/backend/Jobs.Infrastructure/Jobs.Infrastructure.csproj" />
+  <Project Path="tests/backend-tests/Jobs.Application.Tests/Jobs.Application.Tests.csproj" />
+  <Project Path="tests/backend-tests/Jobs.Domain.Tests/Jobs.Domain.Tests.csproj" />
+  <Project Path="tests/backend-tests/Jobs.Infrastructure.Tests/Jobs.Infrastructure.Tests.csproj" />
 </Solution>
