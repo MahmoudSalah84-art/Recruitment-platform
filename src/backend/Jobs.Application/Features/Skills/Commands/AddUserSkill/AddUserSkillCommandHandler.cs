@@ -1,7 +1,7 @@
 ﻿using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.Entities;
-using Jobs.Infrastructure.Repositories.UnitOfWork;
+using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Skills.Commands.AddUserSkill
 {
@@ -19,7 +19,7 @@ namespace Jobs.Application.Features.Skills.Commands.AddUserSkill
 
 		public async Task<Result> Handle( AddUserSkillCommand request, CancellationToken cancellationToken)
 		{
-			if (_currentUser.UserId == Guid.Empty)
+			if (_currentUser.UserId == string.Empty)
 				return Result.Failure("User not authenticated");
 
 

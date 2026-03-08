@@ -9,7 +9,7 @@ namespace Jobs.Domain.Rules.SkillRules
 	public class SkillAlreadyAddedRule : IBusinessRule
 	{
 		private readonly IEnumerable<JobSkill> _skills;
-		private readonly Guid _skillId;
+		private readonly string _skillId;
 
 		public SkillAlreadyAddedRule(Job job)
 		{

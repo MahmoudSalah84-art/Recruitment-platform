@@ -2,7 +2,7 @@
 namespace Jobs.Application.Features.Companies.Queries.GetCompanyProfile
 {
 	public record CompanyProfileDto(
-	Guid Id,
+	string Id,
 	string Name,
 	string Description,
 	string Industry,

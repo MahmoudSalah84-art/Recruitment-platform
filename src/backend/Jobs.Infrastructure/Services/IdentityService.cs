@@ -37,12 +37,16 @@ namespace Jobs.Infrastructure.Services
 			if (await _userManager.FindByEmailAsync(req.Email) != null)
 				return Result<AuthResponse>.Failure("Email already registered.");
 
+			if (await _userManager.FindByNameAsync(req.UserName) != null)
+				return Result<AuthResponse>.Failure("userName already registered.");
+
 			var user = new AppUser
 			{
+				Id = req.Id,
 				FirstName = req.FirstName,
 				LastName = req.LastName,
 				Email = req.Email,
-				UserName = req.Email
+				UserName = req.UserName ?? req.Email,
 			};
 
 			var result = await _userManager.CreateAsync(user, req.Password);

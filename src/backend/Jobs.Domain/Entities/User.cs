@@ -11,8 +11,9 @@ namespace Jobs.Domain.Entities
     public class User : AggregateRoot , ISoftDelete
     {
 		// ========= Properties =========
-		public string FullName { get; private set; }
-        public Email Email { get; private set; }
+		public string FirstName { get; private set; }
+		public string LastName { get; private set; }
+		public Email Email { get; private set; }
         public UserRole Role { get; private set; }
         public PhoneNumber? PhoneNumber { get; private set; }
         public string ProfilePictureUrl { get; private set; } = string.Empty;
@@ -21,7 +22,7 @@ namespace Jobs.Domain.Entities
 		public string? GitHubUrl { get; private set; }
 		public string? PortfolioUrl { get; private set; }
 
-		public Guid? CompanyId { get; private set; }
+		public string? CompanyId { get; private set; }
         public Company Company { get; private set; }
 
         public bool IsVerified { get; private set; }
@@ -30,7 +31,6 @@ namespace Jobs.Domain.Entities
 		private readonly List<UserSkill> _skills = new();
 		public IReadOnlyCollection<UserSkill> Skills => _skills.AsReadOnly();
 
-		public Guid? CVId { get; private set; }
 		public CV CV { get; private set; }
 
 
@@ -38,29 +38,26 @@ namespace Jobs.Domain.Entities
 		public IReadOnlyCollection<JobApplication> Applications => _applications.AsReadOnly();
 
 
-		private readonly List<UserExperience> _experience = new();
-		public IReadOnlyCollection<UserExperience> Experience => _experience.AsReadOnly();
-
 
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
 		// ========= Constructors =========
 		private User() { }
-		public User(string fullName, Email email, UserRole role , Func<string, bool> emailExists)
+	
+		public User(string firstName, string lastName, string email, bool isEmailExists, string? phoneNumber = null, string bio = "")
 		{
-			CheckRule(new NotEmptyRule(fullName , "name"));
-			CheckRule(new StringLengthRule(fullName));
-			CheckRule(new NotNullRule<Email>(email));
-			CheckRule(new EmailFormatRule(email));
-			CheckRule(new UserEmailMustBeUniqueRule(emailExists, email.Value));
+			CheckRule(new UserEmailMustBeUniqueRule(isEmailExists));
 
+			FirstName = firstName;
+			LastName = lastName;
+			Email =  Email.Create(email);
+			PhoneNumber = PhoneNumber.Create(phoneNumber);
+			Bio = bio;
 
-			FullName = fullName ;
-			Email = email ;
-			Role = role;
 			IsVerified = false;
 			CreatedAt = DateTime.UtcNow;
 			UpdatedAt = CreatedAt;
+
 			AddEvent(new UserRegisteredEvent(this));
 		}
 
@@ -72,11 +69,11 @@ namespace Jobs.Domain.Entities
 			IsVerified = true;
 			AddEvent(new UserVerifiedEvent(this));
 		}
-		public void UpdateEmail(Email newEmail , Func<string, bool> emailExists)
+		public void UpdateEmail(Email newEmail , bool isEmailExists)
         {
 			CheckRule(new NotNullRule<Email>(newEmail));
 			CheckRule(new EmailFormatRule(newEmail));
-			CheckRule(new UserEmailMustBeUniqueRule(emailExists, newEmail.Value));
+			CheckRule(new UserEmailMustBeUniqueRule(isEmailExists));
 
 			Email = newEmail;
 			UpdatedAt = DateTime.UtcNow;
@@ -88,85 +85,163 @@ namespace Jobs.Domain.Entities
 
 		}
 
-		public void UpdateProfile(string fullName, String email, String phoneNumber, string bio, string profilePictureUrl)
+		public void UpdateProfile(
+		string firstName,
+		string lastName,
+		string? bio,
+		string? linkedInUrl,
+		string? gitHubUrl,
+		string? portfolioUrl)
 		{
-			FullName = fullName;
-			Email.Create(email);
-			PhoneNumber.Create(phoneNumber);
-			Bio = bio ?? Bio;
-			ProfilePictureUrl = profilePictureUrl ?? ProfilePictureUrl;
-			UpdatedAt = DateTime.UtcNow;
+			if (string.IsNullOrWhiteSpace(firstName))
+				throw new DomainException("First name is required.");
 
-		}
+			if (string.IsNullOrWhiteSpace(lastName))
+				throw new DomainException("Last name is required.");
 
-		public void AddSkill(UserSkill skill)
-		{
-			CheckRule(new NotNullRule<UserSkill>(skill));
-			if (_skills.Any(s => s.SkillId == skill.SkillId))
-				return;
-
-			_skills.Add(skill);
-			UpdatedAt = DateTime.UtcNow;
-
-		}
-
-		public void AddCV(CV cv)
-		{
-			CheckRule(new NotNullRule<CV>(cv));
-			CVId = cv.Id;
-			UpdatedAt = DateTime.UtcNow;
-
-		}
-
-		public void AddApplication(JobApplication application)
-		{
-			CheckRule(new NotNullRule<JobApplication>(application));
-			CheckRule(new CandidateCannotApplyTwiceRule(this, application.JobId));
-			CheckRule(new CannotApplyToExpiredJobRule(application.Job));
-
-			_applications.Add(application);
-			UpdatedAt = DateTime.UtcNow;
-
-		}
-
-		public void UpdateSocialLinks(string? linkedInUrl, string? gitHubUrl, string? portfolioUrl)
-		{
+			FirstName = firstName;
+			LastName = lastName;
+			Bio = bio ?? string.Empty;
 			LinkedInUrl = linkedInUrl;
 			GitHubUrl = gitHubUrl;
 			PortfolioUrl = portfolioUrl;
+
+			//RaiseDomainEvent(new UserProfileUpdatedDomainEvent(Id));
+		}
+
+		public void UpdateProfilePicture(string profilePictureUrl)
+		{
+
+			ProfilePictureUrl = profilePictureUrl;
+		}
+		// ==================== Email ====================
+		public void ChangeEmail(Email newEmail)
+		{
+			if (Email == newEmail)
+				throw new DomainException("New email must be different from the current one.");
+
+			Email = newEmail;
+			IsVerified = false;  
+
+			//RaiseDomainEvent(new UserEmailChangedDomainEvent(Id, newEmail.Value));
+		}
+
+
+		// ==================== Company ====================
+		public void AssignToCompany(string companyId)
+		{
+
+			CompanyId = companyId;
+		}
+
+		public void RemoveFromCompany()
+		{
+			if (CompanyId is null)
+				throw new DomainException("User is not assigned to any company.");
+
+			CompanyId = null;
+			Company = null!;
+		}
+
+		// ==================== Skills ====================
+		public void AddSkill(UserSkill skill)
+		{
+			if (_skills.Any(s => s.SkillId == skill.SkillId))
+				throw new DomainException("Skill already added.");
+
+			_skills.Add(skill);
+		}
+
+		public void RemoveSkill(string skillId)
+		{
+			var skill = _skills.FirstOrDefault(s => s.SkillId == skillId);
+
+			if (skill is null)
+				throw new DomainException("Skill not found.");
+
+			_skills.Remove(skill);
+		}
+		public void ClearSkills()
+		{
+			_skills.Clear();
+		}
+
+		// ==================== CV ====================
+		public void UploadCV(CV cv)
+		{
+			CV = cv;
+
+			//RaiseDomainEvent(new UserCVUploadedDomainEvent(Id));
+		}
+
+
+		public void RemoveCV()
+		{
+			if (CV is null)
+				throw new DomainException("No CV to remove.");
+
+			CV = null!;
+		}
+
+		// ==================== Job Applications ====================
+		public void AddApplication(JobApplication application)
+		{
+			CheckRule(new CandidateCannotApplyTwiceRule(this, application.JobId));
+			CheckRule(new CannotApplyToExpiredJobRule(application.Job));
+
 			UpdatedAt = DateTime.UtcNow;
 
+			_applications.Add(application);
+
+			//RaiseDomainEvent(new UserAppliedForJobDomainEvent(Id, application.JobId));
 		}
+		
+
+		public void WithdrawApplication(string jobId)
+		{
+			var application = _applications.FirstOrDefault(a => a.JobId == jobId);
+
+			if (application is null)
+				throw new DomainException("Application not found.");
+
+			if (application.Status != ApplicationStatus.Pending)
+				throw new DomainException("Cannot withdraw a processed application.");
+
+			_applications.Remove(application);
+
+			//RaiseDomainEvent(new UserWithdrewApplicationDomainEvent(Id, jobId));
+		}
+
+		// ==================== Soft Delete ====================
+		public void Delete()
+		{
+			if (IsDeleted)
+				throw new DomainException("User is already deleted.");
+
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
+
+			//RaiseDomainEvent(new UserDeletedDomainEvent(Id));
+		}
+
+		public void Restore()
+		{
+			if (!IsDeleted)
+				throw new DomainException("User is not deleted.");
+
+			IsDeleted = false;
+			DeletedAt = null;
+		}
+	 
+
 
 		void ISoftDelete.SoftDelete()
 		{
 			IsDeleted = true;
 			DeletedAt = DateTime.UtcNow;
 		}
-		public void UpdateSocialLink(string platform, string url)
-		{
-			switch (platform.ToLower())
-			{
-				case "linkedin":
-					LinkedInUrl = url;
-					break;
-
-				case "github":
-					GitHubUrl = url;
-					break;
-
-				case "portfolio":
-					PortfolioUrl = url;
-					break;
-
-				default:
-					throw new DomainException("Invalid social platform");
-			}
-		}
-		public void RemoveSocialLink(string platform)
-        {
-			UpdateSocialLink(platform, null!);
-		}
+		
+		
     }
 }
 

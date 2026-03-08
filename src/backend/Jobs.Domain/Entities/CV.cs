@@ -2,6 +2,7 @@
 using Jobs.Domain.Events.CV_Recommendation_Events;
 using Jobs.Domain.Rules;
 using Jobs.Domain.ValueObjects;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.Domain.Entities
 {
@@ -9,8 +10,7 @@ namespace Jobs.Domain.Entities
 	{
 
 		// ========== Properties ==========
-		public Guid UserId { get; private set; }
-		public User User { get; set; }
+		public string UserId { get; private set; }
 
         public string Title { get; private set; } = string.Empty;
 		public FilePath FilePath { get; private set; }
@@ -21,11 +21,25 @@ namespace Jobs.Domain.Entities
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
 
+
+
+		// Navigation Properties
+		public User User { get; set; }
+
+		private readonly List<JobApplication> _applications = new();
+		public IReadOnlyCollection<JobApplication> Applications => _applications.AsReadOnly();
+
+
+		private readonly List<CVJobRecommendation> _cVJobRecommendations = new();
+		public IReadOnlyCollection<CVJobRecommendation> CVJobRecommendations => _cVJobRecommendations.AsReadOnly();
+
+
+
 		// ========== Constructor ==========
 		private CV() { }
-		public CV(Guid userId, string title, string file, string? summary)
+		public CV(string userId, string title, string file, string? summary)
 		{
-			CheckRule(new NotNullRule<Guid>(userId));
+			CheckRule(new NotNullRule<string>(userId));
 			CheckRule(new NotNullRule<string>(file));
 			CheckRule(new NotEmptyRule(title, title));
 

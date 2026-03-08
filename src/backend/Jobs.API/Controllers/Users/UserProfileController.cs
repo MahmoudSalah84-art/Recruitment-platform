@@ -1,4 +1,5 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.Application.Features.Users.Commands.Register;
 using Jobs.Application.Features.Users.Commands.UpdateUserProfile;
 using Jobs.Application.Features.Users.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Mvc;
@@ -36,5 +37,7 @@ namespace Jobs.API.Controllers.Users
 
 			return result.IsSuccess ? NoContent() : BadRequest(result.Error);
 		}
+
+		
 	}
 }

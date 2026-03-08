@@ -9,10 +9,10 @@ namespace Jobs.Domain.Entities
     public class UserSkill : BaseEntity , ISoftDelete
 	{
 		// ========== Properties ==========
-		public Guid UserId { get; private set; }
+		public string UserId { get; private set; }
 		public User User { get; private set; }
 
-		public Guid SkillId { get; private set; }
+		public string SkillId { get; private set; }
 		public Skill Skill { get; private set; }
 
 		public bool IsDeleted { get; set; }
@@ -21,7 +21,7 @@ namespace Jobs.Domain.Entities
 		// ========== Constructor ==========
 		private UserSkill() { }
 
-		public UserSkill(Guid userId, Guid skillId)
+		public UserSkill(string userId, string skillId)
 		{
 			CheckRule(new NotEmptyGuidRule(userId));
 			CheckRule(new NotEmptyGuidRule(skillId));

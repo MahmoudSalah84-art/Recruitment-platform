@@ -8,8 +8,8 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
     public class CvParsedEvent : DomainEvent
     {
-		public Guid CvId { get; }
-		public Guid UserId { get; }
+		public string CvId { get; }
+		public string UserId { get; }
 
 
         public CvParsedEvent(CV cv)

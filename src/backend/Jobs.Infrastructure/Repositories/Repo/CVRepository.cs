@@ -1,6 +1,5 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Interfaces;
-using Jobs.Domain.Repository.Repo;
+using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -19,12 +18,13 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <param name="id">The Id of the CV.</param>
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>The CV entity with parsed details if found, otherwise null.</returns>
-		public async Task<CV?> GetByIdWithParsedAsync(Guid id, CancellationToken ct = default)
+		public async Task<CV?> GetByIdWithParsedAsync(string id, CancellationToken ct = default)
 		{
 			return await _set
 				.AsNoTracking()
 				.Include(cv => cv.ParsedData)
 				.FirstOrDefaultAsync(cv => cv.Id == id, ct);
 		}
+
     }
 }

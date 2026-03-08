@@ -13,66 +13,94 @@ namespace Jobs.Infrastructure.Data.Configurations
 		{
 			builder.ToTable("Companies");
 
-			builder.HasKey(c => c.Id);
-			builder.Property(c => c.Id)
-				   .ValueGeneratedNever();
+			builder.HasKey(e => e.Id);
 
+			builder.Property(e => e.Id)
+				.ValueGeneratedNever()
+				.IsRequired()
+				.HasMaxLength(36);
+
+			builder.Property(e => e.CreatedAt)
+				.IsRequired();
+
+			builder.Property(e => e.UpdatedAt)
+				.IsRequired(false);
+
+			// ===== Properties =====
 			builder.Property(c => c.Name)
-				   .HasMaxLength(100)
-				   .IsRequired();
+				.IsRequired()
+				.HasMaxLength(200);
 
+			builder.OwnsOne(c => c.Email, email =>
+			{
+				email.Property(e => e.Value)
+					.HasColumnName("EmailAddress")
+					.IsRequired()
+					.HasMaxLength(256);
+			});
 
 			builder.Property(c => c.Industry)
-				   .HasMaxLength(150)
-				   .IsRequired();
-
-			builder.Property(c => c.Description)
-				   .HasMaxLength(4000);
-
-			builder.Property(c => c.LogoUrl)
-				   .HasMaxLength(500);
-
-			builder.Property(c => c.IsDeleted)
-				   .HasDefaultValue(false);
-
-			builder.Property(c => c.DeletedAt);
-
-			builder.HasQueryFilter(c => !c.IsDeleted);
+				.IsRequired()
+				.HasMaxLength(100);
 
 			builder.OwnsOne(c => c.CompanyAddress, address =>
 			{
-				address.Property(a => a.Country)
-					   .HasMaxLength(50)
-					   .IsRequired();
-				address.Property(a => a.City)
-					   .HasMaxLength(50)
-					   .IsRequired();
 				address.Property(a => a.Street)
-					   .HasMaxLength(100)
-					   .IsRequired();
-				address.WithOwner();
+					.HasColumnName("Street")
+					.HasMaxLength(200)
+					.IsRequired(false);
+
+				address.Property(a => a.City)
+					.HasColumnName("City")
+					.HasMaxLength(100)
+					.IsRequired(false);
+
+				address.Property(a => a.Country)
+					.HasColumnName("Country")
+					.HasMaxLength(100)
+					.IsRequired(false);
 			});
 
-			builder.HasMany<User>("_employees")
-				   .WithOne(j => j.Company)
-				   .HasForeignKey(u => u.CompanyId)
-				   .OnDelete(DeleteBehavior.Restrict);
-			builder.Navigation("_employees")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			builder.Property(c => c.EmployeesCount)
+				.IsRequired()
+				.HasDefaultValue(0);
 
-			builder.HasMany<Job>("_jobs")
-				   .WithOne(j => j.Company)
-				   .HasForeignKey(j => j.CompanyId)
-				   .OnDelete(DeleteBehavior.Cascade);
-			builder.Navigation("_jobs")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			builder.Property(c => c.Description)
+				.HasMaxLength(2000)
+				.HasDefaultValue(string.Empty);
 
-			builder.HasMany<UserExperience>("_experience")
-			   .WithOne(u => u.Company)
-			   .HasForeignKey(a => a.CompanyId)
-			   .OnDelete(DeleteBehavior.Cascade);
-			builder.Navigation("_experience")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			builder.Property(c => c.LogoUrl)
+				.HasMaxLength(500)
+				.HasDefaultValue(string.Empty);
+
+			// ===== Soft Delete =====
+			builder.Property(c => c.IsDeleted)
+				.IsRequired()
+				.HasDefaultValue(false);
+
+			builder.Property(c => c.DeletedAt)
+				.IsRequired(false);
+
+			builder.HasQueryFilter(c => !c.IsDeleted);
+ 
+
+
+			// Relationships
+			builder.HasMany(c => c.Jobs)
+				.WithOne(j => j.Company)
+				.HasForeignKey(j => j.CompanyId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.HasMany(c => c.Employees)
+				.WithOne(u => u.Company)
+				.HasForeignKey(u => u.CompanyId)
+				.OnDelete(DeleteBehavior.SetNull);
+
+
+
+			// ===== Indexes =====
+			builder.HasIndex(c => c.Name);
+			builder.HasIndex(c => c.Industry);
 		}
 	}
 }

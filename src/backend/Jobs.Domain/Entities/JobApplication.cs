@@ -14,14 +14,11 @@ namespace Jobs.Domain.Entities
 	{
 		// ========= Properties =========
 
-		public Guid ApplicantId { get; private set; }
-		public User Applicant { get; private set; }
+		public string ApplicantId { get; private set; }
 
-		public Guid JobId { get; private set; }
-		public Job Job { get; private set; }
+		public string JobId { get; private set; }
 
-		public Guid? CvId { get; private set; }
-		public CV CV { get; private set; }
+		public string? CvId { get; private set; }
 
 		public int MatchScore { get; private set; } // 0..100
 		public ApplicationStatus Status { get; private set; } // Pending, Accepted, Rejected
@@ -31,9 +28,15 @@ namespace Jobs.Domain.Entities
 		public DateTime? DeletedAt { get; set; }
 
 
+
+		// Navigation Properties
+		public User Applicant { get; set; }
+		public Job Job { get; set; }
+		public CV CV { get; set; }
+
 		// ========= Constructors =========
 		private JobApplication() { }
-		public JobApplication(Guid applicantId, Guid jobId, Guid? cvId)
+		public JobApplication(string applicantId, string jobId, string? cvId)
 		{
 			CheckRule(new NotEmptyGuidRule(applicantId));
 			CheckRule(new NotEmptyGuidRule(jobId));

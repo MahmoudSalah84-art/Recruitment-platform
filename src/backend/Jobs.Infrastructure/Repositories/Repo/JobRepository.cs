@@ -1,6 +1,5 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Interfaces;
-using Jobs.Domain.Repository.Repo;
+using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,7 +15,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <param name="id">The Id of the Job.</param>
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>The Job entity with Skills if found, otherwise null.</returns>
-		public async Task<Job?> GetByIdWithSkillsAsync(Guid id, CancellationToken ct = default)
+		public async Task<Job?> GetByIdWithSkillsAsync(string id, CancellationToken ct = default)
 		{
 			return await _set
 				.AsNoTracking()            

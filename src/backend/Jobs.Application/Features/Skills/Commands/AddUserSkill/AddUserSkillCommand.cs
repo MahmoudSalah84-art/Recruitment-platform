@@ -3,6 +3,6 @@
 namespace Jobs.Application.Features.Skills.Commands.AddUserSkill
 {
 	public record AddUserSkillCommand(
-	Guid SkillId
+	string SkillId
 	) : ICommand;
 }

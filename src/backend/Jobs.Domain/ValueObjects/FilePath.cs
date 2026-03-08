@@ -9,6 +9,8 @@ namespace Jobs.Domain.ValueObjects
 	{
 		public string Value { get; }
 
+		public FilePath() { }
+
 		private FilePath(string path) => Value = path;
 
 		public static FilePath Create(string path)

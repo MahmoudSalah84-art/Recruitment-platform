@@ -12,11 +12,9 @@ namespace Jobs.Domain.Entities
 	{
 
 		// ========= Properties =========
-		public Guid CompanyId { get; private set; }
-		public Company Company { get; private set; }
+		public string CompanyId { get; private set; }
 
-		public Guid HrId { get; private set; }
-		public User Hr { get; private set; }
+		public string HrId { get; private set; }
 
 		public string Title { get; private set; }
 		public string Description { get; private set; }
@@ -33,17 +31,33 @@ namespace Jobs.Domain.Entities
 
 
 
-		private readonly List<JobSkill> _requiredSkills = new();
-		public IReadOnlyCollection<JobSkill> RequiredSkills => _requiredSkills.AsReadOnly();
+		
 
 
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
 
+
+
+		// Navigation Properties
+		public Company Company { get; set; }
+		public User HR { get; set; }
+
+		private readonly List<JobSkill> _requiredSkills = new();
+		public IReadOnlyCollection<JobSkill> RequiredSkills => _requiredSkills.AsReadOnly();
+
+
+		private readonly List<JobApplication> _applications = new();
+		public IReadOnlyCollection<JobApplication> Applications => _applications.AsReadOnly();
+
+
+		private readonly List<CVJobRecommendation> _cVJobRecommendations = new();
+		public IReadOnlyCollection<CVJobRecommendation> CVJobRecommendations => _cVJobRecommendations.AsReadOnly();
+
 		// ========= Constructors =========
 		private Job() { }
 
-		public Job(Guid companyId, Guid hrId, string title, SalaryRange? salary, string description, string requirements, int expLevel, DateTime? expirationDate = null)
+		public Job(string companyId, string hrId, string title, SalaryRange? salary, string description, string requirements, int expLevel, DateTime? expirationDate = null)
         {
 			CheckRule(new NotEmptyGuidRule(companyId));
 			CheckRule(new NotEmptyGuidRule(hrId));

@@ -1,5 +1,4 @@
-﻿using Jobs.Domain.Repositories.UnitOfWork;
-using Jobs.Domain.Repository.Repo;
+﻿using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,7 +21,6 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		public ICompanyRepository Companies => GetRepository<ICompanyRepository>();
 		public IApplicationRepository Applications => GetRepository<IApplicationRepository>();
 		public ICVRepository CVs => GetRepository<ICVRepository>();
-        public IExperienceRepository Experiences => GetRepository<IExperienceRepository>();
 		public ISkillRepository Skills => GetRepository<ISkillRepository>();
 		public IJobSkillRepository JobSkills => GetRepository<IJobSkillRepository>();
 		public IUserSkillRepository UserSkills => GetRepository<IUserSkillRepository>();

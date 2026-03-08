@@ -1,12 +1,7 @@
 ﻿using Jobs.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Reflection.Emit;
-using System.Text;
-using static System.Net.Mime.MediaTypeNames;
-
+ 
 namespace Jobs.Infrastructure.Data.Configurations
 {
 	public class ApplicationConfiguration : IEntityTypeConfiguration<JobApplication>
@@ -15,43 +10,81 @@ namespace Jobs.Infrastructure.Data.Configurations
 		{
 			builder.ToTable("JobApplications");
 
-			builder.HasKey(x => x.Id);
-			builder.Property(x => x.Id)
-				   .ValueGeneratedNever();
+			builder.HasKey(e => e.Id);
 
-			builder.Property(x => x.CreatedAt)
-				   .IsRequired();
-			builder.Property(x => x.UpdatedAt)
-				   .IsRequired(false);
+			builder.Property(e => e.Id)
+				.ValueGeneratedNever()
+				.IsRequired()
+				.HasMaxLength(36);
 
-			builder.Property(x => x.MatchScore)
-				   .IsRequired();
-			builder.ToTable(t => t.HasCheckConstraint("CK_JobApplication_MatchScore", "[MatchScore] >= 0 AND [MatchScore] <= 100"));
+			builder.Property(e => e.CreatedAt)
+				.IsRequired();
 
-			builder.Property(x => x.Status)
-				   .HasConversion<string>()
-				   .HasMaxLength(50);
+			builder.Property(e => e.UpdatedAt)
+				.IsRequired(false);
 
-			builder.Property(x => x.StatusHistory)
-				   .IsRequired(false);
+			// ===== Properties =====
+			builder.Property(ja => ja.ApplicantId)
+				.IsRequired()
+				.HasMaxLength(36);
 
-			builder.HasOne(x => x.Applicant)
-				   .WithMany() 
-				   .HasForeignKey(x => x.ApplicantId)
-				   .OnDelete(DeleteBehavior.Restrict); // forbidden delete if there are related applications
+			builder.Property(ja => ja.JobId)
+				.IsRequired()
+				.HasMaxLength(36);
 
-			builder.HasOne(x => x.Job)
-				   .WithMany()
-				   .HasForeignKey(x => x.JobId)
-				   .OnDelete(DeleteBehavior.Restrict);
+			builder.Property(ja => ja.CvId)
+				.HasMaxLength(36)
+				.IsRequired(false);
 
-			builder.HasOne(x => x.CV)
-				   .WithMany()
-				   .HasForeignKey(x => x.CvId)
-				   .IsRequired(false)
-				   .OnDelete(DeleteBehavior.SetNull);
+			builder.Property(ja => ja.MatchScore)
+				.IsRequired()
+				.HasDefaultValue(0);
 
-			builder.HasQueryFilter(p => !p.IsDeleted);
+			builder.Property(ja => ja.Status)
+				.IsRequired()
+				.HasConversion<string>()
+				.HasMaxLength(50);
+
+			builder.Property(ja => ja.StatusHistory)
+				.IsRequired();
+
+			// ===== Soft Delete =====
+			builder.Property(ja => ja.IsDeleted)
+				.IsRequired()
+				.HasDefaultValue(false);
+
+			builder.Property(ja => ja.DeletedAt)
+				.IsRequired(false);
+
+			builder.HasQueryFilter(ja => !ja.IsDeleted);
+
+			// ===== Relationships =====
+			 
+			builder.HasOne(a => a.Applicant)
+				.WithMany(u => u.Applications)
+				.HasForeignKey(a => a.ApplicantId)
+				.OnDelete(DeleteBehavior.Restrict);
+
+			builder.HasOne(a => a.Job)
+				.WithMany(j => j.Applications)
+				.HasForeignKey(a => a.JobId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.HasOne(a => a.CV)
+				.WithMany(cv => cv.Applications)
+				.HasForeignKey(a => a.CvId)
+				.OnDelete(DeleteBehavior.SetNull)
+				.IsRequired(false);
+
+
+			// ===== Indexes =====
+			builder.HasIndex(ja => ja.ApplicantId);
+			builder.HasIndex(ja => ja.JobId);
+			// Prevent duplicate applications
+			builder.HasIndex(ja => new { ja.ApplicantId, ja.JobId })
+				.IsUnique()
+				.HasFilter("[IsDeleted] = 0");
+   
 		}
     }
 }

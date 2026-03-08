@@ -1,4 +1,5 @@
-﻿using Jobs.Domain.Entities;
+﻿using Jobs.Domain.Common;
+using Jobs.Domain.Entities;
 using Jobs.Infrastructure.Data.Configurations;
 using Jobs.Infrastructure.Outbox;
 using Microsoft.EntityFrameworkCore;
@@ -24,11 +25,12 @@ namespace Jobs.Infrastructure.Data
 		public DbSet<Skill> Skills => Set<Skill>();
 		public DbSet<User> Users => Set<User>();
 		public DbSet<UserSkill> UserSkills => Set<UserSkill>();
-		public DbSet<UserExperience> UserExperations => Set<UserExperience>();
 		public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			modelBuilder.Ignore<DomainEvent>();
+
 			modelBuilder.ApplyConfiguration(new UserConfiguration());
 			modelBuilder.ApplyConfiguration(new CompanyConfiguration());
 			modelBuilder.ApplyConfiguration(new JobConfiguration());
@@ -38,7 +40,6 @@ namespace Jobs.Infrastructure.Data
 			modelBuilder.ApplyConfiguration(new JobSkillConfiguration());
 			modelBuilder.ApplyConfiguration(new CVJobRecommendationConfiguration());
 			modelBuilder.ApplyConfiguration(new CVConfiguration());
-			modelBuilder.ApplyConfiguration(new UserExperienceConfiguration());
 
 			modelBuilder.ApplyConfiguration(new OutboxMessageConfiguration());
 

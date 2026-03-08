@@ -3,6 +3,8 @@ using Jobs.Domain.Events.Company_Events;
 using Jobs.Domain.Events.JobEvents;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.CompanyRoles;
+using Jobs.Domain.Rules.UserRules;
+using Jobs.Domain.ValueObjects;
 using Jobs.Domain.ValueObjects.YourProject.Domain.ValueObjects;
 
 namespace Jobs.Domain.Entities
@@ -11,23 +13,19 @@ namespace Jobs.Domain.Entities
 	{
 		// ========== Properties ==========
 		public string Name { get; private set; }
-        public string Industry { get; private set; }
+		public Email Email { get; private set; }
+		public string Industry { get; private set; }
         public Address CompanyAddress { get; private set; }
         public int EmployeesCount { get; private set; }
         public string Description { get; private set; } = string.Empty;
 		public string LogoUrl { get; private set; } = string.Empty;
 
 		private readonly List<User> _employees = new();
-		public IReadOnlyCollection<User> Employees => _employees;
+		public IReadOnlyCollection<User> Employees => _employees; // current user
 
 		private readonly  List<Job> _jobs = new();
 		//if you don't wrirte AsReadOnly(), the consumer can cast it back to List<Job> and modify it.
 		public IReadOnlyCollection<Job> Jobs => _jobs.AsReadOnly();
-
-
-		private readonly List<UserExperience> _experience = new();
-		public IReadOnlyCollection<UserExperience> Experience => _experience.AsReadOnly();
-
 
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
@@ -36,18 +34,21 @@ namespace Jobs.Domain.Entities
 		// ========== Constructor ==========
 		private Company(){}
 
-		public Company(string name, string? description,
-			string industry, string? logoUrl,string Country, string City,
-			string Street, string BuildingNumber, string PostalCode)
+		public Company(string name,bool isNameExists, 
+			string email,bool isEmailExists, 
+			string industry,string Country, string city,
+			string Street, string BuildingNumber, string postalCode,
+			string? logoUrl = default, string? description = default)
 		{
-			CheckRule(new NotEmptyRule(name, nameof(name)));
-			CheckRule(new NotEmptyRule(industry, nameof(industry)));
+			CheckRule(new CompanyNameMustBeUniqueRule(isNameExists));
+			CheckRule(new UserEmailMustBeUniqueRule(isEmailExists));
 
 			Name = name;
-			Description = description ?? string.Empty;
+			Email = Email.Create(email);
 			Industry = industry;
+			CompanyAddress = Address.Create(Country, city, Street, BuildingNumber, postalCode);
+			Description = description ?? string.Empty;
 			LogoUrl = logoUrl ?? string.Empty;
-			CompanyAddress = Address.Create(Country, City, Street, BuildingNumber, PostalCode);
 
 			CreatedAt = DateTime.UtcNow;
 			UpdatedAt = CreatedAt;

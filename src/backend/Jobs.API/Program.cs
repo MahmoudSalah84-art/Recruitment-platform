@@ -1,10 +1,9 @@
 ﻿using Jobs.API.Extensions;
+using Jobs.API.Middlewares;
 using Jobs.Application;
 using Jobs.Infrastructure;
-using Jobs.Infrastructure.Data;
+using Jobs.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,17 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddInfrastructure("ddxx","dddd");
-builder.Services.AddApplication();
-builder.Services.AddDbContext<JobDbContext>(options =>
-{
-	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 
-	options.AddInterceptors(new SoftDeleteInterceptor());
-});
+
+builder.Services.AddOpenApi(); 
+
+
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddApplication();
+
 // في ملف Program.cs
-//builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+
 builder.Services.AddProblemDetails(); // ميزة لدعم عرض الأخطاء بشكل قياسي
 
 builder.Services.AddPermissionPolicies();

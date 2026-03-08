@@ -8,9 +8,9 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
     public class CvRecommendedJobCreatedEvent : DomainEvent
     {
-		public Guid RecommendationId { get; }
-		public Guid CvId { get; }
-		public Guid JobId { get; }
+		public string RecommendationId { get; }
+		public string CvId { get; }
+		public string JobId { get; }
 		public double Score { get; }
 
 

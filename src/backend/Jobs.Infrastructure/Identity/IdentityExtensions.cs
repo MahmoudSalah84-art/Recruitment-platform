@@ -9,10 +9,11 @@ namespace Jobs.Infrastructure.Identity
 	{
 		public static IServiceCollection AddJobSiteIdentity(this IServiceCollection services, string identityConnectionString)
 		{
-			services.AddDbContext<IdentityDbContext>(options =>
-				options.UseSqlServer(identityConnectionString) );
+			services.AddDbContext<AppIdentityDbContext>(options =>
+				options.UseSqlServer(identityConnectionString, sql => { sql.EnableRetryOnFailure(); }) 
+			);
 
-			services.AddIdentity<AppUser, IdentityRole<Guid>>(options =>
+			services.AddIdentity<AppUser, AppRole>(options =>
 			{
 				// password settings
 				options.Password.RequireDigit = true;
@@ -29,7 +30,7 @@ namespace Jobs.Infrastructure.Identity
 				// user settings
 				options.User.RequireUniqueEmail = true;
 			})
-			.AddEntityFrameworkStores<IdentityDbContext>()
+			.AddEntityFrameworkStores<AppIdentityDbContext>()
 			.AddDefaultTokenProviders();
 
 			return services;

@@ -21,13 +21,13 @@ namespace Jobs.API.Controllers.AdminController
 			return Ok(userProfile);
 		}
 
-		//GET: /api/Users
-		[HttpGet()]
-		public async Task<IActionResult> GetAllUsersProfiles()
-		{
-			var usersProfiles = await Sender.Send();
-			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
-		}
+		////GET: /api/Users
+		//[HttpGet()]
+		//public async Task<IActionResult> GetAllUsersProfiles()
+		//{
+		//	var usersProfiles = await Sender.Send();
+		//	return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+		//}
 	}
 }
 

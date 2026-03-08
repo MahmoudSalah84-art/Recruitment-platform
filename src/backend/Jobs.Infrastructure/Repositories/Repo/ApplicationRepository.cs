@@ -1,5 +1,5 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Repository.Repo;
+using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +17,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <param name="applicantId">The ID of the applicant.</param>
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>True if the applicant has applied for the job, otherwise false.</returns>
-		public async Task<bool> ExistsForApplicantAsync(Guid jobId, Guid applicantId, CancellationToken ct = default)
+		public async Task<bool> ExistsForApplicantAsync(string jobId, string applicantId, CancellationToken ct = default)
 		{
 			return await _set
 				.AsNoTracking()

@@ -1,7 +1,7 @@
 ﻿using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Features.Companies.Queries.GetCompanyProfile;
-using Jobs.Infrastructure.Repositories.UnitOfWork;
+using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Companies.Queries.GetCompanyDetails
 {
@@ -18,10 +18,10 @@ namespace Jobs.Application.Features.Companies.Queries.GetCompanyDetails
 
 		public async Task<Result<CompanyProfileDto>> Handle( GetCompanyProfileQuery request, CancellationToken cancellationToken)
 		{
-			if (_currentUser.UserId == Guid.Empty)
+			if (_currentUser.UserId == string.Empty)
 				return Result<CompanyProfileDto>.Failure("User not authenticated");
 
-			var company = await _unitOfWork.Companies.GetByIdAsync(_currentUser.UserId)
+			var company = await _unitOfWork.Companies.GetByIdAsync(_currentUser.UserId);
 
 			if (company is null)
 				return Result<CompanyProfileDto>.Failure("Company not found");

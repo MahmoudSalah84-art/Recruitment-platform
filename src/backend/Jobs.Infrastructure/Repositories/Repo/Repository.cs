@@ -1,9 +1,10 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Repository.Repo;
+using Jobs.Domain.IRepositories;
 using Jobs.Domain.Specifications;
 using Jobs.Infrastructure.Data;
 using Jobs.Infrastructure.Specifications;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Jobs.Infrastructure.Repositories.Repo
 {
@@ -21,17 +22,15 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <param name="id">The unique identifier of the entity.</param>
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>The entity if found; otherwise, null.</returns>
-		public virtual async Task<TEntity?> GetByIdAsync(Guid id, CancellationToken ct = default)
+		public virtual async Task<TEntity?> GetByIdAsync(string id, CancellationToken ct = default)
 			=> await _set.FindAsync(id , ct);
-
+		
 		/// <summary>
 		/// Adds a new entity to the database context.
 		/// </summary>
 		/// <param name="entity">The entity to add.</param>
 		public void Add(TEntity entity)
 			=> _set.Add(entity);
-		public async Task AddAsync(TEntity entity, CancellationToken ct = default)
-			=> await _set.AddAsync(entity, ct);
 
 		/// <summary>
 		/// Updates an existing entity in the database context.
@@ -62,6 +61,10 @@ namespace Jobs.Infrastructure.Repositories.Repo
 
 		public async Task<int> CountAsync(ISpecification<TEntity> spec)
 			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).CountAsync();
-		
-	}
+
+		public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+			=> await _set.AnyAsync(predicate);
+
+        
+    }
 }

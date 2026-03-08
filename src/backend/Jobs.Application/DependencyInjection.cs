@@ -1,4 +1,5 @@
 ﻿
+using Jobs.Application.Abstractions.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 
@@ -13,7 +14,7 @@ namespace Jobs.Application
 
 			//services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
-
+			
 
 
 			var assembly = typeof(DependencyInjection).Assembly;

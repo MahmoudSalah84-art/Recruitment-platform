@@ -1,5 +1,4 @@
-﻿using Jobs.Application.Features.Identity.Query.GetUserClaims;
-
+﻿
 namespace Jobs.Application.Common.DTOs
 {
 	public record UserDto

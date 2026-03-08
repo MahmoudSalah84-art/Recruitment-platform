@@ -9,7 +9,7 @@ namespace Jobs.Infrastructure.Services
 	/// <summary>
 	/// Minimal implementation that can be replaced by SMTP / SendGrid / Amazon SES etc.
 	/// </summary>
-	public class EmailService : IEmailService
+	public class EmailService //: IEmailService
 	{
 		// This is a placeholder implementation
 		// In production, use services like SendGrid, AWS SES, or SMTP

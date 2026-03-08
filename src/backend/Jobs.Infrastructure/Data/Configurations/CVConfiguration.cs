@@ -1,9 +1,6 @@
 ﻿using Jobs.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Infrastructure.Data.Configurations
 {
@@ -11,47 +8,88 @@ namespace Jobs.Infrastructure.Data.Configurations
     {
 		public void Configure(EntityTypeBuilder<CV> builder)
 		{
+
 			builder.ToTable("CVs");
 
-			builder.HasKey(cv => cv.Id);
-			builder.Property(cv => cv.Id)
-				   .ValueGeneratedNever();
+			builder.HasKey(e => e.Id);
+
+			builder.Property(e => e.Id)
+				.ValueGeneratedNever()
+				.IsRequired()
+				.HasMaxLength(36);
+
+			builder.Property(e => e.CreatedAt)
+				.IsRequired();
+
+			builder.Property(e => e.UpdatedAt)
+				.IsRequired(false);
+
+			// ===== Properties =====
+			builder.Property(cv => cv.UserId)
+				.IsRequired()
+				.HasMaxLength(36);
 
 			builder.Property(cv => cv.Title)
-				   .HasMaxLength(200)
-				   .IsRequired();
-
-			builder.Property(cv => cv.SummaryText)
-				   .HasMaxLength(2000);
-
-			builder.HasOne(c => c.User)
-				   .WithOne(u => u.CV)
-				   .HasForeignKey<CV>(c => c.UserId)
-				   .OnDelete(DeleteBehavior.Cascade);
+				.HasMaxLength(200)
+				.HasDefaultValue(string.Empty);
 
 			builder.OwnsOne(cv => cv.FilePath, fp =>
 			{
 				fp.Property(f => f.Value)
 					.HasColumnName("FilePath")
-					.HasMaxLength(500)
-					.IsRequired();
-				fp.WithOwner(); // tell EF Core that FilePath is owned by CV , if you remove this line, it will create a separate table for FilePath
+					.IsRequired()
+					.HasMaxLength(500);
 			});
 
-			
+			builder.Property(cv => cv.SummaryText)
+				.HasMaxLength(3000)
+				.IsRequired(false);
+
 			builder.OwnsOne(cv => cv.ParsedData, parsed =>
 			{
 				parsed.Property(p => p.Json)
-					  .HasColumnName("ParsedJson")
-					  .HasColumnType("nvarchar(max)");
-				parsed.WithOwner();
+					.HasColumnName("ParsedJson")
+					.HasColumnType("nvarchar(max)")
+					.IsRequired(false);
+
 			});
 
 			// ===== Soft Delete =====
 			builder.Property(cv => cv.IsDeleted)
-				   .HasDefaultValue(false);
-			builder.Property(cv => cv.DeletedAt);
+				.IsRequired()
+				.HasDefaultValue(false);
+
+			builder.Property(cv => cv.DeletedAt)
+				.IsRequired(false);
+
 			builder.HasQueryFilter(cv => !cv.IsDeleted);
+
+			// ===== Relationships =====
+			builder.HasOne(cv => cv.User)
+				.WithOne(u => u.CV)
+				.HasForeignKey<CV>(cv => cv.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.HasMany(cv => cv.Applications)
+				.WithOne(a => a.CV)
+				.HasForeignKey(a => a.CvId)
+				.OnDelete(DeleteBehavior.SetNull)
+				.IsRequired(false);
+
+			builder.HasMany(cv => cv.CVJobRecommendations)
+				.WithOne(r => r.CV)
+				.HasForeignKey(r => r.CvId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			// ===== Indexes =====
+			builder.HasIndex(cv => cv.UserId).IsUnique();
+
+
+ 
+
+
+  
+
 		}
 	}
 }

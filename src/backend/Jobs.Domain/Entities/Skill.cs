@@ -14,7 +14,13 @@ namespace Jobs.Domain.Entities
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
 
+		// Navigation Properties
 
+		private readonly List<JobSkill> _jobSkills = new();
+		public IReadOnlyCollection<JobSkill> JobSkills => _jobSkills.AsReadOnly();
+
+		private readonly List<UserSkill> _userSkills = new();
+		public IReadOnlyCollection<UserSkill> UserSkills => _userSkills.AsReadOnly();
 
 		// ========== Constructor ==========
 		private Skill() { }

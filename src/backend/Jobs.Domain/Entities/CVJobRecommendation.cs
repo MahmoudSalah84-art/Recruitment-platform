@@ -9,11 +9,9 @@ namespace Jobs.Domain.Entities
 	{
 
 		// ======== Properties ========
-		public Guid CvId { get; }
-        public CV CV { get; }
+		public string CvId { get; }
 
-        public Guid JobId { get;  }
-        public Job Job { get; }
+        public string JobId { get;  }
 
         public int Score { get; }
 
@@ -23,11 +21,15 @@ namespace Jobs.Domain.Entities
 		public bool IsDeleted { get; set; }
 		public DateTime? DeletedAt { get; set; }
 
+		// Navigation Properties
+		public CV CV { get; set; }
+		public Job Job { get; set; }
+
 		// ======== Constructors ========
 
 		private CVJobRecommendation() { }
 
-		public CVJobRecommendation(Guid cvId, Guid jobId, int score)
+		public CVJobRecommendation(string cvId, string jobId, int score)
 		{
 			CheckRule(new ScoreRangeRule(score));
 			CheckRule(new NotEmptyGuidRule(cvId));

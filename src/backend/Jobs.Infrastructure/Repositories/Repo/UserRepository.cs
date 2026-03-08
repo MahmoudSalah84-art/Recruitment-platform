@@ -1,5 +1,5 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Repository.Repo;
+using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 

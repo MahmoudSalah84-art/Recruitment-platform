@@ -1,24 +1,18 @@
 ﻿using Jobs.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Rules.UserRules
 {
 	public class UserEmailMustBeUniqueRule : IBusinessRule
 	{
-		private readonly Func<string, bool> _emailExists;
-		private readonly string _email;
+		private readonly bool _isEmailExists;
 
-		public UserEmailMustBeUniqueRule(Func<string, bool> emailExists, string email)
+		public UserEmailMustBeUniqueRule(bool isEmailExists)
 		{
-			_emailExists = emailExists;
-			_email = email;
+			_isEmailExists = isEmailExists;
 		}
 
-		public bool IsBroken() => _emailExists(_email);
+		public bool IsBroken() => _isEmailExists;
 
 		public string Message => "Email already exists.";
 	}
-
 }

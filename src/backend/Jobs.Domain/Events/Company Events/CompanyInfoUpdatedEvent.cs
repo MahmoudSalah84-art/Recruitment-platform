@@ -7,10 +7,10 @@ namespace Jobs.Domain.Rules
 {
 	public class CompanyInfoUpdatedEvent : DomainEvent
 	{
-		public Guid CompanyId { get; }
+		public string CompanyId { get; }
 		
 
-		public CompanyInfoUpdatedEvent(Guid companyId)
+		public CompanyInfoUpdatedEvent(string companyId)
 		{
 			CompanyId = companyId;
 			OccurredOn = DateTime.UtcNow;

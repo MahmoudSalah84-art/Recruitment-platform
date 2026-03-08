@@ -13,24 +13,44 @@ namespace Jobs.Infrastructure.Data.Configurations
 		{
 			builder.ToTable("Skills");
 
-			builder.HasKey(s => s.Id);
-			builder.Property(s => s.Id)
-				   .ValueGeneratedNever();
+			builder.HasKey(e => e.Id);
 
+			builder.Property(e => e.Id)
+				.ValueGeneratedNever()
+				.IsRequired()
+				.HasMaxLength(36);
+
+			builder.Property(e => e.CreatedAt)
+				.IsRequired();
+
+			builder.Property(e => e.UpdatedAt)
+				.IsRequired(false);
+
+			// ===== Properties =====
 			builder.Property(s => s.Name)
-				   .HasMaxLength(150)
-				   .IsRequired();
+				.IsRequired()
+				.HasMaxLength(100);
 
+			// ===== Soft Delete =====
 			builder.Property(s => s.IsDeleted)
-				   .HasDefaultValue(false);
+				.IsRequired()
+				.HasDefaultValue(false);
 
-			builder.Property(s => s.DeletedAt);
+			builder.Property(s => s.DeletedAt)
+				.IsRequired(false);
 
 			builder.HasQueryFilter(s => !s.IsDeleted);
 
+			 
+
 			// ===== Indexes =====
 			builder.HasIndex(s => s.Name)
-				   .IsUnique();
+				.IsUnique()
+				.HasFilter("[IsDeleted] = 0");
+
+
+ 
+			 
 
 		}
 	}

@@ -7,15 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Features\Applications\EventHandlers\**" />
+    <Compile Remove="Features\Companies\EventHandlers\**" />
+    <Compile Remove="Features\Users\EventHandlers\**" />
+    <EmbeddedResource Remove="Features\Applications\EventHandlers\**" />
+    <EmbeddedResource Remove="Features\Companies\EventHandlers\**" />
+    <EmbeddedResource Remove="Features\Users\EventHandlers\**" />
+    <None Remove="Features\Applications\EventHandlers\**" />
+    <None Remove="Features\Companies\EventHandlers\**" />
+    <None Remove="Features\Users\EventHandlers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Applications\EventHandlers\" />
-    <Folder Include="Features\Companies\EventHandlers\" />
     <Folder Include="Features\Jobs\EventHandlers\" />
-    <Folder Include="Features\Users\EventHandlers\" />
   </ItemGroup>
 
   <ItemGroup>
