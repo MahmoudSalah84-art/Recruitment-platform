@@ -1,8 +1,4 @@
-﻿using Jobs.Domain.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
+﻿
 namespace Jobs.Domain.Common
 {
 	public interface ISoftDelete  
@@ -11,5 +7,6 @@ namespace Jobs.Domain.Common
 		DateTime? DeletedAt { get;  set; }
 
 		void SoftDelete();
+		
 	}
 }

@@ -1,8 +1,8 @@
-﻿using Jobs.Application.Abstractions.Messaging;
+﻿//using Jobs.Application.Abstractions.Messaging;
 
-namespace Jobs.Application.Features.Skills.Commands.AddUserSkill
-{
-	public record AddUserSkillCommand(
-	string SkillId
-	) : ICommand;
-}
+//namespace Jobs.Application.Features.Skills.Commands.AddUserSkill
+//{
+//	public record AddUserSkillCommand(
+//	string SkillId
+//	) : ICommand;
+//}

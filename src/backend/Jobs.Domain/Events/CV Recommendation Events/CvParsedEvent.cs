@@ -21,5 +21,4 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 		
 		
 	}
-
 }

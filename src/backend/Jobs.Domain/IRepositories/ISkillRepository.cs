@@ -7,5 +7,8 @@ namespace Jobs.Domain.IRepositories
 {
 	public interface ISkillRepository : IRepository<Skill>
 	{
+
+		Task<Skill?> GetByIdWithRelationsAsync(string id, CancellationToken cancellationToken);
+		
 	}
 }

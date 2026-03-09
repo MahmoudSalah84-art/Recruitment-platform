@@ -42,5 +42,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.AsNoTracking()
 				.AnyAsync(u => u.Email.Value == email, ct);
 		}
+
+		
 	}
 }

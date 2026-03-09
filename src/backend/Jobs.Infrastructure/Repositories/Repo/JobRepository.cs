@@ -12,14 +12,16 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// <summary>
 		/// Retrieves a Job by its Id including the related Skills.
 		/// </summary>
-		/// <param name="id">The Id of the Job.</param>
+		/// <param name="id">The Id of the
+		/// Job.</param>
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>The Job entity with Skills if found, otherwise null.</returns>
 		public async Task<Job?> GetByIdWithSkillsAsync(string id, CancellationToken ct = default)
 		{
 			return await _set
 				.AsNoTracking()            
-				.Include(j => j.RequiredSkills)              
+				.Include(j => j.RequiredSkills) 
+				.ThenInclude(js => js.Skill)
 				.FirstOrDefaultAsync(j => j.Id == id, ct); 
 		}
 
@@ -55,5 +57,5 @@ namespace Jobs.Infrastructure.Repositories.Repo
 			return await jobsQuery.ToListAsync(ct);
 		}
 
-    }
+	}
 }

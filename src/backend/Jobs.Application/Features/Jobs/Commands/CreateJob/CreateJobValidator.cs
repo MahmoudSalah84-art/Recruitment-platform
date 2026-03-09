@@ -1,32 +1,20 @@
 ﻿
-//using FluentValidation;
+using FluentValidation;
 
-//namespace Jobs.Application.Features.Jobs.Commands.CreateJob
-//{
-//	public class CreateJobCommandValidator : AbstractValidator<CreateJobCommand>
-//	{
-//		public CreateJobCommandValidator()
-//		{
-//			// التحقق من عنوان الوظيفة
-//			RuleFor(x => x.title)
-//				.NotEmpty().WithMessage("عنوان الوظيفة مطلوب.")
-//				.MinimumLength(5).WithMessage("عنوان الوظيفة يجب ألا يقل عن 5 أحرف.")
-//				.MaximumLength(100).WithMessage("عنوان الوظيفة يجب ألا يتجاوز 100 حرف.");
-
-//			// التحقق من وصف الوظيفة
-//			RuleFor(x => x.description)
-//				.NotEmpty().WithMessage("وصف الوظيفة مطلوب.")
-//				.MinimumLength(20).WithMessage("وصف الوظيفة يجب أن يكون مفصلاً (20 حرف على الأقل).");
-
-//			// التحقق من الراتب
-//			RuleFor(x => x.salary)
-//				.GreaterThan(0).WithMessage("يجب أن يكون الراتب أكبر من صفر.")
-//				.LessThan(1000000).WithMessage("الراتب المدخل غير منطقي.");
-
-//			// التحقق من معرف الشركة
-//			RuleFor(x => x.companyId)
-//				.NotEmpty().WithMessage("يجب تحديد الشركة المعلنة عن الوظيفة.");
-//		}
-//	}
-//}
- 
+namespace Jobs.Application.Features.Jobs.Commands.CreateJob
+{
+	public class CreateJobCommandValidator : AbstractValidator<CreateJobCommand>
+	{
+		public CreateJobCommandValidator()
+		{
+			RuleFor(x => x.CompanyId).NotEmpty().WithMessage("Company ID is required.");
+			RuleFor(x => x.HrId).NotEmpty().WithMessage("HR ID is required.");
+			RuleFor(x => x.Title).NotEmpty().MaximumLength(100).WithMessage("Title is required and must be under 100 chars.");
+			RuleFor(x => x.Description).NotEmpty().WithMessage("Description is required.");
+			RuleFor(x => x.Requirements).NotEmpty().WithMessage("Requirements are required.");
+			RuleFor(x => x.ExperienceLevel).InclusiveBetween(0, 20).WithMessage("Experience must be between 0 and 20 years.");
+			RuleFor(x => x.ExpirationDate).GreaterThan(DateTime.UtcNow).When(x => x.ExpirationDate.HasValue)
+				.WithMessage("Expiration date must be in the future.");
+		}
+	}
+}

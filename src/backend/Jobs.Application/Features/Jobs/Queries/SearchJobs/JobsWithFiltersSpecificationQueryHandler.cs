@@ -1,46 +1,49 @@
-﻿//using Jobs.Application.Abstractions.Messaging;
-//using Jobs.Application.Common.Models;
-//using Jobs.Application.Features.Jobs.Queries.GetJobsWithPagination;
-//using Jobs.Domain.Specifications.Jobs;
-//using Jobs.Infrastructure.Repositories.UnitOfWork;
-//using Microsoft.EntityFrameworkCore;
+﻿using Jobs.Application.Abstractions.Messaging;
+using Jobs.Application.Common.Models;
+using Jobs.Application.Features.Jobs.Queries.GetJobById;
+using Jobs.Domain.IRepositories;
+using Jobs.Domain.Specifications.Jobs;
 
-//namespace Jobs.Application.Features.Jobs.Queries.SearchJobs
-//{
-//	public class JobsWithFiltersSpecificationQueryHandler : IQueryHandler<JobsWithFiltersSpecificationQuery, PaginatedList<JobDto>>
-//	{
-//		private readonly IUnitOfWork _unitOfWork;
+namespace Jobs.Application.Features.Jobs.Queries.SearchJobs
+{
+	public class JobsWithFiltersSpecificationQueryHandler : IQueryHandler<JobsWithFiltersSpecificationQuery, PaginatedList<JobResponse>>
+	{
+		private readonly IUnitOfWork _unitOfWork;
 
-//		public JobsWithFiltersSpecificationQueryHandler(IUnitOfWork unitOfWork)
-//		{
-//			_unitOfWork = unitOfWork;
-//		}
+		public JobsWithFiltersSpecificationQueryHandler(IUnitOfWork unitOfWork)
+		{
+			_unitOfWork = unitOfWork;
+		}
 
-		 
-//		public async Task<Result<PaginatedList<JobDto>>> Handle(JobsWithFiltersSpecificationQuery request, CancellationToken cancellationToken)
-//		{
-//			var spec = new JobsWithFiltersSpecification(request.Search, request.PageSize, request.PageNumber, request.Country, request.City, request.MinExperience, request.Type, request.PostedInDays);
 
-//			var Count = await _unitOfWork.Jobs.CountAsync(spec);
+		public async Task<Result<PaginatedList<JobResponse>>> Handle(JobsWithFiltersSpecificationQuery request, CancellationToken cancellationToken)
+		{
+			var spec = new JobsWithFiltersSpecification(
+				request.Search, request.PageSize, request.PageNumber,
+				request.Country, request.City, request.MinExperience,
+				request.Type,request.OnlyPublished, request.PostedInDays);
 
-//			var jobs = await _unitOfWork.Jobs.ListWithSpecAsync(spec);
+			var Count = await _unitOfWork.Jobs.CountAsync(spec);
 
-//			var dtos = jobs.Select(job => new JobDto
-//			{
-//				Id = job.Id,
-//				Title = job.Title,
-//				Description = job.Description,
-//				CompanyName = job.Company.Name,
-//				JobType = job.EmploymentType,
-//				MinSalary = job.Salary!.Min,
-//				MaxSalary = job.Salary!.Max,
-//				CreatedDate = job.CreatedAt,
-//				IsExpired = job.IsExpired,
-//				Location = job.Company.CompanyAddress!.Country + ", " + job.Company.CompanyAddress!.City
-//			}).ToList();
+			var jobs = await _unitOfWork.Jobs.ListWithSpecAsync(spec);
 
-//			PaginatedList<JobDto> paginatedList = PaginatedList<JobDto>.Create(dtos, Count, request.PageNumber, request.PageSize);
-//			return Result<PaginatedList<JobDto>>.Success(paginatedList);
-//		}   
-//    }
-//}
+			var response = jobs.Select(job => new JobResponse(
+			job.Id,
+			job.Title,
+			job.Description,
+			job.Requirements,
+			job.EmploymentType.ToString(),
+			job.ExperienceLevel,
+			job.Salary,
+			job.IsPublished,
+			job.IsExpired,
+			job.ExpirationDate,
+			job.RequiredSkills.Select(s => s.Skill.Name).ToList(),
+			job.CompanyId,
+			job.HrId)).ToList();
+
+			PaginatedList<JobResponse> paginatedList = PaginatedList<JobResponse>.Create(response, Count, request.PageNumber, request.PageSize);
+			return Result<PaginatedList<JobResponse>>.Success(paginatedList);
+		}
+	}
+}
