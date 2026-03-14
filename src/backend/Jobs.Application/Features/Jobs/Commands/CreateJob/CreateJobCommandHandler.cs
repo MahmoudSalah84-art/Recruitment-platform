@@ -7,12 +7,12 @@ namespace Jobs.Application.Features.Jobs.Commands.CreateJob
 {
 	public class CreateJobCommandHandler : ICommandHandler<CreateJobCommand, string>
 	{
-		private readonly IRepository<Job> _jobRepo;
+	 
 		private readonly IUnitOfWork _unitOfWork;
 
-		public CreateJobCommandHandler(IRepository<Job> jobRepository, IUnitOfWork unitOfWork)
+		public CreateJobCommandHandler( IUnitOfWork unitOfWork)
 		{
-			_jobRepo = jobRepository;
+			
 			_unitOfWork = unitOfWork;
 		}
 
