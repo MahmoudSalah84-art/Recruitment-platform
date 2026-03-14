@@ -1,7 +1,8 @@
 using Jobs.Domain.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-
+using System.Threading;
+using System.Threading.Tasks;
 
 public class SoftDeleteInterceptor : SaveChangesInterceptor
 {
@@ -15,12 +16,12 @@ public class SoftDeleteInterceptor : SaveChangesInterceptor
 
 		foreach (var entry in ctx.ChangeTracker.Entries())
 		{
-			if (entry.Entity is ISoftDelete sd) // check if entity implements ISoftDelete
+			if (entry.Entity is SoftDelete sd) // check if entity implements SoftDelete
 			{
 				if (entry.State == EntityState.Deleted)
 				{
 					entry.State = EntityState.Modified; // convert delete to soft-delete
-					sd.IsDeleted = true;// UPDATE Users SET IsDeleted = 1 WHERE Id = 1
+					sd.MarkAsDeleted(); // use public method to set IsDeleted/DeletedAt (fixes CS0272)
 				}
 			}
 		}

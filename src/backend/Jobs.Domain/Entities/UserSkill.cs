@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class UserSkill : BaseEntity , ISoftDelete
+    public class UserSkill : BaseEntity  
 	{
 		// ========== Properties ==========
 		public string UserId { get; private set; }
@@ -30,10 +30,6 @@ namespace Jobs.Domain.Entities
 			SkillId = skillId;
 		}
 
-		void ISoftDelete.SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
+	 
 	}
 }

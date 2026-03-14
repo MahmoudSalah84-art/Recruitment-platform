@@ -41,6 +41,7 @@ namespace Jobs.Infrastructure
 			services.AddJobSiteIdentity(configuration.GetConnectionString("IdentityConnection")!);
 
 			// Repositories
+			services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 			services.AddScoped<IUserRepository, UserRepository>();
 			services.AddScoped<ICompanyRepository, CompanyRepository>();
 			services.AddScoped<IJobRepository,JobRepository>();

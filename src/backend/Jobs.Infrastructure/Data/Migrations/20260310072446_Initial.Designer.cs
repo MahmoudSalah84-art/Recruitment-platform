@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Jobs.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(JobDbContext))]
-    [Migration("20260308060335_IdentityInitial")]
-    partial class IdentityInitial
+    [Migration("20260310072446_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

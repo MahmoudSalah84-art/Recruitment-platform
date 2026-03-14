@@ -1,11 +1,12 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Events.CV_Recommendation_Events;
+using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
 
 
 namespace Jobs.Domain.Entities
 {
-    public class CVJobRecommendation :AggregateRoot , ISoftDelete
+    public class CVJobRecommendation :AggregateRoot  
 	{
 
 		// ======== Properties ========
@@ -47,22 +48,42 @@ namespace Jobs.Domain.Entities
 
 
 		// ======== Behaviors ========
+		// ==================== Activation ====================
 		public void Deactivate()
 		{
 			if (!IsActive)
-				return;
+				throw new DomainException("Recommendation is already inactive.");
 
 			IsActive = false;
 			DeactivatedAt = DateTime.UtcNow;
 
 			AddEvent(new CVRecommendationDeactivatedEvent(this));
+
 		}
 
-		void ISoftDelete.SoftDelete()
+		public void Reactivate()
 		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
+			if (IsActive)
+				throw new DomainException("Recommendation is already active.");
+
+			if (IsDeleted)
+				throw new DomainException("Cannot reactivate a deleted recommendation.");
+
+			IsActive = true;
+			DeactivatedAt = null;
+
+			//RaiseDomainEvent(new CVJobRecommendationReactivatedDomainEvent(Id, CvId, JobId));
+		}
+
+		public void Restore()
+		{
+			if (!IsDeleted)
+				throw new DomainException("Recommendation is not deleted.");
+
+			IsDeleted = false;
+			DeletedAt = null;
+
+			//RaiseDomainEvent(new CVJobRecommendationRestoredDomainEvent(Id, CvId, JobId));
 		}
 	}
-
 }

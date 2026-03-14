@@ -23,6 +23,5 @@ namespace Jobs.Domain.IRepositories
 		/// <param name="pageSize">Number of items per page.</param>
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>List of Jobs matching the search query.</returns>
-		Task<IEnumerable<Job>> SearchAsync(string Search, int page = 1, int pageSize = 10, CancellationToken ct = default);
 	}
 }

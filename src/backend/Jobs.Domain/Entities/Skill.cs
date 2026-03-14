@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class Skill :AggregateRoot , ISoftDelete
+    public class Skill :AggregateRoot  
 	{
 		// ========== Properties ==========
 		public string Name { get; private set; }
@@ -76,10 +76,6 @@ namespace Jobs.Domain.Entities
 			//RaiseDomainEvent(new SkillRestoredDomainEvent(Id));
 		}
 
-		void ISoftDelete.SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
+ 
 	}
 }

@@ -3,14 +3,10 @@ using Jobs.Domain.Enums;
 using Jobs.Domain.Events.ApplicationEvents;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.JobApplication;
-using Jobs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class JobApplication : AggregateRoot , ISoftDelete
+    public class JobApplication : AggregateRoot
 	{
 		// ========= Properties =========
 
@@ -64,11 +60,6 @@ namespace Jobs.Domain.Entities
 			AddEvent(new ApplicationStatusChangedEvent(this, oldStatus, newStatus));
 		}
 
-		void ISoftDelete.SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
 	}
 }
 

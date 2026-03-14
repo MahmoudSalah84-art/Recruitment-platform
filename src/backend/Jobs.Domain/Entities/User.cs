@@ -8,7 +8,7 @@ using Jobs.Domain.ValueObjects;
 
 namespace Jobs.Domain.Entities
 {
-    public class User : AggregateRoot , ISoftDelete
+    public class User : AggregateRoot  
     {
 		// ========= Properties =========
 		public string FirstName { get; private set; }
@@ -235,13 +235,7 @@ namespace Jobs.Domain.Entities
 	 
 
 
-		void ISoftDelete.SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
-		
-		
+ 
     }
 }
 

@@ -15,6 +15,7 @@ namespace Jobs.Domain.IRepositories
 		ISkillRepository Skills { get; }
 		IJobSkillRepository JobSkills { get; }
 		IUserSkillRepository UserSkills { get; }
+		ICVJobRecommendationRepository CVJobRecommendations { get; }
 
 		// Save changes
 		Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

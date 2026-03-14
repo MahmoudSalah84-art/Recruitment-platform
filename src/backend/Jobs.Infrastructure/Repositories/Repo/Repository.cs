@@ -8,7 +8,7 @@ using System.Linq.Expressions;
 
 namespace Jobs.Infrastructure.Repositories.Repo
 {
-    public abstract class Repository<TEntity> : IRepository<TEntity> 
+    public class Repository<TEntity> : IRepository<TEntity> 
 		where TEntity : BaseEntity
 	{
 		protected readonly DbSet<TEntity> _set;
@@ -53,18 +53,19 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		public virtual IQueryable<TEntity> Query() 
 			=> _set.AsNoTracking().AsQueryable();
 
+		public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+			=> await _set.AnyAsync(predicate);
 
+
+
+
+		// Specification pattern support
 
 		public async Task<List<TEntity>> ListWithSpecAsync(ISpecification<TEntity> spec)
 			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).ToListAsync();
-		
 
 		public async Task<int> CountAsync(ISpecification<TEntity> spec)
 			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).CountAsync();
 
-		public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
-			=> await _set.AnyAsync(predicate);
-
-        
     }
 }

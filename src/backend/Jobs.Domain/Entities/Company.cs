@@ -9,7 +9,7 @@ using Jobs.Domain.ValueObjects.YourProject.Domain.ValueObjects;
 
 namespace Jobs.Domain.Entities
 {
-    public class Company : AggregateRoot , ISoftDelete
+    public class Company : AggregateRoot
 	{
 		// ========== Properties ==========
 		public string Name { get; private set; }
@@ -100,16 +100,9 @@ namespace Jobs.Domain.Entities
 			
 			AddEvent(new JobCreatedEvent(job));
 		}
-		
-		
-        void ISoftDelete.SoftDelete()
-        {
-            IsDeleted = true;
-            DeletedAt = DateTime.UtcNow;
-        }
 
-        
-    }
+		 
+	}
 }
 
 

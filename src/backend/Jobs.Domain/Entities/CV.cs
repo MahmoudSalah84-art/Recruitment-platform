@@ -8,7 +8,7 @@ using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.Domain.Entities
 {
-    public class CV : AggregateRoot , ISoftDelete
+    public class CV : AggregateRoot 
 	{
 
 		// ========== Properties ==========
@@ -174,12 +174,7 @@ namespace Jobs.Domain.Entities
 
 			//RaiseDomainEvent(new CVRestoredDomainEvent(Id, UserId));
 		}
-
-		void ISoftDelete.SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
+ 
 	}
 }
 

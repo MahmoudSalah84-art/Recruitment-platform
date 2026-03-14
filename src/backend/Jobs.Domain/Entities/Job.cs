@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Jobs.Domain.Entities
 {
-    public class Job : AggregateRoot , ISoftDelete
+    public class Job : AggregateRoot
 	{
 
 		// ========= Properties =========
@@ -283,12 +283,7 @@ namespace Jobs.Domain.Entities
 			//RaiseDomainEvent(new JobRestoredDomainEvent(Id, CompanyId));
 		}
 	
-			
-		void ISoftDelete.SoftDelete()
-		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
+
 	}
 }
 

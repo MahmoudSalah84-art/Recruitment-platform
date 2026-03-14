@@ -24,8 +24,9 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		public ISkillRepository Skills => GetRepository<ISkillRepository>();
 		public IJobSkillRepository JobSkills => GetRepository<IJobSkillRepository>();
 		public IUserSkillRepository UserSkills => GetRepository<IUserSkillRepository>();
+		public ICVJobRecommendationRepository CVJobRecommendations => GetRepository<ICVJobRecommendationRepository>();
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
 			=> await _context.SaveChangesAsync(cancellationToken);
 
 		public int SaveChanges()

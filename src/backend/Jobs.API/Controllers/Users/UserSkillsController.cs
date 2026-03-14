@@ -27,7 +27,7 @@ namespace Jobs.API.Controllers.Users
 
 		// DELETE /api/userSkills/{id}
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(Guid id)
+		public async Task<IActionResult> Delete(string id)
 		{
 			var result = await Sender.Send(new DeleteUserSkillCommand(id));
 

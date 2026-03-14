@@ -26,6 +26,8 @@ namespace Jobs.Domain.IRepositories
 		// Queryable for custom queries
 		IQueryable<TEntity> Query();
 
+
+
 		// Specification pattern support
 		Task<List<TEntity>> ListWithSpecAsync(ISpecification<TEntity> spec);
 		Task<int> CountAsync(ISpecification<TEntity> spec);
