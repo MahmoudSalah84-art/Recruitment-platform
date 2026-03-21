@@ -48,9 +48,6 @@ namespace Jobs.Application.Features.Companies.Command.Register
 				RuleFor(x => x.Description)
 					.MaximumLength(500);
 
-				RuleFor(x => x.Image)
-					.SetValidator(new FileUploadDtoValidator())
-					.When(x => x.Image != null);
 
 				RuleFor(x => x.Password)
 					.NotEmpty()

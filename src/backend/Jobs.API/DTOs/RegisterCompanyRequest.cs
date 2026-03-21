@@ -11,7 +11,6 @@
 		public string BuildingNumber { get; set; } = string.Empty;
 		public string PostalCode { get; set; } = string.Empty;
 		public string? Description { get; set; }
-		public IFormFile? Image { get; set; }
 		public string Password { get; set; } = string.Empty;
 		public string ConfirmPassword { get; set; } = string.Empty;
 	}

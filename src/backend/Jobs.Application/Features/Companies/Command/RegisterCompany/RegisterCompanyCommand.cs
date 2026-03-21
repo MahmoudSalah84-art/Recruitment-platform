@@ -13,7 +13,6 @@ namespace Jobs.Application.Features.Companies.Command.Register
 		string BuildingNumber,
 		string PostalCode,
 		string? Description,
-		FileUploadDto? Image,
 		string Password,
 		string ConfirmPassword
 	) : ICommand<AuthResponse>;

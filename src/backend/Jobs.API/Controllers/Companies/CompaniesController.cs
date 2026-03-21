@@ -1,33 +1,46 @@
 ﻿using Jobs.API.Controllers.Abstractions;
-using Jobs.API.DTOs;
-using Jobs.Application.Abstractions.Messaging;
-using Jobs.Application.Common.DTOs;
+using Jobs.Application.Features.Companies.Command.AddEmployee;
+using Jobs.Application.Features.Companies.Command.DeleteCompany;
 using Jobs.Application.Features.Companies.Command.LoginCompany;
 using Jobs.Application.Features.Companies.Command.Register;
-using Microsoft.AspNetCore.Http.HttpResults;
+using Jobs.Application.Features.Companies.Command.RemoveEmployee;
+using Jobs.Application.Features.Companies.Command.UpdateCompany;
+using Jobs.Application.Features.Companies.Queries.GetAllCompanies;
+using Jobs.Application.Features.Companies.Queries.GetCompanyById;
+using Jobs.Application.Features.Companies.Queries.GetCompanyEmployees;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Companies
 {
-	[ApiController]
 	public sealed class CompaniesController : ApiController
 	{
 
-		//// GET /api/companies
-		//[HttpGet]
-		//public async Task<IActionResult> GetAll()
-		//{
-		//	var result = await Sender.Send(new GetCompaniesQuery());
-		//	return Ok(result);
-		//}
+		// GET /api/companies
+		[HttpGet]
+		public async Task<IActionResult> GetAllCompanies(
+			[FromQuery] int page = 1,
+			[FromQuery] int pageSize = 10,
+			[FromQuery] string? name = null,
+			[FromQuery] string? industry = null)
+		{
+			var query = new GetAllCompaniesQuery(page, pageSize, name, industry);
 
-		//// GET /api/companies/{id}
-		//[HttpGet("{id:guid}")]
-		//public async Task<IActionResult> GetById(Guid id)
-		//{
-		//	var result = await Sender.Send(new GetCompanyByIdQuery(id));
-		//	return result is null ? NotFound() : Ok(result);
-		//}
+			var result = await Sender.Send(query);
+
+			return Ok(result);
+		}
+
+
+		// GET /api/companies/{id}
+		[HttpGet("{id}")]
+		public async Task<IActionResult> GetCompanyById(string id)
+		{
+			var query = new GetCompanyByIdQuery(id);
+
+			var result = await Sender.Send(query);
+
+			return Ok(result);
+		}
 
 
 		// POST /api/companies/login-company
@@ -47,55 +60,120 @@ namespace Jobs.API.Controllers.Companies
 			return Ok(result.Value);
 		}
 
+		// POST /api/companies/register
+		[HttpPost("register")]
+		public async Task<IActionResult> RegisterCompany([FromBody] RegisterCompanyCommand command)
+		{
+			var result = await Sender.Send(command);
 
+			return Ok(result);
+		}
 
-				// POST /api/companies/register
-				[HttpPost("register")] 
-				public async Task<IActionResult> RegisterCompany([FromBody] RegisterCompanyRequest request)
-				{
-					FileUploadDto? fileDto = default;
+		// DELETE /api/companies/{id}
+		[HttpDelete("{id}")]
+		public async Task<IActionResult> DeleteCompany(string id)
+		{
+			await Sender.Send(new DeleteCompanyCommand(id));
 
-					if (request.Image != null)
-					{
-						using var memoryStream = new MemoryStream();
-						await request.Image.CopyToAsync(memoryStream);
-						fileDto = new FileUploadDto(
-							request.Image.FileName,
-							request.Image.ContentType,
-							memoryStream
-						);
-					}
+			return NoContent(); // 204
+		}
 
-					var command = new RegisterCompanyCommand(
-						request.UserName,
-						request.Email,
-						request.Industry,
-						request.Country,
-						request.City,
-						request.Street,
-						request.BuildingNumber,
-						request.PostalCode,
-						request.Description,
-						fileDto,
-						request.Password,
-						request.ConfirmPassword
-					);
+		// PUT /api/companies/{id}
+		[HttpPut("{id}")]
+		public async Task<IActionResult> UpdateCompany(string id, [FromBody] UpdateCompanyCommand command)
+		{
+			if (id != command.CompanyId)
+				return BadRequest("Route id and body id must match");
 
-					var result = await Sender.Send(command);
+			await Sender.Send(command);
 
-					if (result.IsFailure) return Ok(result.Error);
+			return NoContent(); // 204
+		}
 
-					return Ok(result.Value);
-				}
+		// POST /api/companies/{companyId}/employees/{employeeId}
+		[HttpPost("{companyId}/employees/{employeeId}")]
+		public async Task<IActionResult> AddEmployeeToCompany(
+			string companyId,
+			string employeeId)
+		{
+			var command = new AddEmployeeCommand(companyId, employeeId);
+
+			await Sender.Send(command);
+
+			return NoContent(); // 204
+		}
+
+		// GET /api/companies/{companyId}/employees
+		[HttpGet("{companyId}/employees")]
+		public async Task<IActionResult> GetCompanyEmployees(
+			string companyId,
+			[FromQuery] int page = 1,
+			[FromQuery] int pageSize = 10)
+		{
+			var query = new GetCompanyEmployeesQuery(companyId, page, pageSize);
+
+			var result = await Sender.Send(query);
+
+			return Ok(result);
+		}
+
+		// DELETE /api/companies/{companyId}/employees/{employeeId}
+		[HttpDelete("{companyId}/employees/{employeeId}")]
+		public async Task<IActionResult> RemoveEmployeeFromCompany(
+			string companyId,
+			string employeeId)
+		{
+			await Sender.Send(new RemoveEmployeeCommand(companyId, employeeId));
+
+			return NoContent(); // 204
+		}
 	}
-
-
-
-	//// DELETE /api/companies/{id}
-	//[HttpDelete("{id:guid}")]
-	//public async Task<IActionResult> Delete(Guid id)
-	//{
-	//	await Sender.Send(new DeleteCompanyCommand(id));
-	//	return NoContent();
-	//}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//// DELETE /api/companies/{id}
+//[HttpDelete("{id:guid}")]
+//public async Task<IActionResult> Delete(Guid id)
+//{
+//	await Sender.Send(new DeleteCompanyCommand(id));
+//	return NoContent();
+//}
+
+
+//[HttpPost("register")] 
+//public async Task<IActionResult> RegisterCompany([FromBody] RegisterCompanyRequest request)
+//{
+
+//	var command = new RegisterCompanyCommand(
+//		request.UserName,
+//		request.Email,
+//		request.Industry,
+//		request.Country,
+//		request.City,
+//		request.Street,
+//		request.BuildingNumber,
+//		request.PostalCode,
+//		request.Description,
+//		request.Password,
+//		request.ConfirmPassword
+//	);
+
+//	var result = await Sender.Send(command);
+
+//	if (result.IsFailure) return Ok(result.Error);
+
+//	return Ok(result.Value);
+//}

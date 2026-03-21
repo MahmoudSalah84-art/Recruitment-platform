@@ -10,8 +10,8 @@ namespace Jobs.API.Controllers.Users
 	{
 
 
-		// Post: api/User/register-user
-		[HttpPost("register-user")]
+		// Post: api/User/register
+		[HttpPost("register")]
 		public async Task<IActionResult> Register([FromBody] RegisterCommand command, CancellationToken ct)
 		{
 			var result = await Sender.Send(command, ct);
@@ -25,8 +25,8 @@ namespace Jobs.API.Controllers.Users
 		}
 
 
-		// POST api/User/login-user
-		[HttpPost("login-user")]
+		// POST api/User/login
+		[HttpPost("login")]
 		public async Task<IActionResult> Login([FromBody] LoginCommand command, CancellationToken ct)
 		{
 			var result = await Sender.Send(command);

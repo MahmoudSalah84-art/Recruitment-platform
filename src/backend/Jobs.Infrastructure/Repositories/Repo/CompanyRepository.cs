@@ -23,5 +23,12 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.FirstOrDefaultAsync(c => c.Name == name, ct);
 		}
 
+		public async Task<Company?> GetByIdWithEmployeeAsync(string companyId, CancellationToken cancellationToken)
+		{
+			return await _set
+				.Include(c => c.Employees)
+				.FirstOrDefaultAsync(c => c.Id == companyId, cancellationToken);
+		}
+
 	}
 }

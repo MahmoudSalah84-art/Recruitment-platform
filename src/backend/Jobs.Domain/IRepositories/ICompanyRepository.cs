@@ -1,7 +1,4 @@
 ﻿using Jobs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.IRepositories
 {
@@ -14,5 +11,8 @@ namespace Jobs.Domain.IRepositories
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>The Company entity if found, otherwise null.</returns>
 		Task<Company?> GetByNameAsync(string name, CancellationToken ct = default);
+
+		Task<Company?> GetByIdWithEmployeeAsync(string companyId, CancellationToken cancellationToken);
+		
 	}
 }

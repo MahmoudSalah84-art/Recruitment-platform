@@ -266,6 +266,14 @@ namespace Jobs.Infrastructure.Services
 			return Result<string>.Success(user.IsActive ? "User activated." : "User deactivated.");
 		}
 
+		public async Task<Result> DeleteUserAsync(string userId)
+		{
+			var user = await _userManager.FindByIdAsync(userId);
+			if (user == null) return Result.Failure("User not found.");
+			var res = await _userManager.DeleteAsync(user);
+			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+		}
+
 		//_______ Email Confirmation ─────────────────────────────────────────────────
 		public async Task<string> GenerateEmailConfirmationTokenAsync(string userId)
 		{

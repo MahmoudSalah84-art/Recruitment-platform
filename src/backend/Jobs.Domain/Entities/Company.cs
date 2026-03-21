@@ -1,6 +1,8 @@
 ﻿using Jobs.Domain.Common;
+using Jobs.Domain.Enums;
 using Jobs.Domain.Events.Company_Events;
 using Jobs.Domain.Events.JobEvents;
+using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.CompanyRoles;
 using Jobs.Domain.Rules.UserRules;
@@ -57,51 +59,87 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ========== Behaviors ==========
-		public void UpdateProfile(string name, string description, string industry, int employeesCount, string logoUrl, Address address)
+		public void UpdateProfile( string? description, string? industry, int employeesCount, Address? address)
 		{
-			CheckRule(new NotEmptyRule(name, nameof(name)));
-			CheckRule(new NotEmptyRule(industry, nameof(industry)));
-
-			Name = name ?? Name;
 			Description = description ?? Description;
-			Industry = industry ?? Industry;
-			LogoUrl = logoUrl ?? LogoUrl;
-			CompanyAddress = address;
+			Industry = industry?.Trim() ?? Industry;
+			CompanyAddress = address ?? CompanyAddress;
 			EmployeesCount = employeesCount;
 			UpdatedAt = DateTime.UtcNow;
+
 			AddEvent(new CompanyInfoUpdatedEvent(this.Id));
 		}
-		public void AddEmployee(User user)
+
+		public void UpdateLogo(string logoUrl)
 		{
-			CheckRule(new NotNullRule<User>(user ));
-			
-			if (!_employees.Contains(user))
-			{
-				_employees.Add(user);
-			}
+			LogoUrl = logoUrl;
 		}
 
-		public void RemoveEmployee(User user)
-		{
-			CheckRule(new NotNullRule<User>(user));
 
-			if (_employees.Contains(user))
-			{
-				_employees.Remove(user);
-			}
+		// ==================== Employees ====================
+		public void AddEmployee(User employee)
+		{
+			if (_employees.Any(e => e.Id == employee.Id))
+				throw new DomainException("Employee is already part of this company.");
+
+			_employees.Add(employee);
+
+			//RaiseDomainEvent(new CompanyEmployeeAddedDomainEvent(Id, employee.Id));
 		}
 
+		public void RemoveEmployee(string employeeId)
+		{
+			var employee = _employees.FirstOrDefault(e => e.Id == employeeId);
+
+			if (employee is null)
+				throw new DomainException("Employee not found in this company.");
+
+			var hasActiveJobs = _jobs.Any(j =>
+				j.HrId == employeeId && j.IsPublished && !j.IsExpired);
+
+			if (hasActiveJobs)
+				throw new DomainException("Cannot remove an employee who owns active published jobs.");
+
+			_employees.Remove(employee);
+
+			//RaiseDomainEvent(new CompanyEmployeeRemovedDomainEvent(Id, employeeId));
+		}
+
+		// ==================== Jobs ====================
 		public void AddJob(Job job)
 		{
-			CheckRule(new NotNullRule<Job>(job));
 			CheckRule(new CompanyCannotPostMoreThanNJobsRule(this));
 
+			ArgumentNullException.ThrowIfNull(job);
+
+			if (IsDeleted)
+				throw new DomainException("Cannot add jobs to a deleted company.");
+
+			if (_jobs.Any(j => j.Id == job.Id))
+				throw new DomainException("Job is already associated with this company.");
+
 			_jobs.Add(job);
-			
+
 			AddEvent(new JobCreatedEvent(job));
+
+			//RaiseDomainEvent(new CompanyJobAddedDomainEvent(Id, job.Id));
 		}
 
-		 
+		public void RemoveJob(string jobId)
+		{
+			var job = _jobs.FirstOrDefault(j => j.Id == jobId);
+
+			if (job is null)
+				throw new DomainException("Job not found in this company.");
+
+			if (job.IsPublished)
+				throw new DomainException("Cannot remove a published job. Unpublish it first.");
+
+			_jobs.Remove(job);
+		}
+
+		
+
 	}
 }
 

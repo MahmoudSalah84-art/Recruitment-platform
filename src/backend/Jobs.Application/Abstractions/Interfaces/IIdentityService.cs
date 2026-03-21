@@ -31,6 +31,7 @@ namespace Jobs.Application.Abstractions.Interfaces
 		Task<Result<IEnumerable<UserDto>>> GetUsersAsync();
 		Task<Result<UserDto>> GetUserByIdAsync(string userId);
 		Task<Result> ToggleUserActiveAsync(string userId);
+		Task<Result> DeleteUserAsync(string userId);
 
 		// ── Email Confirmation ────────────────────────────────────────────────────
 		Task<string> GenerateEmailConfirmationTokenAsync(string userId);
