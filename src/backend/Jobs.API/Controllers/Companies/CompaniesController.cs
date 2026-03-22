@@ -1,10 +1,12 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.Application.Common.DTOs;
 using Jobs.Application.Features.Companies.Command.AddEmployee;
 using Jobs.Application.Features.Companies.Command.DeleteCompany;
 using Jobs.Application.Features.Companies.Command.LoginCompany;
 using Jobs.Application.Features.Companies.Command.Register;
 using Jobs.Application.Features.Companies.Command.RemoveEmployee;
 using Jobs.Application.Features.Companies.Command.UpdateCompany;
+using Jobs.Application.Features.Companies.Command.UpdateCompanyLogo;
 using Jobs.Application.Features.Companies.Queries.GetAllCompanies;
 using Jobs.Application.Features.Companies.Queries.GetCompanyById;
 using Jobs.Application.Features.Companies.Queries.GetCompanyEmployees;
@@ -127,6 +129,25 @@ namespace Jobs.API.Controllers.Companies
 
 			return NoContent(); // 204
 		}
+
+		// POST /api/companies/upload-image
+		[HttpPost("upload-image")]
+		public async Task<IActionResult> UploadImage(
+			[FromQuery] string CompanyId,
+			[FromForm] IFormFile file)
+		{
+			var fileUploadDto = new FileUploadDto(
+				file.FileName,
+				file.ContentType,
+				file.OpenReadStream()
+			);
+			var command = new UpdateCompanyLogoCommand(CompanyId, fileUploadDto);
+
+			var result = await Sender.Send(command);
+
+			return Ok(result);
+		}
+
 	}
 }
 

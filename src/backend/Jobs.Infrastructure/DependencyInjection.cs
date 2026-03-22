@@ -1,4 +1,5 @@
-﻿using Jobs.Application.Abstractions.Interfaces;
+﻿using CloudinaryDotNet;
+using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Common.Interfaces;
 using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.BackgroundJobs;
@@ -12,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace Jobs.Infrastructure
 {
@@ -66,6 +68,24 @@ namespace Jobs.Infrastructure
 			services.AddScoped<IJwtTokenService, JwtTokenService>();
 			services.AddScoped<ICurrentUserService, CurrentUserService>();
 			services.AddScoped<IIdentityService, IdentityService>();
+			services.AddScoped<IFileService, CloudinaryFileService>();
+
+
+			services.Configure<CloudinarySettings>(
+						configuration.GetSection("CloudinarySettings"));
+
+			services.AddSingleton(provider =>
+			{
+				var config = provider.GetRequiredService<IOptions<CloudinarySettings>>().Value;
+
+				var account = new Account(
+					config.CloudName,
+					config.ApiKey,
+					config.ApiSecret
+				);
+
+				return new Cloudinary(account);
+			});
 
 			// Background Service
 			services.AddHostedService<OutboxProcessor>();
