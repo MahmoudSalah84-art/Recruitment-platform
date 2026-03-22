@@ -1,15 +1,12 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.Application.Common.DTOs;
-using Jobs.Application.Features.Companies.Command.AddEmployee;
 using Jobs.Application.Features.Companies.Command.DeleteCompany;
 using Jobs.Application.Features.Companies.Command.LoginCompany;
 using Jobs.Application.Features.Companies.Command.Register;
-using Jobs.Application.Features.Companies.Command.RemoveEmployee;
 using Jobs.Application.Features.Companies.Command.UpdateCompany;
 using Jobs.Application.Features.Companies.Command.UpdateCompanyLogo;
 using Jobs.Application.Features.Companies.Queries.GetAllCompanies;
 using Jobs.Application.Features.Companies.Queries.GetCompanyById;
-using Jobs.Application.Features.Companies.Queries.GetCompanyEmployees;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Companies
@@ -92,43 +89,7 @@ namespace Jobs.API.Controllers.Companies
 			return NoContent(); // 204
 		}
 
-		// POST /api/companies/{companyId}/employees/{employeeId}
-		[HttpPost("{companyId}/employees/{employeeId}")]
-		public async Task<IActionResult> AddEmployeeToCompany(
-			string companyId,
-			string employeeId)
-		{
-			var command = new AddEmployeeCommand(companyId, employeeId);
-
-			await Sender.Send(command);
-
-			return NoContent(); // 204
-		}
-
-		// GET /api/companies/{companyId}/employees
-		[HttpGet("{companyId}/employees")]
-		public async Task<IActionResult> GetCompanyEmployees(
-			string companyId,
-			[FromQuery] int page = 1,
-			[FromQuery] int pageSize = 10)
-		{
-			var query = new GetCompanyEmployeesQuery(companyId, page, pageSize);
-
-			var result = await Sender.Send(query);
-
-			return Ok(result);
-		}
-
-		// DELETE /api/companies/{companyId}/employees/{employeeId}
-		[HttpDelete("{companyId}/employees/{employeeId}")]
-		public async Task<IActionResult> RemoveEmployeeFromCompany(
-			string companyId,
-			string employeeId)
-		{
-			await Sender.Send(new RemoveEmployeeCommand(companyId, employeeId));
-
-			return NoContent(); // 204
-		}
+		
 
 		// POST /api/companies/upload-image
 		[HttpPost("upload-image")]

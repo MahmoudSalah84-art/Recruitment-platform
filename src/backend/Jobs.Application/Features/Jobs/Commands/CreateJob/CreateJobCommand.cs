@@ -1,8 +1,6 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.Enums;
 using Jobs.Domain.ValueObjects;
-using MediatR;
-using System.ComponentModel.DataAnnotations;
 
 namespace Jobs.Application.Features.Jobs.Commands.CreateJob
 {
