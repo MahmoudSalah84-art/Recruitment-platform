@@ -1,8 +1,4 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Rules;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Entities
 {
@@ -23,8 +19,6 @@ namespace Jobs.Domain.Entities
 
 		public UserSkill(string userId, string skillId)
 		{
-			CheckRule(new NotEmptyGuidRule(userId));
-			CheckRule(new NotEmptyGuidRule(skillId));
 
 			UserId = userId;
 			SkillId = skillId;

@@ -3,38 +3,38 @@ using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 {
-	//public class GetUserApplicationDetailsQuieryHandler : IQueryHandler<GetUserApplicationDetailsQuery, GetUserApplicationDetailsDTO>
-	//{
-	//	private readonly IUnitOfWork _unitOfWork;
+	public class GetUserApplicationDetailsQuieryHandler : IQueryHandler<GetUserApplicationDetailsQuery, GetUserApplicationDetailsDTO>
+	{
+		private readonly IUnitOfWork _unitOfWork;
+		public GetUserApplicationDetailsQuieryHandler(IUnitOfWork unitOfWork)
+		{
+			_unitOfWork = unitOfWork;
+		}
 
-	//	public GetUserApplicationDetailsQuieryHandler(IUnitOfWork unitOfWork)
-	//	{
-	//		_unitOfWork = unitOfWork;
-	//	}
+		public async Task<Result<GetUserApplicationDetailsDTO>> Handle(GetUserApplicationDetailsQuery request, CancellationToken cancellationToken)
+		{
+			var dto = _unitOfWork.Applications
+			.Query()
+			.Where(a => a.Id == request.ApplicationId)
+			.Select(a => new GetUserApplicationDetailsDTO
+			(
+				Id: a.Id,
+				ApplicantId: a.ApplicantId,
+				ApplicantName: a.Applicant.FirstName + " " + a.Applicant.LastName,
+				JobId: a.Job.Id,
+				JobTitle: a.Job.Title,
+				CvId: a.CvId,
+				MatchScore: a.MatchScore,
+				Status: a.Status.ToString(),
+				CompanyName: a.Job.Company.Name
+			))
+			.FirstOrDefault();
 
-	//	public async Task<Result<GetUserApplicationDetailsDTO>> Handle(GetUserApplicationDetailsQuery query, CancellationToken cancellationToken)
-	//	{
-	//		var application = await _unitOfWork.Applications.Query()
-	//			.Include(a => a.Job)
-	//				.ThenInclude(j => j.Company)
-	//			.Include(a => a.Applicant)
-	//			.FirstOrDefaultAsync(a => a.Id == query.Id, cancellationToken);
 
-	//		if (application is null)
-	//			return Result<GetUserApplicationDetailsDTO>.Failure("عذراً، لم يتم العثور على طلب التقديم هذا.");
+			if (dto is null)
+				return Result<GetUserApplicationDetailsDTO>.Failure( "Application not found.");
 
-	//		var dto = new GetUserApplicationDetailsDTO
-	//		{
-	//			Id = application.Id,
-	//			JobId = application.Job.Id,
-	//			JobTitle = application.Job.Title,
-	//			CompanyName = application.Job.Company.Name,
-	//			ApplicantName = application.Applicant.FullName,
-	//			Status = application.Status.ToString(),
-	//			AppliedAt = application.CreatedAt
-	//		};
-
-	//		return Result<GetUserApplicationDetailsDTO>.Success(dto);
-	//	}
-	//}
+			return Result<GetUserApplicationDetailsDTO>.Success(dto);
+		}
+	}
 }

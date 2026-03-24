@@ -1,10 +1,6 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Entities;
 using Jobs.Domain.Exceptions;
-using Jobs.Domain.Rules;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Entities
 {

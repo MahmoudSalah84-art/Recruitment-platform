@@ -33,8 +33,6 @@ namespace Jobs.Domain.Entities
 		public CVJobRecommendation(string cvId, string jobId, int score)
 		{
 			CheckRule(new ScoreRangeRule(score));
-			CheckRule(new NotEmptyGuidRule(cvId));
-			CheckRule(new NotEmptyGuidRule(jobId));
 
 			CvId = cvId;
 			JobId = jobId;

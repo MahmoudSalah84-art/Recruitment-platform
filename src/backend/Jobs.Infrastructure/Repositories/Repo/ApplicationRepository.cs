@@ -23,5 +23,6 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.AsNoTracking()
 				.AnyAsync(ja => ja.JobId == jobId && ja.ApplicantId == applicantId, ct);
 		}
+
 	}
 }
