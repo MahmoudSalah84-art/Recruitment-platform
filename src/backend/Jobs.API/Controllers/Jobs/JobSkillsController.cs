@@ -1,10 +1,10 @@
-﻿using Jobs.Domain.Entities;
+﻿//using Jobs.Domain.Entities;
 
-namespace Jobs.API.Controllers.Jobs
-{
-    public class JobSkillsController
-    {
-    }
-}
+//namespace Jobs.API.Controllers.Jobs
+//{
+//    public class JobSkillsController
+//    {
+//    }
+//}
 
 //GET / api / jobs /{ jobId}/ skills

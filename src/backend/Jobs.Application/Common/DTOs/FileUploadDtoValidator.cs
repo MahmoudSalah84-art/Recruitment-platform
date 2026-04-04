@@ -12,10 +12,6 @@ namespace Jobs.Application.Common.DTOs
 				.NotEmpty()
 				.WithMessage("File name is required");
 
-			RuleFor(x => x.ContentType)
-				.NotEmpty()
-				.Must(BeValidImageType)
-				.WithMessage("Only jpg, jpeg, png images are allowed");
 
 			RuleFor(x => x.Content)
 				.NotNull()
@@ -25,11 +21,6 @@ namespace Jobs.Application.Common.DTOs
 				.WithMessage("File size must be less than 2MB");
 		}
 
-		private bool BeValidImageType(string contentType)
-		{
-			return contentType == "image/jpeg"
-				|| contentType == "image/png"
-				|| contentType == "image/jpg";
-		}
+		
 	}
 }

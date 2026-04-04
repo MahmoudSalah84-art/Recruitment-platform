@@ -1,39 +1,33 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.API.Extensions;
+using Jobs.Application.Features.CV.Command.CreateOrUpdateResume;
 using Jobs.Application.Features.CV.Query.GetMyResume;
-using Jobs.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System;
 
 namespace Jobs.API.Controllers.CVs
 {
-    public class CVController : ApiController
-    {
-		//// POST /api/UserProfile/CreateOrUpdate
-		//[HttpPost("CreateOrUpdate")]
-		//public async Task<IActionResult> CreateOrUpdate(CreateOrUpdateResumeCommand command)
-		//{
-		//	var userIdClaim = User.FindFirst("sub")?.Value;
-		//	if (string.IsNullOrEmpty(userIdClaim))
-		//		return Unauthorized();
+	public class CVController : ApiController
+	{
+		// POST /api/UserProfile/CreateOrUpdate
+		[HttpPost("CreateOrUpdate")]
+		public async Task<IActionResult> CreateOrUpdate(CreateOrUpdateResumeCommand command)
+		{
+			var result = await Sender.Send(command);
 
-		//	var result = await Sender.Send(command);
+			var response = result.ToApiResponse();
 
-		//	return result.IsSuccess ? Ok() : BadRequest(result.Error);
-		//}
+			return StatusCode(response.StatusCode, response);
+		}
 
-		//// GET /api/userResume/cv
-		//[HttpGet("cv")]
-		//public async Task<IActionResult> Get()
-		//{
-		//	var result = await Sender.Send(new GetMyResumeQuery());
+		// GET /api/userResume/cv
+		[HttpGet("cv")]
+		public async Task<IActionResult> Get(GetMyResumeQuery Query)
+		{
+			var result = await Sender.Send(Query);
 
-		//	return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
-		//}
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
+		}
 	}
 }
-
-//GET / api / cvs /{ id}
-//POST / api / cvs
-//PUT / api / cvs /{ id}
-//DELETE / api / cvs /{ id}

@@ -1,5 +1,8 @@
 ﻿using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
+using Jobs.Infrastructure.Exceptions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jobs.Infrastructure.Repositories.UnitOfWork
@@ -26,8 +29,24 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		public IUserSkillRepository UserSkills => GetRepository<IUserSkillRepository>();
 		public ICVJobRecommendationRepository CVJobRecommendations => GetRepository<ICVJobRecommendationRepository>();
 
+		//public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+		//	=> await _context.SaveChangesAsync(cancellationToken);
+
 		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-			=> await _context.SaveChangesAsync(cancellationToken);
+		{
+			try
+			{
+				return await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (DbUpdateException ex)
+			{
+				throw new DatabaseException("Error saving changes", ex);
+			}
+			catch (SqlException ex)
+			{
+				throw new DatabaseException("SQL error occurred", ex);
+			}
+		}
 
 		public int SaveChanges()
 			=> _context.SaveChanges();

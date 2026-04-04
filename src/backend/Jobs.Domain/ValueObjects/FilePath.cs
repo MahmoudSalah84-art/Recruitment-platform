@@ -1,7 +1,5 @@
 ﻿using Jobs.Domain.Common.YourProject.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Jobs.Domain.Exceptions;
 
 namespace Jobs.Domain.ValueObjects
 {
@@ -16,7 +14,7 @@ namespace Jobs.Domain.ValueObjects
 		public static FilePath Create(string path)
 		{
 			if (string.IsNullOrWhiteSpace(path))
-				throw new ArgumentException("File path is required.", nameof(path));
+				throw new DomainException("File path is required.");
 			return new FilePath(path.Trim());
 		}
 

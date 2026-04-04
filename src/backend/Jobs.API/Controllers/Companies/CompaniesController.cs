@@ -1,4 +1,5 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.API.Extensions;
 using Jobs.Application.Common.DTOs;
 using Jobs.Application.Features.Companies.Command.DeleteCompany;
 using Jobs.Application.Features.Companies.Command.LoginCompany;
@@ -26,7 +27,9 @@ namespace Jobs.API.Controllers.Companies
 
 			var result = await Sender.Send(query);
 
-			return Ok(result);
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
 		}
 
 
@@ -38,7 +41,9 @@ namespace Jobs.API.Controllers.Companies
 
 			var result = await Sender.Send(query);
 
-			return Ok(result);
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
 		}
 
 
@@ -48,15 +53,18 @@ namespace Jobs.API.Controllers.Companies
 		{
 			var result = await Sender.Send(command);
 
-			if (result.IsFailure)
-			{
-				if (result.Error == "Auth.InvalidCredentials")
-					return Unauthorized(result.Error);
+			//if (result.IsFailure)
+			//{
+			//	if (result.Error == "Auth.InvalidCredentials")
+			//		return Unauthorized(result.Error);
 
-				return BadRequest(result.Error);
-			}
+			//	return BadRequest(result.Error);
+			//}
 
-			return Ok(result.Value);
+
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
 		}
 
 		// POST /api/companies/register
@@ -65,7 +73,9 @@ namespace Jobs.API.Controllers.Companies
 		{
 			var result = await Sender.Send(command);
 
-			return Ok(result);
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
 		}
 
 		// DELETE /api/companies/{id}
@@ -89,34 +99,11 @@ namespace Jobs.API.Controllers.Companies
 			return NoContent(); // 204
 		}
 
+
+
 		
-
-		// POST /api/companies/upload-image
-		[HttpPost("upload-image")]
-		public async Task<IActionResult> UploadImage(
-			[FromQuery] string CompanyId,
-			[FromForm] IFormFile file)
-		{
-			var fileUploadDto = new FileUploadDto(
-				file.FileName,
-				file.ContentType,
-				file.OpenReadStream()
-			);
-			var command = new UpdateCompanyLogoCommand(CompanyId, fileUploadDto);
-
-			var result = await Sender.Send(command);
-
-			return Ok(result);
-		}
-
 	}
 }
-
-
-
-
-
-
 
 
 

@@ -1,5 +1,6 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.IRepositories;
+using Jobs.Domain.ValueObjects;
 
 namespace Jobs.Application.Features.Jobs.Commands.UpdateJob
 {
@@ -27,7 +28,7 @@ namespace Jobs.Application.Features.Jobs.Commands.UpdateJob
 				request.Requirements,
 				request.EmploymentType,
 				request.ExperienceLevel,
-				request.Salary,
+				SalaryRange.Create(request.minSalary, request.maxSalary),
 				request.ExpirationDate);
 
 			await _unitOfWork.SaveChangesAsync(cancellationToken);

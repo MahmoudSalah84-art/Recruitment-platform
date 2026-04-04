@@ -47,7 +47,7 @@ namespace Jobs.Domain.Entities
 
 			UserId = userId;
 			Title = title;
-			FilePath.Create(file);
+			FilePath = FilePath.Create(file);
 			SummaryText = summary;
 			CreatedAt = DateTime.UtcNow;
 			UpdatedAt = CreatedAt;
@@ -58,12 +58,12 @@ namespace Jobs.Domain.Entities
 		// ========== Behaviors ==========
 
 		// ==================== File ====================
-		public void UpdateFile(FilePath newFilePath, string title)
+		public void UpdateFile(string newFilePath, string title)
 		{
 			if (string.IsNullOrWhiteSpace(title))
 				throw new DomainException("CV title is required.");
 
-			FilePath = newFilePath ?? throw new ArgumentNullException(nameof(newFilePath));
+			FilePath = FilePath.Create(newFilePath);
 			Title = title;
 
 			// لما الفايل يتغير، الـ ParsedData القديمة بتبقى invalid

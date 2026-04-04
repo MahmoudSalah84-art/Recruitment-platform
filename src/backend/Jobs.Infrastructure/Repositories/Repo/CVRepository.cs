@@ -26,5 +26,10 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.FirstOrDefaultAsync(cv => cv.Id == id, ct);
 		}
 
+		public async Task<CV?> GetByUserId(string userId)
+		{
+  				return await _set
+				.FirstOrDefaultAsync(cv => cv.UserId == userId);
+		}
     }
 }

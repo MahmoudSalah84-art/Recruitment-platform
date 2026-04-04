@@ -1,7 +1,4 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Application.Features.Companies.Command.UpdateCompanyLogo
 {
@@ -10,6 +7,18 @@ namespace Jobs.Application.Features.Companies.Command.UpdateCompanyLogo
 		public UpdateCompanyLogoCommandValidator()
 		{
 			RuleFor(x => x.CompanyId).NotEmpty();
+
+			RuleFor(x => x.file.ContentType)
+				.NotEmpty()
+				.Must(BeValidImageType)
+				.WithMessage("Only jpg, jpeg, png images are allowed");
+		}
+
+		private bool BeValidImageType(string contentType)
+		{
+			return contentType == "image/jpeg"
+				|| contentType == "image/png"
+				|| contentType == "image/jpg";
 		}
 	}
 }

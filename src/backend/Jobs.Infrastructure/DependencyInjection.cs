@@ -90,6 +90,17 @@ namespace Jobs.Infrastructure
 			// Background Service
 			services.AddHostedService<OutboxProcessor>();
 
+
+
+
+			services.AddHttpClient<IAiServiceATS, AiServiceATS>();
+
+			//services.AddHangfire(x =>
+			//	x.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+
+			//services.AddHangfireServer();
+
+
 			return services;
 		}
 	}

@@ -8,10 +8,5 @@ namespace Jobs.Domain.Exceptions
 			: base(message)
 		{
 		}
-
-		public DomainException(string message, Exception innerException)
-			: base(message, innerException)
-		{
-		}
 	}
 }

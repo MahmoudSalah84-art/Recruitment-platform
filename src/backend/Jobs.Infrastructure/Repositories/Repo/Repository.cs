@@ -51,7 +51,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		/// </summary>
 		/// <returns>An IQueryable of TEntity.</returns>
 		public virtual IQueryable<TEntity> Query() 
-			=> _set.AsNoTracking().AsQueryable();
+			=> _set.AsQueryable();
 
 		public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
 			=> await _set.AnyAsync(predicate);
@@ -62,10 +62,10 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		// Specification pattern support
 
 		public async Task<List<TEntity>> ListWithSpecAsync(ISpecification<TEntity> spec)
-			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).ToListAsync();
+			=> await SpecificationEvaluator<TEntity>.GetQuery(Query().AsNoTracking(), spec).ToListAsync();
 
 		public async Task<int> CountAsync(ISpecification<TEntity> spec)
-			=> await SpecificationEvaluator<TEntity>.GetQuery(Query(), spec).CountAsync();
+			=> await SpecificationEvaluator<TEntity>.GetQuery(Query().AsNoTracking(), spec).CountAsync();
 
     }
 }

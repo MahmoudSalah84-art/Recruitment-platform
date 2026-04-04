@@ -1,4 +1,5 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.API.Extensions;
 using Jobs.Application.Features.Jobs.Commands.CreateJob;
 using Jobs.Application.Features.Jobs.Commands.DeleteJob;
 using Jobs.Application.Features.Jobs.Commands.PublishJob;
@@ -10,8 +11,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Jobs
 {
-    public class JobsController : ApiController
-    {
+	public class JobsController : ApiController
+	{
 		// GET: api/jobs/{id}
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetJobById(string id)
@@ -21,7 +22,9 @@ namespace Jobs.API.Controllers.Jobs
 			if (result is null)
 				return NotFound();
 
-			return Ok(result);
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
 		}
 
 		// GET: api/jobs/search?title=Developer&location=New%20York
@@ -30,7 +33,9 @@ namespace Jobs.API.Controllers.Jobs
 		{
 			var result = await Sender.Send(query);
 
-			return Ok(result);
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
 		}
 
 		// POST: api/jobs

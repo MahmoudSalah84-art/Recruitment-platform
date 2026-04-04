@@ -1,14 +1,13 @@
 ﻿using Jobs.API.Controllers.Abstractions;
-using Jobs.Application.Features.CV.Query.GetMyResume;
 using Jobs.Application.Features.Users.Commands.UpdateUserProfile;
 using Jobs.Application.Features.Users.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Users
 {
-    public class UserProfileController: ApiController
+	public class UserProfileController : ApiController
 	{
-		
+
 		// GET: api/UserProfile/me
 		[HttpGet("me")]
 		public async Task<IActionResult> GetMyProfile()
@@ -37,6 +36,6 @@ namespace Jobs.API.Controllers.Users
 		}
 
 
-		
+
 	}
 }

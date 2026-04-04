@@ -1,6 +1,7 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
+using Jobs.Domain.ValueObjects;
 
 
 namespace Jobs.Application.Features.Jobs.Commands.CreateJob
@@ -22,7 +23,7 @@ namespace Jobs.Application.Features.Jobs.Commands.CreateJob
 			request.CompanyId,
 			request.HrId, 
 			request.Title,
-			request.Salary,
+			SalaryRange.Create(request.minSalary, request.maxSalary),
 			request.Description,
 			request.Requirements,
 			request.EmploymentType,

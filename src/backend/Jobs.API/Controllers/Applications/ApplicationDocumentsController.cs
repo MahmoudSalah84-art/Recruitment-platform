@@ -1,9 +1,9 @@
-﻿using Jobs.API.Controllers.Companies;
+﻿//using Jobs.API.Controllers.Companies;
 
-namespace Jobs.API.Controllers.Applications
-{
-    public class ApplicationDocumentsController
-    {
-    }
-}
+//namespace Jobs.API.Controllers.Applications
+//{
+//    public class ApplicationDocumentsController
+//    {
+//    }
+//}
 

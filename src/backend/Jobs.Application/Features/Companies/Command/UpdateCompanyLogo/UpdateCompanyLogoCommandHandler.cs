@@ -2,7 +2,6 @@
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.IRepositories;
 
-
 namespace Jobs.Application.Features.Companies.Command.UpdateCompanyLogo
 {
 	public class UpdateCompanyLogoCommandHandler : ICommandHandler<UpdateCompanyLogoCommand >

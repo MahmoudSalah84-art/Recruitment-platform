@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
+﻿using FluentValidation;
+using Jobs.Domain.Exceptions;
+using Jobs.Infrastructure.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 
 namespace Jobs.API.Middlewares
 {
-	// نسخة محسنة من الـ GlobalExceptionHandler مع تسجيل الأخطاء
-
 	public class GlobalExceptionHandler : IExceptionHandler
 	{
 		private readonly ILogger<GlobalExceptionHandler> _logger;
@@ -15,46 +14,75 @@ namespace Jobs.API.Middlewares
 			_logger = logger;
 		}
 
-		public async ValueTask<bool> TryHandleAsync(
-			HttpContext httpContext,
-			Exception exception,
-			CancellationToken cancellationToken)
+		public async ValueTask<bool> TryHandleAsync( HttpContext httpContext, Exception ex, CancellationToken cancellationToken)
 		{
-			// 1. تسجيل الخطأ في الـ Log للمبرمج
-			_logger.LogError(exception, "حدث خطأ غير متوقع: {Message}", exception.Message);
+			_logger.LogError(ex, "Unexpected Error: {Message}", ex.Message);
 
-			// 2. فحص نوع الخطأ: هل هو خطأ "بيانات مدخلة"؟
-			if (exception is not ValidationException validationException)
-			{
-				return false; // لو مش خطأ بيانات، سيبه للمترجمين التانيين
-			}
+			var traceId = httpContext.TraceIdentifier;
 
-			// 3. تجهيز الرد المنظم (JSON)
-			var problemDetails = new ProblemDetails
+			var response = new ApiResponse
 			{
-				Status = StatusCodes.Status400BadRequest,
-				Title = "Bad Request",
-				Type = "ValidationFailure",
-				Detail = "واحد أو أكثر من الحقول المدخلة غير صحيح."
+				IsSuccess = false,
+				TraceId = traceId
 			};
 
-			//// 4. تجميع كل الأخطاء من كل الحقول
-			//var errors = validationException
-			//	.Errors
-			//	.GroupBy(e => e.PropertyName)
-			//	.ToDictionary(
-			//		failureGroup => failureGroup.Key,
-			//		failureGroup => failureGroup.Select(f => f.ErrorMessage).ToArray());
+			switch (ex)
+			{
+				case ValidationException validationEx:
+					response.Message = validationEx.Message;
+					response.Errors = validationEx.Errors
+							.GroupBy(e => e.PropertyName, e => e.ErrorMessage)
+							.ToDictionary(
+								failureGroup => failureGroup.Key,
+								failureGroup => failureGroup.ToArray()
+							);
+					response.ErrorCode = ErrorCodes.Validation;
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					break;
 
-			//problemDetails.Extensions.Add("errors", errors);
+				case DatabaseException:
+					response.Message = "Database error occurred";
+					response.ErrorCode = ErrorCodes.ServerError;
+					response.StatusCode = StatusCodes.Status500InternalServerError;
+					break;
 
-			// 5. إرسال الرد للمتصفح
-			httpContext.Response.StatusCode = problemDetails.Status.Value;
-			await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+				case DomainException or BusinessRuleViolationException:
+					response.Message = ex.Message;
+					response.ErrorCode = ErrorCodes.businessRule;
+					response.StatusCode = StatusCodes.Status400BadRequest;
+					break;
 
-			return true; // تم التعامل مع الخطأ بنجاح
+				//case NotFoundException:
+				//	response.Message = ex.Message;
+				//	response.ErrorCode = ErrorCodes.NotFound;
+				//	response.StatusCode = StatusCodes.Status404NotFound;
+				//	break;
+
+				//case UnauthorizedException:
+				//	response.Message = ex.Message;
+				//	response.ErrorCode = ErrorCodes.Unauthorized;
+				//	response.StatusCode = StatusCodes.Status401Unauthorized;
+				//	break;
+
+				//case ConflictException:
+				//	response.Message = ex.Message;
+				//	response.ErrorCode = ErrorCodes.Conflict;
+				//	response.StatusCode = StatusCodes.Status409Conflict;
+				//	break;
+
+				default:
+					response.Message = $"Internal Server Error : ({ex.Message}) ";
+					response.ErrorCode = ErrorCodes.ServerError;
+					response.StatusCode = StatusCodes.Status500InternalServerError;
+					break;
+			}
+
+			httpContext.Response.StatusCode = response.StatusCode;
+			httpContext.Response.ContentType = "application/json";
+
+			await httpContext.Response.WriteAsJsonAsync(response);
+
+			return true;
 		}
 	}
-
-
 }

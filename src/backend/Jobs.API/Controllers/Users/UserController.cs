@@ -1,5 +1,4 @@
 ﻿using Jobs.API.Controllers.Abstractions;
-using Jobs.Application.Features.Companies.Command.LoginCompany;
 using Jobs.Application.Features.Users.Commands.Login;
 using Jobs.Application.Features.Users.Commands.Register;
 using Microsoft.AspNetCore.Mvc;

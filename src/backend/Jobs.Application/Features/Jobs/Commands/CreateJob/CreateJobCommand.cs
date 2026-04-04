@@ -12,6 +12,7 @@ namespace Jobs.Application.Features.Jobs.Commands.CreateJob
 	string Requirements,
 	EmploymentType EmploymentType,
 	int ExperienceLevel,
-	SalaryRange? Salary,
+	decimal? minSalary,
+	decimal? maxSalary,
 	DateTime? ExpirationDate) : ICommand<string>;
 }

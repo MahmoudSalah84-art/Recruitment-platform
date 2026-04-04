@@ -1,7 +1,4 @@
 ﻿using Jobs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.IRepositories
 {
@@ -14,5 +11,8 @@ namespace Jobs.Domain.IRepositories
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>The CV entity with parsed details if found, otherwise null.</returns>
 		Task<CV?> GetByIdWithParsedAsync(string id, CancellationToken ct = default);
+
+
+		Task<CV?> GetByUserId(string userId);
 	}
 }
