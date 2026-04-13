@@ -14,7 +14,7 @@ namespace Jobs.API.Controllers.CVs
 		{
 			var result = await Sender.Send(command);
 
-			var response = result.ToApiResponse();
+			var response = result.ToApiResponse<object>();
 
 			return StatusCode(response.StatusCode, response);
 		}

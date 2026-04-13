@@ -8,5 +8,7 @@ namespace Jobs.Application.Common.DTOs
 		public string Phone { get; set; }
 		public List<string> Skills { get; set; }
 		public List<string> Education { get; set; }
+
+
 	}
 }

@@ -20,9 +20,6 @@ namespace Jobs.Application.Features.CV.Command.CreateOrUpdateResume
 			//test for AsNoTracking
 			var cv = _unitOfWork.CVs.Query().FirstOrDefault(r => r.UserId == request.UserId);
 
-			///*var fileName = $"{Gu*/id.NewGuid()}_{request.File.FileName}";
-			//var filePath = Path.Combine("wwwroot/CVs", fileName);
-
 			var FileUrl = await _fileService.UploadFileAsync(request.File);
 
 			if (cv is null)

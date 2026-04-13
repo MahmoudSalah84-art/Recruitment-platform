@@ -8,20 +8,15 @@ namespace Jobs.Application.Features.Companies.Queries.GetCompanyDetails
 	public class GetCompanyProfileQueryHandler : IQueryHandler<GetCompanyProfileQuery, CompanyProfileDto>
 	{
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly ICurrentUserService _currentUser;
 
-		public GetCompanyProfileQueryHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUser)
+		public GetCompanyProfileQueryHandler(IUnitOfWork unitOfWork)
 		{
 			_unitOfWork = unitOfWork;
-			_currentUser = currentUser;
 		}
 
 		public async Task<Result<CompanyProfileDto>> Handle( GetCompanyProfileQuery request, CancellationToken cancellationToken)
 		{
-			if (_currentUser.UserId == string.Empty)
-				return Result<CompanyProfileDto>.Failure("User not authenticated");
-
-			var company = await _unitOfWork.Companies.GetByIdAsync(_currentUser.UserId);
+			var company = await _unitOfWork.Companies.GetByIdAsync(request.CompanyId);
 
 			if (company is null)
 				return Result<CompanyProfileDto>.Failure("Company not found");

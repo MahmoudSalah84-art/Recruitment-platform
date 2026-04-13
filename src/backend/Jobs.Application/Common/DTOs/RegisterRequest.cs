@@ -8,6 +8,7 @@ namespace Jobs.Application.Common.DTOs
 		string UserName,
 		string Email,
         string Password,
-        string ConfirmPassword)
+        string ConfirmPassword,
+        string Role)
     {}
 }

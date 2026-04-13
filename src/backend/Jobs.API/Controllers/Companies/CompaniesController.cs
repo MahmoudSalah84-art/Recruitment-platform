@@ -1,22 +1,23 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.API.Extensions;
-using Jobs.Application.Common.DTOs;
 using Jobs.Application.Features.Companies.Command.DeleteCompany;
 using Jobs.Application.Features.Companies.Command.LoginCompany;
 using Jobs.Application.Features.Companies.Command.Register;
 using Jobs.Application.Features.Companies.Command.UpdateCompany;
-using Jobs.Application.Features.Companies.Command.UpdateCompanyLogo;
 using Jobs.Application.Features.Companies.Queries.GetAllCompanies;
 using Jobs.Application.Features.Companies.Queries.GetCompanyById;
+using Jobs.Domain.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Jobs.API.Controllers.Companies
 {
 	public sealed class CompaniesController : ApiController
 	{
-
 		// GET /api/companies
 		[HttpGet]
+		[Authorize(Policy = Permissions.Companies_View)]
 		public async Task<IActionResult> GetAllCompanies(
 			[FromQuery] int page = 1,
 			[FromQuery] int pageSize = 10,
@@ -34,9 +35,13 @@ namespace Jobs.API.Controllers.Companies
 
 
 		// GET /api/companies/{id}
+		[Authorize(Policy = Permissions.Companies_View)]
 		[HttpGet("{id}")]
 		public async Task<IActionResult> GetCompanyById(string id)
 		{
+			string CompanyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			if (CompanyId == null || CompanyId != id) return Unauthorized();
+
 			var query = new GetCompanyByIdQuery(id);
 
 			var result = await Sender.Send(query);
@@ -79,18 +84,26 @@ namespace Jobs.API.Controllers.Companies
 		}
 
 		// DELETE /api/companies/{id}
+		[Authorize(Policy = Permissions.Companies_Delete)]
 		[HttpDelete("{id}")]
 		public async Task<IActionResult> DeleteCompany(string id)
 		{
+			string CompanyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			if (CompanyId == null || CompanyId != id) return Unauthorized();
+
 			await Sender.Send(new DeleteCompanyCommand(id));
 
 			return NoContent(); // 204
 		}
 
 		// PUT /api/companies/{id}
+		[Authorize(Policy = Permissions.Companies_Update)]
 		[HttpPut("{id}")]
 		public async Task<IActionResult> UpdateCompany(string id, [FromBody] UpdateCompanyCommand command)
 		{
+			string CompanyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			if (CompanyId == null || CompanyId != id) return Unauthorized();
+
 			if (id != command.CompanyId)
 				return BadRequest("Route id and body id must match");
 
@@ -98,10 +111,6 @@ namespace Jobs.API.Controllers.Companies
 
 			return NoContent(); // 204
 		}
-
-
-
-		
 	}
 }
 

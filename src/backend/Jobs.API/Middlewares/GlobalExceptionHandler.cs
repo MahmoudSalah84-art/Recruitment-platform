@@ -2,6 +2,7 @@
 using Jobs.Domain.Exceptions;
 using Jobs.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace Jobs.API.Middlewares
 {
@@ -20,7 +21,7 @@ namespace Jobs.API.Middlewares
 
 			var traceId = httpContext.TraceIdentifier;
 
-			var response = new ApiResponse
+			var response = new ApiResponse<object>
 			{
 				IsSuccess = false,
 				TraceId = traceId
@@ -28,26 +29,23 @@ namespace Jobs.API.Middlewares
 
 			switch (ex)
 			{
-				case ValidationException validationEx:
-					response.Message = validationEx.Message;
-					response.Errors = validationEx.Errors
-							.GroupBy(e => e.PropertyName, e => e.ErrorMessage)
-							.ToDictionary(
-								failureGroup => failureGroup.Key,
-								failureGroup => failureGroup.ToArray()
-							);
+				case ValidationException :
+					response.Message = "Failed" ;
+					response.Errors = ex.Message;
 					response.ErrorCode = ErrorCodes.Validation;
 					response.StatusCode = StatusCodes.Status400BadRequest;
 					break;
 
-				case DatabaseException:
+				case DatabaseException :
 					response.Message = "Database error occurred";
+					response.Errors = ex.Message;
 					response.ErrorCode = ErrorCodes.ServerError;
 					response.StatusCode = StatusCodes.Status500InternalServerError;
 					break;
 
-				case DomainException or BusinessRuleViolationException:
-					response.Message = ex.Message;
+				case DomainException or BusinessRuleViolationException :
+					response.Message = "Failed";
+					response.Errors = ex.Message;
 					response.ErrorCode = ErrorCodes.businessRule;
 					response.StatusCode = StatusCodes.Status400BadRequest;
 					break;
@@ -72,6 +70,7 @@ namespace Jobs.API.Middlewares
 
 				default:
 					response.Message = $"Internal Server Error : ({ex.Message}) ";
+					response.Errors = ex.Message;
 					response.ErrorCode = ErrorCodes.ServerError;
 					response.StatusCode = StatusCodes.Status500InternalServerError;
 					break;

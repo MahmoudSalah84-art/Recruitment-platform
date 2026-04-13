@@ -1,45 +1,82 @@
-﻿using Jobs.Application.Abstractions.Messaging;
+﻿using Jobs.Application.Abstractions.Interfaces;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.IRepositories;
+using Microsoft.Extensions.Logging;
 using CVJobRecommendationEntity = Jobs.Domain.Entities.CVJobRecommendation;
 
 namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecommendation
 {
 	internal class CreateCVJobRecommendationCommandHandler : ICommandHandler<CreateCVJobRecommendationCommand, string>
 	{
+		private readonly IFileService _fileService;
 		private readonly IUnitOfWork _unitOfWork;
-
-		public CreateCVJobRecommendationCommandHandler( IUnitOfWork unitOfWork)
+		private readonly ILogger<CreateCVJobRecommendationCommandHandler> _logger;
+		private readonly IAiScoringService _aiScoringService;
+		public CreateCVJobRecommendationCommandHandler( IUnitOfWork unitOfWork ,
+		ILogger<CreateCVJobRecommendationCommandHandler> logger,
+		IAiScoringService aiScoringService ,
+		IFileService fileService)
 		{
+			_aiScoringService = aiScoringService;
 			_unitOfWork = unitOfWork;
+			_logger = logger;
+			_fileService = fileService;
 		}
 
 		public async Task<Result<string>> Handle(CreateCVJobRecommendationCommand request, CancellationToken cancellationToken)
 		{
-			var cvExists = await _unitOfWork.CVs.ExistsAsync(X => X.Id == request.CvId);
-			if (!cvExists)
-				return Result<string>.Failure("CV not found.");
-
 			var job = await _unitOfWork.Jobs.GetByIdAsync(request.JobId, cancellationToken);
 			if (job is null)
-				return Result<string>.Failure("Job not found.");
-
+			{
+				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
+				return Result<string>.Failure(" not found.");
+			}
 			if (!job.IsPublished)
+			{
+				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
 				return Result<string>.Failure("Cannot recommend an unpublished job.");
+			}
 
 			if (job.IsExpired)
+			{
+				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
 				return Result<string>.Failure("Cannot recommend an expired job.");
+			}
 
-			var exists = await _unitOfWork.CVJobRecommendations.ExistsByCvAndJobAsync(request.CvId, request.JobId, cancellationToken);
+			var cvs = _unitOfWork.CVs.Query().ToList();
+			if (!cvs.Any())
+			{
+				_logger.LogInformation("No CVs found to score for Job {JobId}.", request.JobId);
+				return Result<string>.Failure("No CVs found .");
+			}
 
-			if (exists)
-				return Result<string>.Failure("A recommendation already exists for this CV and Job.");
+			_logger.LogInformation("Scoring {Count} CVs for Job {JobId}...", cvs.Count, request.JobId);
 
-			var recommendation = new CVJobRecommendationEntity(request.CvId, request.JobId, request.Score);
+			// Await all file-stream tasks and produce the required List<(string CvId, Stream CvPdf)>
+			var cvStreamsArray = await Task.WhenAll(
+				cvs.Select(async cv => (CvId: cv.Id, CvPdf: await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value)))
+			);
 
-			_unitOfWork.CVJobRecommendations.Add(recommendation);
+			var cvStreams = cvStreamsArray.ToList();
+
+			var results = await _aiScoringService.RankCandidatesAsync(
+								cvStreams,
+								job.Description,
+								cancellationToken);
+
+			// احفظ الـ recommendations
+			var recommendations = results.Select(result => new
+				CVJobRecommendationEntity(
+					cvId: result.CvId,
+					jobId: job.Id,
+					score: result.MatchScore))
+				.ToList();
+
+			await _unitOfWork.CVJobRecommendations.AddRangeAsync(recommendations);
+
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-			return Result<string>.Success(recommendation.Id);
+			return Result<string>.Success("success");
 		}
 	}
 }

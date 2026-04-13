@@ -1,6 +1,6 @@
 ﻿using Jobs.API.Middlewares;
 using Jobs.Application.Abstractions.Messaging;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
+
 
 namespace Jobs.API.Extensions
 {
@@ -22,20 +22,17 @@ namespace Jobs.API.Extensions
 			return new ApiResponse<T>
 			{
 				IsSuccess = false,
-				Message = result.Error,
-				Errors = new Dictionary<string, string[]>
-				{
-					{ "Error", new[] { result.Error } }
-				},
+				Message = "Faild" ,
+				Errors = result.Error,
 				StatusCode = 400
 			};
 		}
 
-		public static ApiResponse ToApiResponse(this Result result, int successStatusCode = 200)
+		public static ApiResponse<T> ToApiResponse<T>(this Result result, int successStatusCode = 200)
 		{
 			if (result.IsSuccess)
 			{
-				return new ApiResponse
+				return new ApiResponse<T>
 				{
 					IsSuccess = true,
 					Message = "Success",
@@ -43,16 +40,14 @@ namespace Jobs.API.Extensions
 				};
 			}
 
-			return new ApiResponse
+			return new ApiResponse<T>
 			{
 				IsSuccess = false,
-				Message = result.Error,
-				Errors = new Dictionary<string, string[]>
-				{
-					{ "Error", new[] { result.Error } }
-				},
+				Message = "Faild" ,
+				Errors = result.Error,
 				StatusCode = 400
 			};
 		}
+
 	}
 }

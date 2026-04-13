@@ -37,10 +37,6 @@ namespace Jobs.Domain.Entities
 		private readonly List<JobApplication> _applications = new();
 		public IReadOnlyCollection<JobApplication> Applications => _applications.AsReadOnly();
 
-
-
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
 		// ========= Constructors =========
 		private User() { }
 	
@@ -55,8 +51,6 @@ namespace Jobs.Domain.Entities
 			Bio = bio;
 
 			IsVerified = false;
-			CreatedAt = DateTime.UtcNow;
-			UpdatedAt = CreatedAt;
 
 			AddEvent(new UserRegisteredEvent(this));
 		}
@@ -76,12 +70,10 @@ namespace Jobs.Domain.Entities
 			CheckRule(new UserEmailMustBeUniqueRule(isEmailExists));
 
 			Email = newEmail;
-			UpdatedAt = DateTime.UtcNow;
 		}
         public void UpdatePhoneNumber(PhoneNumber phoneNumber)
         {
             PhoneNumber = phoneNumber;
-			UpdatedAt = DateTime.UtcNow;
 
 		}
 
@@ -189,7 +181,6 @@ namespace Jobs.Domain.Entities
 			CheckRule(new CandidateCannotApplyTwiceRule(this, application.JobId));
 			CheckRule(new CannotApplyToExpiredJobRule(application.Job));
 
-			UpdatedAt = DateTime.UtcNow;
 
 			_applications.Add(application);
 
@@ -213,16 +204,16 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ==================== Soft Delete ====================
-		public void Delete()
-		{
-			if (IsDeleted)
-				throw new DomainException("User is already deleted.");
+		//public void Delete()
+		//{
+		//	if (IsDeleted)
+		//		throw new DomainException("User is already deleted.");
 
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
+		//	IsDeleted = true;
+		//	DeletedAt = DateTime.UtcNow;
 
-			//RaiseDomainEvent(new UserDeletedDomainEvent(Id));
-		}
+		//	//RaiseDomainEvent(new UserDeletedDomainEvent(Id));
+		//}
 
 		public void Restore()
 		{
@@ -232,10 +223,6 @@ namespace Jobs.Domain.Entities
 			IsDeleted = false;
 			DeletedAt = null;
 		}
-	 
-
-
- 
     }
 }
 

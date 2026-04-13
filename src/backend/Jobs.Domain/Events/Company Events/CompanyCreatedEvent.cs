@@ -1,8 +1,5 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Events.Company_Events
 {

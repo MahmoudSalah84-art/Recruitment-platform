@@ -34,8 +34,10 @@ namespace Jobs.Application.Abstractions.Interfaces
 		Task<Result> DeleteUserAsync(string userId);
 
 		// ── Email Confirmation ────────────────────────────────────────────────────
-		Task<string> GenerateEmailConfirmationTokenAsync(string userId);
+		Task<Result<string>> GenerateEmailConfirmationTokenAsync(string userId);
 		Task<Result> ConfirmEmailAsync(string userId, string token);
+
+		//Task<Result> ResendConfirmationEmailAsync(string email);
 
 		// ── Password Reset ────────────────────────────────────────────────────────
 		Task<string> GeneratePasswordResetTokenAsync(string email);
@@ -44,3 +46,13 @@ namespace Jobs.Application.Abstractions.Interfaces
 
 	}
 }
+
+
+//Task<Result> ForgotPasswordAsync(ForgotPasswordRequest request);
+
+
+//Task<Result<TwoFactorSetupResponse>> Enable2FAAsync(string userId);
+//Task<Result> Verify2FAAsync(string userId, Enable2FARequest request);
+//Task<Result> Disable2FAAsync(string userId);
+//Task<Result<AuthResponse>> ExternalLoginAsync(ExternalLoginRequest request);
+//Task<Result> RevokeRefreshTokenAsync(string userId);

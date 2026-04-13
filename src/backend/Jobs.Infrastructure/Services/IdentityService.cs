@@ -35,10 +35,10 @@ namespace Jobs.Infrastructure.Services
 		public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest req)
 		{
 			if (await _userManager.FindByEmailAsync(req.Email) != null)
-				return Result<AuthResponse>.Failure("Email already registered.");
+				return Result<AuthResponse>.Failure("Email already registered in aut.");
 
 			if (await _userManager.FindByNameAsync(req.UserName) != null)
-				return Result<AuthResponse>.Failure("userName already registered.");
+				return Result<AuthResponse>.Failure("userName already registered in aut.");
 
 			var user = new AppUser
 			{
@@ -50,12 +50,10 @@ namespace Jobs.Infrastructure.Services
 			};
 
 			var result = await _userManager.CreateAsync(user, req.Password);
-			if (!result.Succeeded) return Result<AuthResponse>.Failure(result.Errors.Select(e => e.Description).ToString()!);
+			if (!result.Succeeded) return Result<AuthResponse>.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
 
-			if (!await _roles.RoleExistsAsync("User"))
-				await _roles.CreateAsync(new AppRole { Name = "User" });
 
-			await _userManager.AddToRoleAsync(user, "User");
+			await _userManager.AddToRoleAsync(user, req.Role);
 
 			return await BuildAuthAsync(user);
 		}
@@ -119,7 +117,7 @@ namespace Jobs.Infrastructure.Services
 
 			var res = await _roles.CreateAsync(new AppRole { Name = Name, Description = Description });
 
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result> DeleteRoleAsync(string roleName)
@@ -128,7 +126,7 @@ namespace Jobs.Infrastructure.Services
 			if (role == null) return Result.Failure("Role not found.");
 
 			var res = await _roles.DeleteAsync(role);
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result> AssignRoleAsync(string UserId, string RoleName)
@@ -140,7 +138,7 @@ namespace Jobs.Infrastructure.Services
 
 			var res = await _userManager.AddToRoleAsync(user, RoleName);
 
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result> RemoveRoleAsync(string UserId, string RoleName)
@@ -150,7 +148,7 @@ namespace Jobs.Infrastructure.Services
 
 			var res = await _userManager.RemoveFromRoleAsync(user, RoleName);
 
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result<IEnumerable<string>>> GetAllRolesAsync() =>
@@ -169,7 +167,7 @@ namespace Jobs.Infrastructure.Services
 
 			var res = await _roles.AddClaimAsync(role, new Claim("Permission", Permission));
 
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result> RemovePermissionFromRoleAsync(string RoleName, string Permission)
@@ -178,7 +176,7 @@ namespace Jobs.Infrastructure.Services
 			if (role == null) return Result.Failure("Role not found.");
 
 			var res = await _roles.RemoveClaimAsync(role, new Claim("Permission",Permission));
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result<IEnumerable<string>>> GetRolePermissionsAsync(string roleName)
@@ -271,15 +269,17 @@ namespace Jobs.Infrastructure.Services
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null) return Result.Failure("User not found.");
 			var res = await _userManager.DeleteAsync(user);
-			return res.Succeeded ? Result.Success() : Result.Failure(res.Errors.Select(e => e.Description).ToString()!);
+			return res.Succeeded ? Result.Success() : Result.Failure(string.Join(", ", res.Errors.Select(e => e.Description)));
 		}
 
 		//_______ Email Confirmation ─────────────────────────────────────────────────
-		public async Task<string> GenerateEmailConfirmationTokenAsync(string userId)
+		public async Task<Result<string>> GenerateEmailConfirmationTokenAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
 
-			return await _userManager.GenerateEmailConfirmationTokenAsync(user!);
+			var result =  await _userManager.GenerateEmailConfirmationTokenAsync(user!);
+
+			return Result<string>.Success(result);
 		}
 
 		public async Task<Result> ConfirmEmailAsync(string userId, string token)

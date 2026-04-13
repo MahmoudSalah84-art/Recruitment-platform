@@ -20,7 +20,8 @@ namespace Jobs.Application.Features.Skills.Commands.DeleteSkill
 			if (skill is null)
 				return Result.Failure("Skill not found.");
 
-			skill.Delete();
+			_unitOfWork.Skills.Remove(skill);
+
 
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 

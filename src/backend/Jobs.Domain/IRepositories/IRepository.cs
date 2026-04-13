@@ -1,9 +1,7 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Specifications;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
+
 
 namespace Jobs.Domain.IRepositories
 {
@@ -26,6 +24,7 @@ namespace Jobs.Domain.IRepositories
 		// Queryable for custom queries
 		IQueryable<TEntity> Query();
 
+		Task AddRangeAsync(IEnumerable<TEntity> entities);
 
 
 		// Specification pattern support

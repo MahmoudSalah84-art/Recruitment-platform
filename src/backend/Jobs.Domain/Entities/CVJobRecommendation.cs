@@ -19,8 +19,6 @@ namespace Jobs.Domain.Entities
         public bool IsActive { get; private set; }
 		public DateTime? DeactivatedAt { get; private set; }
 
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
 
 		// Navigation Properties
 		public CV CV { get; set; }
@@ -37,9 +35,8 @@ namespace Jobs.Domain.Entities
 			CvId = cvId;
 			JobId = jobId;
 			Score = score;
-			CreatedAt = DateTime.UtcNow;
 			IsActive = true;
-			UpdatedAt = CreatedAt;
+			
 			AddEvent(new CvRecommendedJobCreatedEvent(this));
 
 		}

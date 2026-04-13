@@ -1,18 +1,14 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Events.JobEvents
 {
 	public class JobCreatedEvent : DomainEvent
 	{
-		public Job Job { get; }
+		public string JobId { get; }
 
-        public JobCreatedEvent(Job job)
+        public JobCreatedEvent(string jobId)
 		{
-			Job = job;
+			JobId = jobId;
 			OccurredOn = DateTime.UtcNow;
 		}
 	}

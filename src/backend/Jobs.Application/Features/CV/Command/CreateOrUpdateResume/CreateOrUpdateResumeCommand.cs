@@ -6,5 +6,4 @@ namespace Jobs.Application.Features.CV.Command.CreateOrUpdateResume
 	public record CreateOrUpdateResumeCommand(
 	string UserId,
 	FileUploadDto File ) : ICommand;
-
 }

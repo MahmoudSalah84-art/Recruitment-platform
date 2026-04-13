@@ -57,7 +57,10 @@ namespace Jobs.Infrastructure.Repositories.Repo
 			=> await _set.AnyAsync(predicate);
 
 
-
+		public async Task AddRangeAsync(IEnumerable<TEntity> entities)
+		{
+			await _set.AddRangeAsync(entities);
+		}
 
 		// Specification pattern support
 

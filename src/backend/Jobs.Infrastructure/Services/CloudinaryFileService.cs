@@ -45,5 +45,19 @@ namespace Jobs.Infrastructure.Services
 
 			return result.SecureUrl.ToString();
 		}
+
+		public async Task<Stream> GetFileStreamFromUrlAsync(string url)
+		{
+			var httpClient = new HttpClient();
+
+			var response = await httpClient.GetAsync(url);
+
+			if (!response.IsSuccessStatusCode)
+			{
+				throw new Exception("Failed to download file");
+			}
+
+			return await response.Content.ReadAsStreamAsync();
+		}
 	}
 }

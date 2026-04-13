@@ -1,9 +1,5 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Exceptions;
-using Jobs.Domain.Rules;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Entities
 {
@@ -12,8 +8,6 @@ namespace Jobs.Domain.Entities
 		// ========== Properties ==========
 		public string Name { get; private set; }
 
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
 
 		// Navigation Properties
 
@@ -48,22 +42,22 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ==================== Soft Delete ====================
-		public void Delete()
-		{
-			if (IsDeleted)
-				throw new DomainException("Skill is already deleted.");
+		//public void Delete()
+		//{
+		//	if (IsDeleted)
+		//		throw new DomainException("Skill is already deleted.");
 
-			if (_jobSkills.Any())
-				throw new DomainException("Cannot delete a skill that is assigned to jobs.");
+		//	if (_jobSkills.Any())
+		//		throw new DomainException("Cannot delete a skill that is assigned to jobs.");
 
-			if (_userSkills.Any())
-				throw new DomainException("Cannot delete a skill that is assigned to users.");
+		//	if (_userSkills.Any())
+		//		throw new DomainException("Cannot delete a skill that is assigned to users.");
 
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
+		//	IsDeleted = true;
+		//	DeletedAt = DateTime.UtcNow;
 
-			//RaiseDomainEvent(new SkillDeletedDomainEvent(Id));
-		}
+		//	//RaiseDomainEvent(new SkillDeletedDomainEvent(Id));
+		//}
 
 		public void Restore()
 		{

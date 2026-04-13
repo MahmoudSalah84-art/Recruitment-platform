@@ -2,6 +2,7 @@
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Common.DTOs;
 using Jobs.Application.Features.Users.Commands.Register;
+using Jobs.Domain.Common;
 using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
 
@@ -42,7 +43,8 @@ namespace Jobs.Application.Features.Identity.Command.Register
 				UserName: cmd.Email,
 				Email: cmd.Email,
 				Password: cmd.Password,
-				ConfirmPassword: cmd.ConfirmPassword
+				ConfirmPassword: cmd.ConfirmPassword,
+				Roles.User
 			);
 
 			return await _identityService.RegisterAsync(registerRequest);

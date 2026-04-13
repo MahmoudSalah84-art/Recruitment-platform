@@ -5,12 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace Jobs.Infrastructure.BackgroundJobs
 {
@@ -23,22 +18,22 @@ namespace Jobs.Infrastructure.BackgroundJobs
 			_scopeFactory = scopeFactory;
 			_logger = logger;
 		}
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override async Task ExecuteAsync(CancellationToken ct)
 		{
 			_logger.LogInformation("Outbox Processor started...");
 
-			while (!stoppingToken.IsCancellationRequested)
+			while (!ct.IsCancellationRequested)
 			{
 				try
 				{
-					await ProcessOutboxMessages(stoppingToken);
+					await ProcessOutboxMessages(ct);
 				}
 				catch (Exception ex)
 				{
 					_logger.LogError(ex, "Error occurred while processing outbox messages.");
 				}
 
-				await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+				await Task.Delay(TimeSpan.FromSeconds(5), ct);
 			}
 			
 		}

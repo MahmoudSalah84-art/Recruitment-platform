@@ -6,5 +6,7 @@ namespace Jobs.Application.Abstractions.Interfaces
 	{
 		Task<string> UploadImageAsync(FileUploadDto file);
 		Task<string> UploadFileAsync(FileUploadDto file);
+
+		Task<Stream> GetFileStreamFromUrlAsync(string url);
 	}
 }

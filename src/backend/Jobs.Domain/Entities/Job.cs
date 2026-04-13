@@ -33,13 +33,6 @@ namespace Jobs.Domain.Entities
 
 
 
-		
-
-
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
-
-
 
 		// Navigation Properties
 		public Company Company { get; set; }
@@ -79,12 +72,10 @@ namespace Jobs.Domain.Entities
 			ExpirationDate = expirationDate ?? DateTime.UtcNow.AddMonths(1);
 			IsPublished = false;
 
-			CreatedAt = DateTime.UtcNow;
-
-			AddEvent(new JobCreatedEvent(this));
+			AddEvent(new JobCreatedEvent(Id));
 
 		}
-
+		 
 		// ========= Behaviors =========
 
 		// ==================== Details ====================
@@ -256,21 +247,6 @@ namespace Jobs.Domain.Entities
 
 
 		// ==================== Soft Delete ====================
-		public void Delete()
-		{
-			if (IsDeleted)
-				throw new DomainException("Job is already deleted.");
-
-			if (IsPublished)
-				throw new DomainException("Cannot delete a published job. Unpublish it first.");
-
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-
-			//RaiseDomainEvent(new JobDeletedDomainEvent(Id, CompanyId));
-		}
-
-
 
 		public void Restore()
 		{

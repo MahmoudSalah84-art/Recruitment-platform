@@ -11,8 +11,6 @@ namespace Jobs.Domain.Entities
 		public string SkillId { get; private set; }
 		public Skill Skill { get; private set; }
 
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
 
 		// ========== Constructor ==========
 		private UserSkill() { }

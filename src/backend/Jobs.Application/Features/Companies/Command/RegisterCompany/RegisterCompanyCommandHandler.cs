@@ -1,10 +1,9 @@
 ﻿using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Common.DTOs;
+using Jobs.Domain.Common;
 using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
-using System.Transactions;
-
 
 namespace Jobs.Application.Features.Companies.Command.Register
 {
@@ -48,7 +47,8 @@ namespace Jobs.Application.Features.Companies.Command.Register
 				UserName: request.UserName,
 				Email: request.Email,
 				Password: request.Password,
-				ConfirmPassword: request.ConfirmPassword
+				ConfirmPassword: request.ConfirmPassword,
+				Roles.Company
 			);
 
 			return await _identityService.RegisterAsync(registerRequest);

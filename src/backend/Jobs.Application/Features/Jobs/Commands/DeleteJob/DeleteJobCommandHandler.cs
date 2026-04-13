@@ -1,4 +1,5 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
+using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Jobs.Commands.DeleteJob
@@ -19,7 +20,7 @@ namespace Jobs.Application.Features.Jobs.Commands.DeleteJob
 			if (job is null)
 				return Result.Failure( "Job not found.");
 
-			job.Delete();
+			_unitOfWork.Jobs.Remove(job);
 
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 

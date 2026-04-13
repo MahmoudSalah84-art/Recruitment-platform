@@ -2,6 +2,9 @@
 using Jobs.API.Middlewares;
 using Jobs.Application;
 using Jobs.Infrastructure;
+using Jobs.Infrastructure.Identity;
+using Jobs.Infrastructure.Identity.Seeder;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,14 +50,22 @@ var app = builder.Build();
 app.UseExceptionHandler();
 
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.MapOpenApi();
-	//Add Swagger UI
-	app.UseSwaggerUI();
-	app.UseSwagger();
+	var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
+
+	await IdentitySeeder.SeedAsync(roleManager);
 }
+
+//// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+app.MapOpenApi();
+	//Add Swagger UI
+	app.UseSwagger();
+	app.UseSwaggerUI();
+//}
+
 
 app.UseHttpsRedirection();
 
@@ -62,6 +73,7 @@ app.UseRouting();
 
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

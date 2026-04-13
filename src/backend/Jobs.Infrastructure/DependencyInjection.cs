@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet;
+using Hangfire;
 using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Common.Interfaces;
 using Jobs.Domain.IRepositories;
@@ -10,7 +11,6 @@ using Jobs.Infrastructure.Repositories.Repo;
 using Jobs.Infrastructure.Repositories.UnitOfWork;
 using Jobs.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -21,26 +21,33 @@ namespace Jobs.Infrastructure
 	{
 		public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 		{
+
+
+			
 			// EF Core context for domain data
 			services.AddDbContext<JobDbContext>((sp, options) =>
 			{
-				// 1. جلب النسخ من الـ Service Provider (sp)
-				//var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
-				//var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+				var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
+				var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
+				var updateTimestampsInterceptor = sp.GetRequiredService<UpdateTimestampsInterceptor>();
 
 				options.UseSqlServer(
 					configuration.GetConnectionString("DefaultConnection"),
-					sql => sql.EnableRetryOnFailure() );
-				//.AddInterceptors(softDeleteInterceptor, outboxInterceptor);
+					sql => sql.EnableRetryOnFailure() )
+				.AddInterceptors(softDeleteInterceptor, outboxInterceptor, updateTimestampsInterceptor);
 			});
 
+
+
 			// Interceptors
-			services.AddScoped<SaveChangesInterceptor, SoftDeleteInterceptor>();
-			services.AddSingleton<SaveChangesInterceptor, ConvertDomainEventsToOutboxMessagesInterceptor>();
+			services.AddScoped<SoftDeleteInterceptor>();
+			services.AddScoped<ConvertDomainEventsToOutboxMessagesInterceptor>();
+			services.AddScoped<UpdateTimestampsInterceptor>();
+
 
 
 			// Identity DB (separate)
-			services.AddJobSiteIdentity(configuration.GetConnectionString("IdentityConnection")!);
+			services.AddJobSiteIdentity(configuration);
 
 			// Repositories
 			services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -66,7 +73,6 @@ namespace Jobs.Infrastructure
 						configuration.GetSection("JwtSettings"));
 
 			services.AddScoped<IJwtTokenService, JwtTokenService>();
-			services.AddScoped<ICurrentUserService, CurrentUserService>();
 			services.AddScoped<IIdentityService, IdentityService>();
 			services.AddScoped<IFileService, CloudinaryFileService>();
 
@@ -88,18 +94,49 @@ namespace Jobs.Infrastructure
 			});
 
 			// Background Service
-			services.AddHostedService<OutboxProcessor>();
+			//services.AddHostedService<OutboxProcessor>();
+
+			// Infrastructure/DependencyInjection.cs
+			services.AddHttpClient<IAiScoringService, AiScoringService>(client =>
+			{
+				client.BaseAddress = new Uri(configuration["AiService:BaseUrl"]!);
+				client.Timeout = TimeSpan.FromMinutes(5); // AI calls ممكن تاخد وقت
+			});
+
+			services.AddScoped<IBackgroundJobService, HangfireBackgroundJobService>();
+
+			//// Hangfire
+			//services.AddHangfire(config => config
+			//	.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+			//	.UseSimpleAssemblyNameTypeSerializer()
+			//	.UseRecommendedSerializerSettings()
+			//	.UseSqlServerStorage(configuration.GetConnectionString("HangfireDb")));
+
+			//services.AddHangfireServer(options =>
+			//{
+			//	options.WorkerCount = 5; // عدد الـ workers المتوازية
+			//});
 
 
 
-
-			services.AddHttpClient<IAiServiceATS, AiServiceATS>();
+			//services.AddHttpClient<IAiScoringService, AiScoringService>();
 
 			//services.AddHangfire(x =>
 			//	x.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
 
 			//services.AddHangfireServer();
 
+
+			// Email Settings
+			services.Configure<EmailSettings>(
+			configuration.GetSection("EmailSettings"));
+
+			// Email Sender
+			services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+			//// Domain Event Handlers (MediatR بيعمل scan أوتوماتيك)
+			//services.AddMediatR(cfg =>
+			//	cfg.RegisterServicesFromAssembly(typeof(UserEmailConfirmedDomainEventHandler).Assembly));
 
 			return services;
 		}

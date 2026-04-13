@@ -1,5 +1,4 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Entities;
 using Jobs.Domain.Exceptions;
 
 namespace Jobs.Domain.Entities
@@ -13,10 +12,6 @@ namespace Jobs.Domain.Entities
 		public string SkillId { get; private set; }
 		public Skill Skill { get; private set; }
 
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
-
-
 		// ========== Constructor ==========
 		private JobSkill() { }
 		public JobSkill(string jobId , string skillId)
@@ -29,15 +24,6 @@ namespace Jobs.Domain.Entities
 
 
 		// ==================== Soft Delete ====================
-		public void Delete()
-		{
-			if (IsDeleted)
-				throw new DomainException("JobSkill is already deleted.");
-
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-		}
-
 		public void Restore()
 		{
 			if (!IsDeleted)

@@ -1,229 +1,108 @@
-﻿//using Jobs.Application.Features.Identity.Commands.ChangePassword;
-//using Jobs.Application.Features.Identity.Commands.ForgotPassword;
-//using Jobs.Application.Features.Identity.Commands.Login;
-//using Jobs.Application.Features.Identity.Commands.Logout;
-//using Jobs.Application.Features.Identity.Commands.RefreshToken;
-//using Jobs.Application.Features.Identity.Commands.Register;
-//using Jobs.Application.Features.Identity.Commands.ResendVerificationEmail;
-//using Jobs.Application.Features.Identity.Commands.ResetPassword;
-//using Jobs.Application.Features.Identity.Commands.VerifyEmail;
-//using Jobs.Domain.Entities;
-//using MediatR;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.Extensions.Hosting;
-//using Microsoft.Win32;
-//using Serilog;
-//using System.Security.Claims;
+﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.API.Extensions;
+using Jobs.Application.Features.Identity.Command.ChangePassword;
+using Jobs.Application.Features.Identity.Command.ConfirmEmail;
+using Jobs.Application.Features.Identity.Command.ForgotPassword;
+using Jobs.Application.Features.Identity.Command.GenerateEmailConfirmationToken;
+using Jobs.Application.Features.Identity.Command.RefreshToken;
+using Jobs.Application.Features.Identity.Command.ResetPassword;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
-//namespace Jobs.API.Controllers.Auth
-//{
-//	[ApiController]
-//	[Route("api/[controller]")]
-//	public class AuthController : ControllerBase
-//	{
-//		private readonly IMediator _mediator;
+namespace Jobs.API.Controllers.Auth
+{
+	[ApiController]
+	[Route("api/[controller]")]
+	public class AuthController : ApiController
+	{
+		// http://localhost:5000/api/auth/refresh-token
+		[HttpPost("refresh-token")]
+		[AllowAnonymous]
+		public async Task<IActionResult> RefreshToken(RefreshTokenCommand command)
+		{
+			var result = await Sender.Send(command);
+		
+			var response = result.ToApiResponse();
 
-//		public AuthController(IMediator mediator)
-//		{
-//			_mediator = mediator;
-//		}
+			return StatusCode(response.StatusCode, response);
+		}
 
-//		/// <summary>
-//		/// تسجيل مستخدم جديد
-//		/// </summary>
-//		[HttpPost("register")]
-//		public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-//		{
-//			var command = new RegisterCommand
-//			{
-//				Email = dto.Email,
-//				UserName = dto.UserName,
-//				Password = dto.Password,
-//				ConfirmPassword = dto.ConfirmPassword,
-//				FirstName = dto.FirstName,
-//				LastName = dto.LastName
-//			};
+		//[HttpPost("logout")]
+		//[Authorize]
+		//public async Task<IActionResult> Logout()
+		//{
+		//	var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		//	var result = await Sender.Send(new LogoutCommand(userId!));
 
-//			var result = await _mediator.Send(command);
+		//	var response = result.ToApiResponse();
 
-//			if (!result.IsSuccess)
-//				return BadRequest(new { message = result.Message, errors = result.Errors });
+		//	return StatusCode(response.StatusCode, response);
+		//}
 
-//			return Ok(new { message = result.Message, data = result.Data });
-//		}
+		// http://localhost:5000/api/auth/confirm-email?userId=123&token=abc
+		[HttpGet("confirm-email")]
+		[AllowAnonymous]
+		public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+		{
+			var result = await Sender.Send(new ConfirmEmailCommand(userId, token));
 
-//		/// <summary>
-//		/// تسجيل دخول مستخدم
-//		/// </summary>
-//		[HttpPost("login")]
-//		public async Task<IActionResult> Login([FromBody] LoginDto dto)
-//		{
-//			var command = new LoginCommand
-//			{
-//				EmailOrUserName = dto.EmailOrUserName,
-//				Password = dto.Password,
-//				RememberMe = dto.RememberMe
-//			};
+			var response = result.ToApiResponse<object>();
 
-//			var result = await _mediator.Send(command);
+			return StatusCode(response.StatusCode, response);
+		}
 
-//			if (!result.IsSuccess)
-//				return Unauthorized(new { message = result.Message, errors = result.Errors });
+		//http://localhost:5000/api/auth/generate-email-confirmation-token?userId=123
+		[HttpGet("generate-email-confirmation-token")]
+		[AllowAnonymous]
+		public async Task<IActionResult> GenerateEmailConfirmationToken([FromQuery] string userId)
+		{
+			var result = await Sender.Send(new GenerateEmailConfirmationTokenCommand(userId));
 
-//			return Ok(new { message = result.Message, data = result.Data });
-//		}
+			var response = result.ToApiResponse<object>();
 
-//		/// <summary>
-//		/// تحديث رمز الوصول باستخدام رمز التحديث
-//		/// </summary>
-//		[HttpPost("refresh-token")]
-//		public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenDto dto)
-//		{
-//			var command = new RefreshTokenCommand
-//			{
-//				RefreshToken = dto.RefreshToken
-//			};
+			return StatusCode(response.StatusCode, response);
+		}
 
-//			var result = await _mediator.Send(command);
+		//http://localhost:5000/api/auth/forgot-password
+		[HttpPost("forgot-password")]
+		[AllowAnonymous]
+		public async Task<IActionResult> ForgotPassword(ForgotPasswordCommand command)
+		{
+			var result = await Sender.Send(command);
 
-//			if (!result.IsSuccess)
-//				return Unauthorized(new { message = result.Message });
+			var response = result.ToApiResponse();
 
-//			return Ok(new { data = result.Data });
-//		}
+			return StatusCode(response.StatusCode, response);
+		}
 
-//		/// <summary>
-//		/// تسجيل خروج المستخدم
-//		/// </summary>
-//		[Authorize]
-//		[HttpPost("logout")]
-//		public async Task<IActionResult> Logout()
-//		{
-//			var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+		//http://localhost:5000/api/auth/reset-password
+		[HttpPost("reset-password")]
+		[AllowAnonymous]
+		public async Task<IActionResult> ResetPassword(ResetPasswordCommand command)
+		{
+			var result = await Sender.Send(command);
 
-//			var command = new LogoutCommand { UserId = userId };
-//			var result = await _mediator.Send(command);
+			var response = result.ToApiResponse<object>();
 
-//			if (!result.IsSuccess)
-//				return BadRequest(new { message = result.Message });
+			return StatusCode(response.StatusCode, response);
+		}
 
-//			return Ok(new { message = result.Message });
-//		}
+		//http://localhost:5000/api/auth/change-password
+		[HttpPost("change-password")]
+		[Authorize]
+		public async Task<IActionResult> ChangePassword(ChangePasswordCommand command)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var result = await Sender.Send(command with { UserId = userId! });
 
-//		/// <summary>
-//		/// التحقق من البريد الإلكتروني
-//		/// </summary>
-//		[HttpPost("verify-email")]
-//		public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto dto)
-//		{
-//			var command = new VerifyEmailCommand
-//			{
-//				Token = dto.Token,
-//				Email = dto.Email
-//			};
 
-//			var result = await _mediator.Send(command);
+			var response = result.ToApiResponse<object>();
 
-//			if (!result.IsSuccess)
-//				return BadRequest(new { message = result.Message });
-
-//			return Ok(new { message = result.Message });
-//		}
-
-//		/// <summary>
-//		/// إعادة إرسال بريد التحقق
-//		/// </summary>
-//		[HttpPost("resend-verification")]
-//		public async Task<IActionResult> ResendVerification([FromBody] ForgotPasswordDto dto)
-//		{
-//			var command = new ResendVerificationEmailCommand { Email = dto.Email };
-//			var result = await _mediator.Send(command);
-
-//			if (!result.IsSuccess)
-//				return BadRequest(new { message = result.Message });
-
-//			return Ok(new { message = result.Message });
-//		}
-
-//		/// <summary>
-//		/// تغيير كلمة المرور
-//		/// </summary>
-//		[Authorize]
-//		[HttpPost("change-password")]
-//		public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto dto)
-//		{
-//			var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
-//			var command = new ChangePasswordCommand
-//			{
-//				UserId = userId,
-//				CurrentPassword = dto.CurrentPassword,
-//				NewPassword = dto.NewPassword,
-//				ConfirmNewPassword = dto.ConfirmNewPassword
-//			};
-
-//			var result = await _mediator.Send(command);
-
-//			if (!result.IsSuccess)
-//				return BadRequest(new { message = result.Message, errors = result.Errors });
-
-//			return Ok(new { message = result.Message });
-//		}
-
-//		/// <summary>
-//		/// نسيت كلمة المرور
-//		/// </summary>
-//		[HttpPost("forgot-password")]
-//		public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
-//		{
-//			var command = new ForgotPasswordCommand { Email = dto.Email };
-//			var result = await _mediator.Send(command);
-
-//			return Ok(new { message = result.Message });
-//		}
-
-//		/// <summary>
-//		/// إعادة تعيين كلمة المرور
-//		/// </summary>
-//		[HttpPost("reset-password")]
-//		public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
-//		{
-//			var command = new ResetPasswordCommand
-//			{
-//				Token = dto.Token,
-//				Email = dto.Email,
-//				NewPassword = dto.NewPassword,
-//				ConfirmNewPassword = dto.ConfirmNewPassword
-//			};
-
-//			var result = await _mediator.Send(command);
-
-//			if (!result.IsSuccess)
-//				return BadRequest(new { message = result.Message, errors = result.Errors });
-
-//			return Ok(new { message = result.Message });
-//		}
-
-//		/// <summary>
-//		/// الحصول على معلومات المستخدم الحالي
-//		/// </summary>
-//		[Authorize]
-//		[HttpGet("me")]
-//		public async Task<IActionResult> GetCurrentUser()
-//		{
-//			var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-
-//			var query = new GetUserByIdQuery { UserId = userId };
-//			var result = await _mediator.Send(query);
-
-//			if (!result.IsSuccess)
-//				return NotFound(new { message = result.Message });
-
-//			return Ok(new { data = result.Data });
-//		}
-//	}
-//}
+			return StatusCode(response.StatusCode, response);
+		}
+	}
+}
 
 
 

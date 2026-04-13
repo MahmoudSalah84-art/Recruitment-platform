@@ -4,7 +4,6 @@ using Jobs.Domain.Events.CV_Recommendation_Events;
 using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
 using Jobs.Domain.ValueObjects;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.Domain.Entities
 {
@@ -19,10 +18,6 @@ namespace Jobs.Domain.Entities
 		public string? SummaryText { get; private set; }
 
 		public ParsedData? ParsedData { get; private set; }
-
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
-
 
 
 		// Navigation Properties
@@ -49,8 +44,7 @@ namespace Jobs.Domain.Entities
 			Title = title;
 			FilePath = FilePath.Create(file);
 			SummaryText = summary;
-			CreatedAt = DateTime.UtcNow;
-			UpdatedAt = CreatedAt;
+			
 			AddEvent(new CvUploadedEvent(this));
 			//AddEvent(new CvUploadedEvent(this.Id, userId, title));
 		}
@@ -150,19 +144,7 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ==================== Soft Delete ====================
-		public void Delete()
-		{
-			if (IsDeleted)
-				throw new DomainException("CV is already deleted.");
-
-			if (_applications.Any(a => a.Status == ApplicationStatus.Pending))
-				throw new DomainException("Cannot delete a CV with pending applications.");
-
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
-
-			//RaiseDomainEvent(new CVDeletedDomainEvent(Id, UserId));
-		}
+		
 
 		public void Restore()
 		{

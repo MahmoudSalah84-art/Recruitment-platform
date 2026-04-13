@@ -21,8 +21,6 @@ namespace Jobs.Domain.Entities
 		public ApplicationStatus Status { get; private set; } // Pending, Accepted, Rejected
 
 		public DateTime StatusHistory { get; private set; } 
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
 
 
 
@@ -48,7 +46,6 @@ namespace Jobs.Domain.Entities
 
 
 			Status = ApplicationStatus.Pending;
-			CreatedAt = DateTime.UtcNow;
 
 			AddEvent(new ApplicationSubmittedEvent(this));
 		}

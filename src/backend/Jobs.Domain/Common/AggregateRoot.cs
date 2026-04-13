@@ -1,10 +1,4 @@
-﻿using Jobs.Domain.Events;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Security.Cryptography;
-using System.Text;
-
+﻿
 namespace Jobs.Domain.Common
 {
 	public abstract class AggregateRoot : BaseEntity 

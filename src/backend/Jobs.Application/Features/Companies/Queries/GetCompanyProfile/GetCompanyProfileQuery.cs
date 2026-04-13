@@ -3,5 +3,5 @@ using Jobs.Application.Features.Companies.Queries.GetCompanyProfile;
 
 namespace Jobs.Application.Features.Companies.Queries.GetCompanyDetails
 {
-	public record GetCompanyProfileQuery() : IQuery<CompanyProfileDto>;
+	public record GetCompanyProfileQuery(string CompanyId) : IQuery<CompanyProfileDto>;
 }
