@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
+﻿
 namespace Jobs.Infrastructure.Outbox
 {
 	public class OutboxMessage
 	{
-		public Guid Id { get; private set; } = Guid.NewGuid();
+		public string Id { get; private set; } = Guid.NewGuid().ToString();
 		public DateTime OccurredOn { get; private set; } 
 		public string Type { get; private set; } = string.Empty; // event name
 		public string Content { get; private set; } = string.Empty; // Jason

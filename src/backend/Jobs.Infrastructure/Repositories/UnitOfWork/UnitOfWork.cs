@@ -1,6 +1,8 @@
-﻿using Jobs.Domain.Repositories.UnitOfWork;
-using Jobs.Domain.Repository.Repo;
+﻿using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
+using Jobs.Infrastructure.Exceptions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Jobs.Infrastructure.Repositories.UnitOfWork
@@ -22,13 +24,29 @@ namespace Jobs.Infrastructure.Repositories.UnitOfWork
 		public ICompanyRepository Companies => GetRepository<ICompanyRepository>();
 		public IApplicationRepository Applications => GetRepository<IApplicationRepository>();
 		public ICVRepository CVs => GetRepository<ICVRepository>();
-        public IExperienceRepository Experiences => GetRepository<IExperienceRepository>();
 		public ISkillRepository Skills => GetRepository<ISkillRepository>();
 		public IJobSkillRepository JobSkills => GetRepository<IJobSkillRepository>();
 		public IUserSkillRepository UserSkills => GetRepository<IUserSkillRepository>();
+		public ICVJobRecommendationRepository CVJobRecommendations => GetRepository<ICVJobRecommendationRepository>();
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-			=> await _context.SaveChangesAsync(cancellationToken);
+		//public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+		//	=> await _context.SaveChangesAsync(cancellationToken);
+
+		public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+		{
+			try
+			{
+				return await _context.SaveChangesAsync(cancellationToken);
+			}
+			catch (DbUpdateException ex)
+			{
+				throw new DatabaseException("Error saving changes", ex);
+			}
+			catch (SqlException ex)
+			{
+				throw new DatabaseException("SQL error occurred", ex);
+			}
+		}
 
 		public int SaveChanges()
 			=> _context.SaveChanges();

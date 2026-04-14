@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Jobs.Infrastructure.Data.Interceptors
 {
-    internal class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChangesInterceptor
+    public class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChangesInterceptor
 	{
 		public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
 			DbContextEventData eventData,
@@ -15,13 +15,13 @@ namespace Jobs.Infrastructure.Data.Interceptors
 			var dbContext = eventData.Context;
 			if (dbContext == null) return base.SavingChangesAsync(eventData, result, cancellationToken);
 
-
-			var outboxMessages = dbContext.ChangeTracker
+			var aggregates = dbContext.ChangeTracker
 				.Entries<AggregateRoot>()
-				.Select(x => x.Entity)
+				.Select(x => x.Entity);
+			var outboxMessages = aggregates
 				.SelectMany(aggregateRoot => {
 					var events = aggregateRoot.Events;
-					aggregateRoot.ClearEvents();
+					//aggregateRoot.ClearEvents(); error
 					return events;
 				})
 				// convert entity to OutboxMessage Entity
@@ -29,9 +29,14 @@ namespace Jobs.Infrastructure.Data.Interceptors
 				(
 					domainEvent.GetType().Name,
 					JsonSerializer.Serialize(domainEvent)
-				)).ToList();
+				))
+				.ToList();
+			foreach (var agg in aggregates)	agg.ClearEvents();
+				
 
-			// 3. إضافتها لنفس الـ Context ليتم حفظها في نفس الـ Transaction
+
+				
+			// 3. Add it for the same Transaction
 			dbContext.Set<OutboxMessage>().AddRange(outboxMessages);
 
 			return base.SavingChangesAsync(eventData, result, cancellationToken);

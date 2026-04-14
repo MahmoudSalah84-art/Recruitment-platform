@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//using System;
+//using System.Collections.Generic;
 
-namespace Jobs.API.Controllers.AdminController
-{
-    public class AdminJobsController
-    {
-    }
-}
+//namespace Jobs.API.Controllers.AdminController
+//{
+//    public class AdminJobsController
+//    {
+//    }
+//}
 
 //| Method |         Route                  | Description         |
 //| ------ | ------------------------------ | ------------------- |

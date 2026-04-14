@@ -1,9 +1,7 @@
 ﻿using Jobs.Domain.Entities;
+using Jobs.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Infrastructure.Data.Configurations
 { 
@@ -11,109 +9,116 @@ namespace Jobs.Infrastructure.Data.Configurations
 	{
 		public void Configure(EntityTypeBuilder<User> builder)
 		{
-
-			builder.Property<string>("Email") // shadow property used for indexing/unique
-				.HasMaxLength(255)
-				.IsRequired();
-
-
 			builder.ToTable("Users");
 
-			builder.HasKey(u => u.Id);
-			builder.Property(u => u.Id)
-				   .ValueGeneratedNever();
+			builder.HasKey(e => e.Id);
 
-			builder.Property(u => u.FullName)
-				   .HasMaxLength(200)
-				   .IsRequired();
+			builder.Property(e => e.Id)
+				.ValueGeneratedNever()
+				.IsRequired()
+				.HasMaxLength(36);
 
-			builder.Property(u => u.Role)
-				   .IsRequired();
+			builder.Property(e => e.CreatedAt)
+				.IsRequired();
 
-			builder.Property(u => u.ProfilePictureUrl)
-				   .HasMaxLength(500);
+			builder.Property(e => e.UpdatedAt)
+				.IsRequired(false);
 
-			builder.Property(u => u.Bio)
-				   .HasMaxLength(2000);
+			// ===== Properties =====
+			builder.Property(u => u.FirstName)
+				.IsRequired()
+				.HasMaxLength(150);
 
-			builder.Property(u => u.IsVerified)
-				   .HasDefaultValue(false);
+			builder.Property(u => u.LastName)
+				.IsRequired()
+				.HasMaxLength(150);
+
 
 			builder.OwnsOne(u => u.Email, email =>
 			{
 				email.Property(e => e.Value)
-					 .HasColumnName("Email")
-					 .HasMaxLength(100)
-					 .IsRequired();
-				email.WithOwner();
+					.HasColumnName("EmailAddress")
+					.IsRequired()
+					.HasMaxLength(256);
+				email.HasIndex(e => e.Value)
+						.IsUnique()
+						.HasFilter("[IsDeleted] = 0");
+
 			});
+
+			builder.Property(u => u.Role)
+					.IsRequired()
+					.HasConversion<string>()
+					.HasMaxLength(50);
 
 			builder.OwnsOne(u => u.PhoneNumber, phone =>
 			{
 				phone.Property(p => p.Value)
-					 .HasColumnName("PhoneNumber")
-					 .HasMaxLength(30);
-				phone.WithOwner();
+					.HasColumnName("PhoneNumber")
+					.HasMaxLength(20)
+					.IsRequired(false);
 			});
 
 
-			builder.HasOne(u => u.Company)
-				   .WithMany("_employees")
-				   .HasForeignKey(u => u.CompanyId)
-				   .OnDelete(DeleteBehavior.Restrict);
-			builder.Navigation("_employees")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			builder.Property(u => u.ProfilePictureUrl)
+				.HasMaxLength(500)
+				.HasDefaultValue(string.Empty);
 
-			builder.HasMany<UserSkill>("_skills")
-				   .WithOne(us => us.User)
-				   .HasForeignKey(us => us.UserId)
-				   .OnDelete(DeleteBehavior.Cascade);
-			builder.Navigation("_skills")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			builder.Property(u => u.Bio)
+				.HasMaxLength(1000)
+				.HasDefaultValue(string.Empty);
 
-			builder.HasOne(u => u.CV)
-				   .WithOne(c => c.User)
-				   .HasForeignKey<User>(u => u.CVId)
-				   .OnDelete(DeleteBehavior.Cascade);
-			 
+			builder.Property(u => u.LinkedInUrl)
+				.HasMaxLength(300)
+				.IsRequired(false);
 
-			//builder.HasOne(u => u.Company)
-			//	   .WithMany("_employees")
-			//	   .HasForeignKey(u => u.CompanyId)
-			//	   .OnDelete(DeleteBehavior.Restrict);
-			//builder.Navigation("_employees")
-			//	   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			builder.Property(u => u.GitHubUrl)
+				.HasMaxLength(300)
+				.IsRequired(false);
 
+			builder.Property(u => u.PortfolioUrl)
+				.HasMaxLength(300)
+				.IsRequired(false);
 
+			builder.Property(u => u.IsVerified)
+				.IsRequired()
+				.HasDefaultValue(false);
 
-
-
-			builder.HasMany<JobApplication>("_applications")
-				   .WithOne(a => a.Applicant)
-				   .HasForeignKey(a => a.ApplicantId)
-				   .OnDelete(DeleteBehavior.Cascade);
-			builder.Navigation("_applications")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
-
-			builder.HasMany<UserExperience>("_experience")
-				   .WithOne(a => a.User)
-				   .HasForeignKey(a => a.UserId)
-				   .OnDelete(DeleteBehavior.Cascade);
-			builder.Navigation("_experience")
-				   .UsePropertyAccessMode(PropertyAccessMode.Field);
+			// ===== Soft Delete =====
 
 			builder.Property(u => u.IsDeleted)
-				   .HasDefaultValue(false);
+				.IsRequired()
+				.HasDefaultValue(false);
 
-			builder.Property(u => u.DeletedAt);
+			builder.Property(u => u.DeletedAt)
+				.IsRequired(false);
 
 			builder.HasQueryFilter(u => !u.IsDeleted);
 
-			// ===== Indexes =====
-			builder.HasIndex(u => u.CompanyId);
-			builder.HasIndex(u => u.Role);
-			builder.HasIndex("Email")
-				   .IsUnique();
+
+
+			// Relationships
+			builder.HasOne(u => u.Company)
+				.WithMany(c => c.Employees)
+				.HasForeignKey(u => u.CompanyId)
+				.OnDelete(DeleteBehavior.SetNull)
+				.IsRequired(false);
+
+			builder.HasOne(u => u.CV)
+				.WithOne(cv => cv.User)
+				.HasForeignKey<CV>(cv => cv.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.HasMany(u => u.Skills)
+				.WithOne(us => us.User)
+				.HasForeignKey(us => us.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+
+			builder.HasMany(u => u.Applications)
+				.WithOne(a => a.Applicant)
+				.HasForeignKey(a => a.ApplicantId)
+				.OnDelete(DeleteBehavior.Restrict);
+
 		}
 	}
 }

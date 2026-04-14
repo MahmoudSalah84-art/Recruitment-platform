@@ -1,62 +1,42 @@
 ﻿using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
-using Jobs.Infrastructure.Repositories.UnitOfWork;
-using Microsoft.EntityFrameworkCore;
+using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.CV.Command.CreateOrUpdateResume
 {
 	public class CreateOrUpdateResumeCommandHandler : ICommandHandler<CreateOrUpdateResumeCommand>
 	{
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly ICurrentUserService _currentUser;
+		private readonly IFileService _fileService;
 
-		public CreateOrUpdateResumeCommandHandler(
-			IUnitOfWork unitOfWork,
-			ICurrentUserService currentUser)
+		public CreateOrUpdateResumeCommandHandler(IFileService fileService , IUnitOfWork unitOfWork)
 		{
+			_fileService = fileService;
 			_unitOfWork = unitOfWork;
-			_currentUser = currentUser;
 		}
 
 		public async Task<Result> Handle(CreateOrUpdateResumeCommand request, CancellationToken cancellationToken)
 		{
-			if (_currentUser.UserId == Guid.Empty)
-				return Result.Failure("User not authenticated");
+			//test for AsNoTracking
+			var cv = _unitOfWork.CVs.Query().FirstOrDefault(r => r.UserId == request.UserId);
 
-			if (string.IsNullOrWhiteSpace(request.Summary))
-				return Result.Failure("Summary is required");
-
-			if (request.File == null || request.File.Length == 0)
-				return Result.Failure("Please upload a valid CV file");
-
-			var cv = await _unitOfWork.CVs.Query()
-				.FirstOrDefaultAsync(r => r.UserId == _currentUser.UserId, cancellationToken);
-
-			var fileName = $"{Guid.NewGuid()}_{request.File.FileName}";
-			var filePath = Path.Combine("wwwroot/CVs", fileName);
-
-
-			using (var stream = new FileStream(filePath, FileMode.Create))
-			{
-				await request.File.CopyToAsync(stream);
-			}
+			var FileUrl = await _fileService.UploadFileAsync(request.File);
 
 			if (cv is null)
 			{
-				cv = new  Domain.Entities.CV(
-					_currentUser.UserId,
-					request.Title,
-					filePath,
-					request.Summary
+				cv = new Domain.Entities.CV(
+					request.UserId,
+					"Title",
+					FileUrl,
+					"Summary"
 				);
 				_unitOfWork.CVs.Add(cv);
 			}
 			else
 			{
-				cv.Update(
-					request.Title,
-					filePath,
-					request.Summary
+				cv.UpdateFile(
+					FileUrl,
+					"Title"
 				);
 			}
 

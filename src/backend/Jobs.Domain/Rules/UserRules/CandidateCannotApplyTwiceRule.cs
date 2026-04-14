@@ -9,9 +9,9 @@ namespace Jobs.Domain.Rules.UserRules
 	public class CandidateCannotApplyTwiceRule : IBusinessRule
 	{
 		private readonly User _candidate;
-		private readonly Guid _jobId;
+		private readonly string _jobId;
 
-		public CandidateCannotApplyTwiceRule(User candidate, Guid jobId)
+		public CandidateCannotApplyTwiceRule(User candidate, string jobId)
 		{
 			_candidate = candidate ;
 			_jobId = jobId;

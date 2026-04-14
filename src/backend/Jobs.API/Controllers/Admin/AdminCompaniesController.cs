@@ -1,6 +1,6 @@
-﻿namespace Jobs.API.Controllers.AdminController
-{
-    public class AdminCompaniesController
-    {
-    }
-}
+﻿//namespace Jobs.API.Controllers.AdminController
+//{
+//    public class AdminCompaniesController
+//    {
+//    }
+//}

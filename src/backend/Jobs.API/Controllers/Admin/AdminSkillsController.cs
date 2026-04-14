@@ -1,9 +1,9 @@
-﻿namespace Jobs.API.Controllers.AdminController
-{
-    public class AdminSkillsController
-    {
-    }
-}
+﻿//namespace Jobs.API.Controllers.AdminController
+//{
+//    public class AdminSkillsController
+//    {
+//    }
+//}
 
 //| Method | Route | Description |
 //| ------ | ------------------ | --------------- |

@@ -2,12 +2,12 @@
 
 namespace Jobs.Domain.Common
 {
-    public abstract class BaseEntity
+    public abstract class BaseEntity : SoftDelete
 	{
-        public Guid Id { get; protected set; } = Guid.NewGuid();
+        public string Id { get; protected set; } = Guid.NewGuid().ToString();
 
-		public DateTime CreatedAt { get; protected set; } 
-		public DateTime? UpdatedAt { get; protected set; }
+		public DateTime CreatedAt { get; protected set; }
+		public DateTime? UpdatedAt { get; protected set; } 
 
 		
 

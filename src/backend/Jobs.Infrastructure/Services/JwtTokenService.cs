@@ -1,5 +1,4 @@
 ﻿using Jobs.Application.Common.Interfaces;
-using Jobs.Infrastructure.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -24,7 +23,7 @@ namespace Jobs.Infrastructure.Services
 			var claims = new List<Claim>
 			{
 				new(JwtRegisteredClaimNames.Sub,   userId),
-				new(JwtRegisteredClaimNames.Email, email!),
+				new(JwtRegisteredClaimNames.Email, email),
 				new(JwtRegisteredClaimNames.Jti,   Guid.NewGuid().ToString()),
 				new("firstName", FirstName),
 				new("lastName",  LastName),
@@ -60,30 +59,30 @@ namespace Jobs.Infrastructure.Services
 
 		
 		
-		public bool ValidateToken(string token)
-		{
-			var tokenValidationParameters = new TokenValidationParameters
-			{
-				ValidateAudience = true,
-				ValidateIssuer = true,
-				ValidateIssuerSigningKey = true,
-				ValidIssuer = _jwtSettings.Issuer,
-				ValidAudience = _jwtSettings.Audience,
-				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
-				ValidateLifetime = true,
-				ClockSkew = TimeSpan.Zero
-			};
-			try
-			{
-				var tokenHandler = new JwtSecurityTokenHandler();
-				tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
-				return true;
-			}
-			catch
-			{
-				return false;
-			}
-		}
+		//public bool ValidateToken(string token)
+		//{
+		//	var tokenValidationParameters = new TokenValidationParameters
+		//	{
+		//		ValidateAudience = true,
+		//		ValidateIssuer = true,
+		//		ValidateIssuerSigningKey = true,
+		//		ValidIssuer = _jwtSettings.Issuer,
+		//		ValidAudience = _jwtSettings.Audience,
+		//		IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
+		//		ValidateLifetime = true,
+		//		ClockSkew = TimeSpan.Zero
+		//	};
+		//	try
+		//	{
+		//		var tokenHandler = new JwtSecurityTokenHandler();
+		//		tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken validatedToken);
+		//		return true;
+		//	}
+		//	catch
+		//	{
+		//		return false;
+		//	}
+		//}
 
 		public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
 		{

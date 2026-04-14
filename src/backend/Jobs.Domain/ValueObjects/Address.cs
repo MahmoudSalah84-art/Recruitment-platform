@@ -15,7 +15,11 @@ namespace Jobs.Domain.ValueObjects
             public string BuildingNumber { get; }
             public string PostalCode { get; }
 
-            private Address(string country, string city, string street, string buildingNumber, string postalCode)
+			public Address()
+			{
+				
+			}
+			private Address(string country, string city, string street, string buildingNumber, string postalCode)
             {
                 Country = country;
                 City = city;

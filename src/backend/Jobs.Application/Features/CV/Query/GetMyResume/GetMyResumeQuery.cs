@@ -2,6 +2,7 @@
 
 namespace Jobs.Application.Features.CV.Query.GetMyResume
 {
-	public record GetMyResumeQuery : IQuery<UserResumeDto>;
+	public record GetMyResumeQuery
+	(string userId): IQuery<UserResumeDto>;
 
 }

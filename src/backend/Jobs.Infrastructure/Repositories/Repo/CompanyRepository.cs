@@ -1,5 +1,5 @@
 ﻿using Jobs.Domain.Entities;
-using Jobs.Domain.Repository.Repo;
+using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +21,13 @@ namespace Jobs.Infrastructure.Repositories.Repo
 			return await _set
 				.AsNoTracking()
 				.FirstOrDefaultAsync(c => c.Name == name, ct);
+		}
+
+		public async Task<Company?> GetByIdWithEmployeeAsync(string companyId, CancellationToken cancellationToken)
+		{
+			return await _set
+				.Include(c => c.Employees)
+				.FirstOrDefaultAsync(c => c.Id == companyId, cancellationToken);
 		}
 
 	}

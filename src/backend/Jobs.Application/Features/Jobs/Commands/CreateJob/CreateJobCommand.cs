@@ -1,17 +1,18 @@
-﻿//using Jobs.Application.Abstractions.Messaging;
-//using Jobs.Domain.ValueObjects;
-//using System.ComponentModel.DataAnnotations;
+﻿using Jobs.Application.Abstractions.Messaging;
+using Jobs.Domain.Enums;
+using Jobs.Domain.ValueObjects;
 
-//namespace Jobs.Application.Features.Jobs.Commands.CreateJob
-//{
-//	public record CreateJobCommand(
-//		Guid companyId,
-//		Guid hrId,
-//		string title,
-//		SalaryRange? salary,
-//		string description,
-//		string requirements,
-//		int expLevel,
-//		DateTime? expirationDate
-//	) : ICommand<Guid>;
-//}
+namespace Jobs.Application.Features.Jobs.Commands.CreateJob
+{
+	public record CreateJobCommand(
+	string CompanyId,
+	string HrId,
+	string Title,
+	string Description,
+	string Requirements,
+	EmploymentType EmploymentType,
+	int ExperienceLevel,
+	decimal? minSalary,
+	decimal? maxSalary,
+	DateTime? ExpirationDate) : ICommand<string>;
+}

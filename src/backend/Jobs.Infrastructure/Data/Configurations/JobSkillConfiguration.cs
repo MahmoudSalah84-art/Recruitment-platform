@@ -11,32 +11,63 @@ namespace Jobs.Infrastructure.Data.Configurations
 		{
 			builder.ToTable("JobSkills");
 
-			builder.HasKey(js => js.Id);
-			builder.Property(js => js.Id)
-				   .ValueGeneratedNever();
+			builder.HasKey(e => e.Id);
 
-			builder.HasOne(js => js.Job)
-				   .WithMany()
-				   .HasForeignKey(js => js.JobId)
-				   .OnDelete(DeleteBehavior.Cascade);
+			builder.Property(e => e.Id)
+				.ValueGeneratedNever()
+				.IsRequired()
+				.HasMaxLength(36);
 
-			builder.HasOne(js => js.Skill)
-				   .WithMany()
-				   .HasForeignKey(js => js.SkillId)
-				   .OnDelete(DeleteBehavior.Restrict);
+			builder.Property(e => e.CreatedAt)
+				.IsRequired();
 
+			builder.Property(e => e.UpdatedAt)
+				.IsRequired(false);
+
+			// ===== Properties =====
+			builder.Property(js => js.JobId)
+				.IsRequired()
+				.HasMaxLength(36);
+
+			builder.Property(js => js.SkillId)
+				.IsRequired()
+				.HasMaxLength(36);
+
+			// ===== Soft Delete =====
 			builder.Property(js => js.IsDeleted)
-				   .HasDefaultValue(false);
+				.IsRequired()
+				.HasDefaultValue(false);
 
-			builder.Property(js => js.DeletedAt);
+			builder.Property(js => js.DeletedAt)
+				.IsRequired(false);
 
 			builder.HasQueryFilter(js => !js.IsDeleted);
 
+			// ===== Relationships =====
+			 
+			builder.HasOne(js => js.Job)
+				.WithMany(j => j.RequiredSkills)
+				.HasForeignKey(js => js.JobId)
+				.OnDelete(DeleteBehavior.Cascade);
 
+			builder.HasOne(js => js.Skill)
+				.WithMany(s => s.JobSkills)
+				.HasForeignKey(js => js.SkillId)
+				.OnDelete(DeleteBehavior.Restrict);
 
 			// ===== Indexes =====
-			builder.HasIndex(js => new { js.JobId, js.SkillId }) // Composite index on JobId and SkillId
-				   .IsUnique();
+			builder.HasIndex(js => new { js.JobId, js.SkillId })
+				.IsUnique()
+				.HasFilter("[IsDeleted] = 0");
+
+
+
+			
+			 
+			 
+
+
+
 
 		}
 	}

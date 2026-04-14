@@ -1,10 +1,10 @@
 ﻿using Jobs.API.Extensions;
+using Jobs.API.Middlewares;
 using Jobs.Application;
 using Jobs.Infrastructure;
-using Jobs.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-
-
+using Jobs.Infrastructure.Identity;
+using Jobs.Infrastructure.Identity.Seeder;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,34 +12,68 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-builder.Services.AddInfrastructure("ddxx","dddd");
-builder.Services.AddApplication();
-builder.Services.AddDbContext<JobDbContext>(options =>
-{
-	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 
-	options.AddInterceptors(new SoftDeleteInterceptor());
-});
-// في ملف Program.cs
-//builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddOpenApi(); 
+
+
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddApplication();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+
 builder.Services.AddProblemDetails(); // ميزة لدعم عرض الأخطاء بشكل قياسي
 
 builder.Services.AddPermissionPolicies();
 
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAll",
+		builder =>
+		{
+			builder.AllowAnyOrigin() 
+				   .AllowAnyMethod()
+				   .AllowAnyHeader();
+		}
+	);
+});
+
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseExceptionHandler();
+
+
+using (var scope = app.Services.CreateScope())
 {
-    app.MapOpenApi();
+	var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
+
+	await IdentitySeeder.SeedAsync(roleManager);
 }
-// ... بعد builder.Build()
-app.UseExceptionHandler(); // تفعيل الميدل وير الخاص بالتعامل مع الأخطاء
+
+//// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+app.MapOpenApi();
+	//Add Swagger UI
+	app.UseSwagger();
+	app.UseSwaggerUI();
+//}
+
 
 app.UseHttpsRedirection();
 
+app.UseRouting();
+
+app.UseCors("AllowAll");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

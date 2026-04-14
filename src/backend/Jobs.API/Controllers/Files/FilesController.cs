@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Hosting;
-using System;
+﻿//using Microsoft.Extensions.Hosting;
+//using System;
 
-namespace Jobs.API.Controllers.Files
-{
-    public class FilesController
-    {
-    }
-}
+//namespace Jobs.API.Controllers.Files
+//{
+//    public class FilesController
+//    {
+//    }
+//}
 
 //| Method  |        Route             | Description        |
 //| ------  | -------------------      | -------------      |

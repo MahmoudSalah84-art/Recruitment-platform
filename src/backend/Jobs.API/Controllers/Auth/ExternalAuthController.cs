@@ -1,12 +1,12 @@
-﻿using Microsoft.Extensions.Hosting;
-using Serilog;
+﻿//using Microsoft.Extensions.Hosting;
+//using Serilog;
 
-namespace Jobs.API.Controllers.Auth
-{
-    public class ExternalAuthController
-    {
-    }
-}
+//namespace Jobs.API.Controllers.Auth
+//{
+//    public class ExternalAuthController
+//    {
+//    }
+//}
 
 //| Method | Route                      | Description        |
 //| ------ | --------------------       | ------------------- |

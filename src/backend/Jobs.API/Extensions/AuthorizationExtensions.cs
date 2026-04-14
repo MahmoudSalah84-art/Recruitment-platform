@@ -1,14 +1,18 @@
-﻿using Jobs.Domain.Common;
+﻿using Jobs.Application.Common.Helpers;
 
 namespace Jobs.API.Extensions
 {
 	public static class AuthorizationExtensions
 	{
-		public static void AddPermissionPolicies( this IServiceCollection services)
+		public static void AddPermissionPolicies(this IServiceCollection services)
 		{
-			services.AddAuthorizationBuilder()
-					.AddPolicy(Permissions.Jobs.Create, policy => policy.RequireClaim("Permission",Permissions.Jobs.Create))
-					.AddPolicy(Permissions.Jobs.Delete, policy => policy.RequireClaim("Permission",Permissions.Jobs.Delete));
+			services.AddAuthorization(options =>
+			{
+				foreach (var permission in PermissionsHelper.GetAllPermissions())
+				{
+					options.AddPolicy(permission!, policy => policy.RequireClaim("Permission", permission!));
+				}
+			});
 		}
 	}
 }

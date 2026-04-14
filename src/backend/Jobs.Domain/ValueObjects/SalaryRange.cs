@@ -15,6 +15,7 @@ namespace Jobs.Domain.ValueObjects
 			Min = min;
 			Max = max;
 		}
+		
 
 		public static SalaryRange Create(decimal? min, decimal? max)
 		{

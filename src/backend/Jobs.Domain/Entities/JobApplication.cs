@@ -1,49 +1,51 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Enums;
 using Jobs.Domain.Events.ApplicationEvents;
+using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.JobApplication;
-using Jobs.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Entities
 {
-    public class JobApplication : AggregateRoot , ISoftDelete
+    public class JobApplication : AggregateRoot
 	{
 		// ========= Properties =========
 
-		public Guid ApplicantId { get; private set; }
-		public User Applicant { get; private set; }
+		public string ApplicantId { get; private set; }
 
-		public Guid JobId { get; private set; }
-		public Job Job { get; private set; }
+		public string JobId { get; private set; }
 
-		public Guid? CvId { get; private set; }
-		public CV CV { get; private set; }
+		public string? CvId { get; private set; }
 
 		public int MatchScore { get; private set; } // 0..100
 		public ApplicationStatus Status { get; private set; } // Pending, Accepted, Rejected
 
 		public DateTime StatusHistory { get; private set; } 
-		public bool IsDeleted { get; set; }
-		public DateTime? DeletedAt { get; set; }
 
+
+
+		// Navigation Properties
+		public User Applicant { get; set; }
+		public Job Job { get; set; }
+		public CV CV { get; set; }
 
 		// ========= Constructors =========
 		private JobApplication() { }
-		public JobApplication(Guid applicantId, Guid jobId, Guid? cvId)
+
+		public JobApplication(string applicantId, string jobId, int matchScore, string? cvId = null)
 		{
 			CheckRule(new NotEmptyGuidRule(applicantId));
 			CheckRule(new NotEmptyGuidRule(jobId));
+			if (matchScore < 0 || matchScore > 100)
+				throw new DomainException("Match score must be between 0 and 100.");
 
 			ApplicantId = applicantId;
 			JobId = jobId;
+			MatchScore = matchScore;
 			CvId = cvId;
 
+
 			Status = ApplicationStatus.Pending;
-			CreatedAt = DateTime.UtcNow;
 
 			AddEvent(new ApplicationSubmittedEvent(this));
 		}
@@ -61,10 +63,37 @@ namespace Jobs.Domain.Entities
 			AddEvent(new ApplicationStatusChangedEvent(this, oldStatus, newStatus));
 		}
 
-		void ISoftDelete.SoftDelete()
+		// ==================== CV ====================
+		public void AttachCV(string cvId)
 		{
-			IsDeleted = true;
-			DeletedAt = DateTime.UtcNow;
+
+			if (Status != ApplicationStatus.Pending)
+				throw new DomainException("Can only attach CV to a pending application.");
+
+			CvId = cvId;
+		}
+
+		public void DetachCV()
+		{
+			if (CvId is null)
+				throw new DomainException("No CV attached to this application.");
+
+			if (Status != ApplicationStatus.Pending)
+				throw new DomainException("Can only detach CV from a pending application.");
+
+			CvId = null;
+		}
+
+		// ==================== Match Score ====================
+		public void UpdateMatchScore(int newScore)
+		{
+			if (newScore < 0 || newScore > 100)
+				throw new DomainException("Match score must be between 0 and 100.");
+
+			if (Status != ApplicationStatus.Pending)
+				throw new DomainException("Can only update match score for pending applications.");
+
+			MatchScore = newScore;
 		}
 	}
 }

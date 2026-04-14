@@ -5,7 +5,7 @@ namespace Jobs.Domain.Specifications.Jobs
 {
 	public class JobsWithFiltersSpecification : BaseSpecifications<Job>
 	{
-		public JobsWithFiltersSpecification(string? search, int PageSize, int PageNumber, string? Country, string? City, int? MinExperience, EmploymentType? Type, int? PostedInDays)
+		public JobsWithFiltersSpecification(string? search, int PageSize, int PageNumber, string? Country, string? City, int? MinExperience, EmploymentType? Type,bool OnlyPublished, int? PostedInDays)
 			: base(j =>
 			(string.IsNullOrEmpty(search) || j.Title.Contains(search.ToLower()) || j.Description.Contains(search.ToLower())) &&
 
@@ -16,6 +16,10 @@ namespace Jobs.Domain.Specifications.Jobs
 			(!MinExperience.HasValue || j.ExperienceLevel <= MinExperience) &&
 
 			(!Type.HasValue || j.EmploymentType == Type) &&
+
+			(j.IsPublished == OnlyPublished) &&
+
+			(!j.IsExpired) &&
 
 			(!PostedInDays.HasValue || j.CreatedAt >= DateTime.UtcNow.AddDays(-PostedInDays.Value))
 			)

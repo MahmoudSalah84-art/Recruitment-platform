@@ -1,5 +1,4 @@
 ﻿using Jobs.API.Controllers.Abstractions;
-using Jobs.Application.Features.Skills.Commands.AddUserSkill;
 using Jobs.Application.Features.Skills.Commands.DeleteUserSkill;
 using Jobs.Application.Features.Skills.Queries.GetUserSkills;
 using Microsoft.AspNetCore.Mvc;
@@ -17,18 +16,18 @@ namespace Jobs.API.Controllers.Users
 			return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
 		}
 
-		// POST /api/userSkills
-		[HttpPost]
-		public async Task<IActionResult> Add(AddUserSkillCommand command)
-		{
-			var result = await Sender.Send(command);
+		//// POST /api/userSkills
+		//[HttpPost]
+		//public async Task<IActionResult> Add(AddUserSkillCommand command)
+		//{
+		//	var result = await Sender.Send(command);
 
-			return result.IsSuccess ? Ok() : BadRequest(result.Error);
-		}
+		//	return result.IsSuccess ? Ok() : BadRequest(result.Error);
+		//}
 
 		// DELETE /api/userSkills/{id}
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> Delete(Guid id)
+		public async Task<IActionResult> Delete(string id)
 		{
 			var result = await Sender.Send(new DeleteUserSkillCommand(id));
 

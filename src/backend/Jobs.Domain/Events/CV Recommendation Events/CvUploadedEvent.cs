@@ -9,8 +9,8 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
     public class CvUploadedEvent : DomainEvent
     {
 
-		public Guid CvId { get; }
-		public Guid UserId { get; }
+		public string CvId { get; }
+		public string UserId { get; }
 		public string Title { get; }
 
         public CvUploadedEvent(CV cv)

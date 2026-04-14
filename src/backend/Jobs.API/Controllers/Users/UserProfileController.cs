@@ -5,12 +5,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Users
 {
-    public class UserProfileController: ApiController
+	public class UserProfileController : ApiController
 	{
-		//  GET,/api/profile, جلب بيانات الملف الشخصي للمستخدم الحالي (Logged-in User).
-		//  PUT,/api/profile, تحديث بيانات الملف الشخصي (يستدعي UpdateProfileCommand).
 
-		// GET: api/UserProfile
+		// GET: api/UserProfile/me
 		[HttpGet("me")]
 		public async Task<IActionResult> GetMyProfile()
 		{
@@ -36,5 +34,8 @@ namespace Jobs.API.Controllers.Users
 
 			return result.IsSuccess ? NoContent() : BadRequest(result.Error);
 		}
+
+
+
 	}
 }

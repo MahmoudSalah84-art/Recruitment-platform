@@ -1,12 +1,9 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
-using Microsoft.AspNetCore.Http;
+using Jobs.Application.Common.DTOs;
 
 namespace Jobs.Application.Features.CV.Command.CreateOrUpdateResume
 {
 	public record CreateOrUpdateResumeCommand(
-	string Title,
-	IFormFile File,
-	string Summary
-	) : ICommand;
-
+	string UserId,
+	FileUploadDto File ) : ICommand;
 }

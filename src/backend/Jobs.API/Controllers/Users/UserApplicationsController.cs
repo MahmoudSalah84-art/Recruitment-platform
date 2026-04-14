@@ -1,13 +1,9 @@
 ﻿using Jobs.API.Controllers.Abstractions;
-using Jobs.Application.Features.Applications.Commands.ApplyForJob;
+using Jobs.Application.Features.Applications.Commands.SubmitApplication;
 using Jobs.Application.Features.Applications.Commands.WithdrawApplication;
 using Jobs.Application.Features.Applications.Queries.GetApplicationById;
 using Jobs.Application.Features.Applications.Queries.GetMyApplications;
-using Jobs.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
-using System;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.API.Controllers.Users
 {
@@ -15,15 +11,15 @@ namespace Jobs.API.Controllers.Users
 	{
 		// POST: api/UserApplications/{jobId}
 		[HttpPost("{jobId}")]
-		public async Task<IActionResult> ApplyForJob(Guid jobId)
+		public async Task<IActionResult> ApplyForJob(string jobId)
 		{
-			var result = await Sender.Send(new ApplyForJobCommand(jobId));
+			var result = await Sender.Send(new SubmitApplicationCommand( "ApplicantId",jobId , "cvId", 22));
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
 		}
 
 		// GET: api/UserApplications/{Id}
 		[HttpGet("{Id}")]
-		public async Task<IActionResult> GetApplicationById(Guid jobId)
+		public async Task<IActionResult> GetApplicationById(string jobId)
 		{
 			var result = await Sender.Send(new GetUserApplicationDetailsQuery(jobId));
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
@@ -33,13 +29,13 @@ namespace Jobs.API.Controllers.Users
 		[HttpGet]
 		public async Task<IActionResult> GetAllApplications()
 		{
-			var result = await Sender.Send(new GetUserApplicationsQuery());
+			var result = await Sender.Send(new GetUserApplicationsQuery("ApplicandId"));
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
 		}
 
 		// DELETE: api/UserApplications/{id}
 		[HttpDelete("{id}")]
-		public async Task<IActionResult> WithdrawApplication(Guid id)
+		public async Task<IActionResult> WithdrawApplication(string id)
 		{
 			var result = await Sender.Send(new WithdrawApplicationCommand(id));
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);

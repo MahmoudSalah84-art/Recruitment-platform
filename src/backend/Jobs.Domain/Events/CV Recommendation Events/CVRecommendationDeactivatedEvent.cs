@@ -8,7 +8,7 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
 	public class CVRecommendationDeactivatedEvent : DomainEvent
 	{
-		public Guid RecommendationId { get; }
+		public string RecommendationId { get; }
 
 		public CVRecommendationDeactivatedEvent(CVJobRecommendation rec)
 		{

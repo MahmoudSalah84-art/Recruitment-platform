@@ -7,7 +7,7 @@ namespace Jobs.Domain.Specifications.Application
 {
 	public class UserApplicationsWithDetailsSpec : BaseSpecifications<JobApplication>
 	{
-		public UserApplicationsWithDetailsSpec(Guid userId,int PageSize, int PageNumber)
+		public UserApplicationsWithDetailsSpec(string userId,int PageSize, int PageNumber)
 			: base(a => a.ApplicantId == userId)
 		{
 			AddInclude(a => a.Job);

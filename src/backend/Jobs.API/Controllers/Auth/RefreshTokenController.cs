@@ -1,6 +1,6 @@
-﻿namespace Jobs.API.Controllers.Auth
-{
-    public class RefreshTokenController
-    {
-    }
-}
+﻿//namespace Jobs.API.Controllers.Auth
+//{
+//    public class RefreshTokenController
+//    {
+//    }
+//}
