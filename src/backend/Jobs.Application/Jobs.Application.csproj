@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Companies\EventHandler\" />
     <Folder Include="Features\Users\EventHandler\" />
   </ItemGroup>
 

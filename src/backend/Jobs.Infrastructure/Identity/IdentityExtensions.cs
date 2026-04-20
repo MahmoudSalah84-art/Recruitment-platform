@@ -39,27 +39,38 @@ namespace Jobs.Infrastructure.Identity
 
 
 
-			services.AddAuthentication(options =>
-			{
+			services.AddAuthentication(options => {
 				options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
 				options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 			})
-			.AddJwtBearer(options =>
+			.AddJwtBearer(options => {
+			options.TokenValidationParameters = new TokenValidationParameters
 			{
-				options.TokenValidationParameters = new TokenValidationParameters
+				ValidateIssuer = true,
+				ValidateAudience = true,
+				ValidateLifetime = true,
+				ValidateIssuerSigningKey = true,
+
+				ValidIssuer = configuration["JwtSettings:Issuer"],
+				ValidAudience = configuration["JwtSettings:Audience"],
+				ClockSkew = TimeSpan.Zero,
+				IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!))
+			};
+
+			options.Events = new JwtBearerEvents
+			{
+				OnMessageReceived = context =>
 				{
-					ValidateIssuer = true,
-					ValidateAudience = true,
-					ValidateLifetime = true,
-					ValidateIssuerSigningKey = true,
 
-					ValidIssuer = configuration["JwtSettings:Issuer"],
-					ValidAudience = configuration["JwtSettings:Audience"],
-					ClockSkew = TimeSpan.FromMinutes(configuration.GetValue<double>("JwtSettings:AccessTokenExpiryMinutes")),
-					IssuerSigningKey = new SymmetricSecurityKey( Encoding.UTF8.GetBytes(configuration["JwtSettings:SecretKey"]!))
-
-				};
-			});
+					var accessToken = context.Request.Cookies["accessToken"];
+					if (!string.IsNullOrEmpty(accessToken))
+					{
+						context.Token = accessToken;
+					}
+					return Task.CompletedTask;
+				}
+			};
+});
 
 
 			return services;

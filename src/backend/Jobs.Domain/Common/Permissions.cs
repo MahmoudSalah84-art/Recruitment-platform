@@ -43,6 +43,14 @@ namespace Jobs.Domain.Common
 		public const string Roles_Update = "Roles.Update";
 		public const string Roles_Delete = "Roles.Delete";
 
+		// skills
+		public const string Skills_View = "Skills.View";
+		public const string Skills_Create = "Skills.Create";
+		public const string Skills_Update = "Skills.Update";
+		public const string Skills_Delete = "Skills.Delete";
+
+
+
 		public const string Permissions_Manage = "Permissions.Manage";
 	}
 }

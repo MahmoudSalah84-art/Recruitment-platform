@@ -17,6 +17,6 @@ namespace Jobs.Application.Features.Jobs.Queries.GetJobById
 	bool IsExpired,
 	DateTime? ExpirationDate,
 	List<string> RequiredSkills,
-	string CompanyId,
-	string HrId);
+	string CompanyId
+	/*string HrId*/);
 }

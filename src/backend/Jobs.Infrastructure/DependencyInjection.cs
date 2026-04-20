@@ -1,5 +1,4 @@
 ﻿using CloudinaryDotNet;
-using Hangfire;
 using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Common.Interfaces;
 using Jobs.Domain.IRepositories;
@@ -27,9 +26,9 @@ namespace Jobs.Infrastructure
 			// EF Core context for domain data
 			services.AddDbContext<JobDbContext>((sp, options) =>
 			{
-				var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>();
-				var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>();
-				var updateTimestampsInterceptor = sp.GetRequiredService<UpdateTimestampsInterceptor>();
+				var outboxInterceptor = sp.GetRequiredService<ConvertDomainEventsToOutboxMessagesInterceptor>(); //2
+				var softDeleteInterceptor = sp.GetRequiredService<SoftDeleteInterceptor>(); //1
+				var updateTimestampsInterceptor = sp.GetRequiredService<UpdateTimestampsInterceptor>();//3
 
 				options.UseSqlServer(
 					configuration.GetConnectionString("DefaultConnection"),
@@ -56,6 +55,9 @@ namespace Jobs.Infrastructure
 			services.AddScoped<IJobRepository,JobRepository>();
 			services.AddScoped<IApplicationRepository, ApplicationRepository>();
 			services.AddScoped<ICVRepository, CVRepository>();
+			services.AddScoped<ISkillRepository, SkillRepository>();
+
+			
 
 			// Unit of Work
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -63,10 +65,6 @@ namespace Jobs.Infrastructure
 
 			// Services
 			services.AddSingleton<IFileStorageService>(_ => new LocalFileStorageService("files"));
-			//var emailOptions = new EmailServiceOptions();
-			//configureEmail?.Invoke(emailOptions);
-			//services.AddSingleton(emailOptions);
-			//services.AddScoped<IEmailService, EmailService>();
 
 			//JWT generator options placeholder
 			services.Configure<JwtSettings>(
@@ -92,7 +90,7 @@ namespace Jobs.Infrastructure
 
 				return new Cloudinary(account);
 			});
-
+			
 			// Background Service
 			//services.AddHostedService<OutboxProcessor>();
 
@@ -103,28 +101,7 @@ namespace Jobs.Infrastructure
 				client.Timeout = TimeSpan.FromMinutes(5); // AI calls ممكن تاخد وقت
 			});
 
-			services.AddScoped<IBackgroundJobService, HangfireBackgroundJobService>();
 
-			//// Hangfire
-			//services.AddHangfire(config => config
-			//	.SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
-			//	.UseSimpleAssemblyNameTypeSerializer()
-			//	.UseRecommendedSerializerSettings()
-			//	.UseSqlServerStorage(configuration.GetConnectionString("HangfireDb")));
-
-			//services.AddHangfireServer(options =>
-			//{
-			//	options.WorkerCount = 5; // عدد الـ workers المتوازية
-			//});
-
-
-
-			//services.AddHttpClient<IAiScoringService, AiScoringService>();
-
-			//services.AddHangfire(x =>
-			//	x.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
-
-			//services.AddHangfireServer();
 
 
 			// Email Settings

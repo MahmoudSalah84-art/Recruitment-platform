@@ -216,11 +216,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HrId")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -248,8 +243,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("ExpirationDate");
-
-                    b.HasIndex("HrId");
 
                     b.HasIndex("IsPublished");
 
@@ -420,16 +413,7 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<string>("GitHubUrl")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<bool>("IsVerified")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false);
@@ -439,25 +423,12 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<string>("LinkedInUrl")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<string>("PortfolioUrl")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
                     b.Property<string>("ProfilePictureUrl")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)")
                         .HasDefaultValue("");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -512,9 +483,8 @@ namespace Jobs.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Jobs.Infrastructure.Outbox.OutboxMessage", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Content")
                         .IsRequired()
@@ -619,25 +589,6 @@ namespace Jobs.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("Jobs.Domain.Entities.Company", b =>
                 {
-                    b.OwnsOne("Jobs.Domain.ValueObjects.Email", "Email", b1 =>
-                        {
-                            b1.Property<string>("CompanyId")
-                                .HasColumnType("nvarchar(36)");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)")
-                                .HasColumnName("EmailAddress");
-
-                            b1.HasKey("CompanyId");
-
-                            b1.ToTable("Companies");
-
-                            b1.WithOwner()
-                                .HasForeignKey("CompanyId");
-                        });
-
                     b.OwnsOne("Jobs.Domain.ValueObjects.YourProject.Domain.ValueObjects.Address", "CompanyAddress", b1 =>
                         {
                             b1.Property<string>("CompanyId")
@@ -668,9 +619,6 @@ namespace Jobs.Infrastructure.Data.Migrations
 
                     b.Navigation("CompanyAddress")
                         .IsRequired();
-
-                    b.Navigation("Email")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Jobs.Domain.Entities.Job", b =>
@@ -679,12 +627,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .WithMany("Jobs")
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Jobs.Domain.Entities.User", "HR")
-                        .WithMany()
-                        .HasForeignKey("HrId")
-                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.OwnsOne("Jobs.Domain.ValueObjects.SalaryRange", "Salary", b1 =>
@@ -709,8 +651,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                         });
 
                     b.Navigation("Company");
-
-                    b.Navigation("HR");
 
                     b.Navigation("Salary");
                 });
@@ -767,53 +707,7 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.OwnsOne("Jobs.Domain.ValueObjects.Email", "Email", b1 =>
-                        {
-                            b1.Property<string>("UserId")
-                                .HasColumnType("nvarchar(36)");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(256)
-                                .HasColumnType("nvarchar(256)")
-                                .HasColumnName("EmailAddress");
-
-                            b1.HasKey("UserId");
-
-                            b1.HasIndex("Value")
-                                .IsUnique()
-                                .HasFilter("[IsDeleted] = 0");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
-                    b.OwnsOne("Jobs.Domain.ValueObjects.PhoneNumber", "PhoneNumber", b1 =>
-                        {
-                            b1.Property<string>("UserId")
-                                .HasColumnType("nvarchar(36)");
-
-                            b1.Property<string>("Value")
-                                .HasMaxLength(20)
-                                .HasColumnType("nvarchar(20)")
-                                .HasColumnName("PhoneNumber");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("Users");
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-                        });
-
                     b.Navigation("Company");
-
-                    b.Navigation("Email")
-                        .IsRequired();
-
-                    b.Navigation("PhoneNumber");
                 });
 
             modelBuilder.Entity("Jobs.Domain.Entities.UserSkill", b =>

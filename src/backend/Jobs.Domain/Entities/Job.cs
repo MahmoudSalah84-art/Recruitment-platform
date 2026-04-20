@@ -3,9 +3,7 @@ using Jobs.Domain.Enums;
 using Jobs.Domain.Events.JobEvents;
 using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
-using Jobs.Domain.Rules.SkillRules;
 using Jobs.Domain.ValueObjects;
-using MediatR;
 
 
 namespace Jobs.Domain.Entities
@@ -16,7 +14,7 @@ namespace Jobs.Domain.Entities
 		// ========= Properties =========
 		public string CompanyId { get; private set; }
 
-		public string HrId { get; private set; }
+		//public string HrId { get; private set; }
 
 		public string Title { get; private set; }
 		public string Description { get; private set; }
@@ -36,7 +34,7 @@ namespace Jobs.Domain.Entities
 
 		// Navigation Properties
 		public Company Company { get; set; }
-		public User HR { get; set; }
+		//public User HR { get; set; }
 
 		private readonly List<JobSkill> _requiredSkills = new();
 		public IReadOnlyCollection<JobSkill> RequiredSkills => _requiredSkills.AsReadOnly();
@@ -52,8 +50,7 @@ namespace Jobs.Domain.Entities
 		// ========= Constructors =========
 		private Job() { }
 		
-		public Job(string companyId,
-			string hrId, string title, SalaryRange? salary, 
+		public Job(string companyId, string title, SalaryRange? salary, 
 			string description, string requirements,
 			EmploymentType employmentType,
 			int expLevel, DateTime? expirationDate = null)
@@ -62,7 +59,6 @@ namespace Jobs.Domain.Entities
 			CheckRule(new ExperienceLevelRule(expLevel));
 
 			CompanyId = companyId;
-			HrId = hrId;
 			Title = title;
 			Salary = salary;
 			Description = description ?? string.Empty;
@@ -120,7 +116,7 @@ namespace Jobs.Domain.Entities
 
 			IsPublished = true;
 
-			AddEvent(new JobPostedEvent(this));
+			AddEvent(new JobPostedEvent(Id));
 			//RaiseDomainEvent(new JobPublishedDomainEvent(Id, CompanyId));
 		}
 
@@ -157,18 +153,18 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ==================== HR ====================
-		public void ReassignHR(string newHrId)
-		{
-			if (string.IsNullOrWhiteSpace(newHrId))
-				throw new DomainException("HR ID is required.");
+		//public void ReassignHR(string newHrId)
+		//{
+		//	if (string.IsNullOrWhiteSpace(newHrId))
+		//		throw new DomainException("HR ID is required.");
 
-			if (HrId == newHrId)
-				throw new DomainException("Job is already assigned to this HR.");
+		//	if (HrId == newHrId)
+		//		throw new DomainException("Job is already assigned to this HR.");
 
-			HrId = newHrId;
+		//	HrId = newHrId;
 
-			//RaiseDomainEvent(new JobHRReassignedDomainEvent(Id, newHrId));
-		}
+		//	//RaiseDomainEvent(new JobHRReassignedDomainEvent(Id, newHrId));
+		//}
 
 		// ==================== Required Skills ====================
 		public void AddRequiredSkill(JobSkill skill)

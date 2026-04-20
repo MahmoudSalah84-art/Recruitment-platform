@@ -4,6 +4,8 @@ using Jobs.Domain.Events.ApplicationEvents;
 using Jobs.Domain.Exceptions;
 using Jobs.Domain.Rules;
 using Jobs.Domain.Rules.JobApplication;
+using Jobs.Domain.Rules.UserRules;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Jobs.Domain.Entities
 {
@@ -34,6 +36,9 @@ namespace Jobs.Domain.Entities
 
 		public JobApplication(string applicantId, string jobId, int matchScore, string? cvId = null)
 		{
+
+		    //CheckRule(new CandidateCannotApplyTwiceRule(this, application.JobId));
+			//CheckRule(new CannotApplyToExpiredJobRule(application.Job));
 			CheckRule(new NotEmptyGuidRule(applicantId));
 			CheckRule(new NotEmptyGuidRule(jobId));
 			if (matchScore < 0 || matchScore > 100)
@@ -43,14 +48,27 @@ namespace Jobs.Domain.Entities
 			JobId = jobId;
 			MatchScore = matchScore;
 			CvId = cvId;
-
-
 			Status = ApplicationStatus.Pending;
+			StatusHistory = DateTime.UtcNow;
 
-			AddEvent(new ApplicationSubmittedEvent(this));
+			AddEvent(new ApplicationSubmittedEvent(Id));
 		}
 
 		// ========= Behaviors =========
+
+		public void WithdrawApplication()
+		{
+			if (Status != ApplicationStatus.Pending)
+				throw new DomainException("Cannot withdraw a processed application.");
+			if (IsDeleted)
+				throw new DomainException("Application already withdrawn");
+
+			IsDeleted = true;
+			DeletedAt = DateTime.UtcNow;
+
+			AddEvent(new WithdrewApplicationDomainEvent(Id));
+		}
+
 
 		public void ChangeStatus(ApplicationStatus newStatus)
 		{
@@ -60,40 +78,7 @@ namespace Jobs.Domain.Entities
 			Status = newStatus;
 			StatusHistory = DateTime.UtcNow;
 
-			AddEvent(new ApplicationStatusChangedEvent(this, oldStatus, newStatus));
-		}
-
-		// ==================== CV ====================
-		public void AttachCV(string cvId)
-		{
-
-			if (Status != ApplicationStatus.Pending)
-				throw new DomainException("Can only attach CV to a pending application.");
-
-			CvId = cvId;
-		}
-
-		public void DetachCV()
-		{
-			if (CvId is null)
-				throw new DomainException("No CV attached to this application.");
-
-			if (Status != ApplicationStatus.Pending)
-				throw new DomainException("Can only detach CV from a pending application.");
-
-			CvId = null;
-		}
-
-		// ==================== Match Score ====================
-		public void UpdateMatchScore(int newScore)
-		{
-			if (newScore < 0 || newScore > 100)
-				throw new DomainException("Match score must be between 0 and 100.");
-
-			if (Status != ApplicationStatus.Pending)
-				throw new DomainException("Can only update match score for pending applications.");
-
-			MatchScore = newScore;
+			AddEvent(new ApplicationStatusChangedEvent(Id));
 		}
 	}
 }

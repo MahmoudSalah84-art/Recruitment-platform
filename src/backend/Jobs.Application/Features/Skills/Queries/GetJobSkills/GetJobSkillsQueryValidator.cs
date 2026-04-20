@@ -2,9 +2,9 @@
 
 namespace Jobs.Application.Features.Skills.Queries.GetSkillsByJob
 {
-	public class GetSkillsByJobQueryValidator : AbstractValidator<GetSkillsByJobQuery>
+	public class GetJobSkillsQueryValidator : AbstractValidator<GetJobSkillsQuery>
 	{
-		public GetSkillsByJobQueryValidator()
+		public GetJobSkillsQueryValidator()
 		{
 			RuleFor(x => x.JobId).NotEmpty();
 		}

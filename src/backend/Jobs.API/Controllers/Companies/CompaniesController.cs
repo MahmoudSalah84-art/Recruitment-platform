@@ -1,7 +1,6 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.API.Extensions;
 using Jobs.Application.Features.Companies.Command.DeleteCompany;
-using Jobs.Application.Features.Companies.Command.LoginCompany;
 using Jobs.Application.Features.Companies.Command.Register;
 using Jobs.Application.Features.Companies.Command.UpdateCompany;
 using Jobs.Application.Features.Companies.Queries.GetAllCompanies;
@@ -52,27 +51,28 @@ namespace Jobs.API.Controllers.Companies
 		}
 
 
-		// POST /api/companies/login-company
-		[HttpPost("login-company")]
-		public async Task<IActionResult> Login([FromBody] LoginCombanyCommand command, CancellationToken ct)
-		{
-			var result = await Sender.Send(command);
+		//// POST /api/companies/login-company
+		//[HttpPost("login-company")]
+		//public async Task<IActionResult> Login([FromBody] LoginCombanyCommand command, CancellationToken ct)
+		//{
+		//	var result = await Sender.Send(command);
 
-			//if (result.IsFailure)
-			//{
-			//	if (result.Error == "Auth.InvalidCredentials")
-			//		return Unauthorized(result.Error);
+		//	//if (result.IsFailure)
+		//	//{
+		//	//	if (result.Error == "Auth.InvalidCredentials")
+		//	//		return Unauthorized(result.Error);
 
-			//	return BadRequest(result.Error);
-			//}
+		//	//	return BadRequest(result.Error);
+		//	//}
 
 
-			var response = result.ToApiResponse();
+		//	var response = result.ToApiResponse();
 
-			return StatusCode(response.StatusCode, response);
-		}
+		//	return StatusCode(response.StatusCode, response);
+		//}
 
-		// POST /api/companies/register
+
+		//// POST /api/companies/register
 		[HttpPost("register")]
 		public async Task<IActionResult> RegisterCompany([FromBody] RegisterCompanyCommand command)
 		{
@@ -80,8 +80,38 @@ namespace Jobs.API.Controllers.Companies
 
 			var response = result.ToApiResponse();
 
+			if (response.IsSuccess && response.Data is not null)
+			{
+				var accessToken = response.Data.AccessToken;
+				var refreshToken = response.Data.RefreshToken;
+				var accessTokenExpiry = response.Data.AccessTokenExpiry;
+
+				// Access Token
+				Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+				{
+					HttpOnly = true,
+					Secure = false,
+					SameSite = SameSiteMode.Strict,
+					Expires = accessTokenExpiry
+				});
+
+				// Refresh Token
+				Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+				{
+					HttpOnly = true,
+					Secure = false,
+					SameSite = SameSiteMode.Strict,
+					Expires = DateTime.UtcNow.AddDays(7)
+				});
+
+				response.Data.AccessToken =" null";
+				response.Data.RefreshToken =" null";
+			}
+
 			return StatusCode(response.StatusCode, response);
 		}
+
+
 
 		// DELETE /api/companies/{id}
 		[Authorize(Policy = Permissions.Companies_Delete)]

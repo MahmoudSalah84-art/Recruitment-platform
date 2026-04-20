@@ -35,16 +35,59 @@ namespace Jobs.Infrastructure.Services
 
 			return result;
 		}
-		
+
+		//public async Task<AiMatchResult> MatchJobAsync(Stream fileStream, string jobDescription, CancellationToken cancellationToken = default)
+		//{
+		//	using var content = new MultipartFormDataContent();
+		//	content.Add(new StreamContent(fileStream), "cv", "cv.pdf");
+		//	content.Add(new StringContent(jobDescription), "job_description");
+
+		//	var response = await _httpClient.PostAsync("https://jeanne-unaddled-shawnee.ngrok-free.dev/docs", content, cancellationToken);
+
+		//	//https://jeanne-unaddled-shawnee.ngrok-free.dev/docs
+		//	response.EnsureSuccessStatusCode();
+
+		//	var result = await response.Content
+		//		.ReadFromJsonAsync<AiMatchResult>(cancellationToken: cancellationToken);
+
+		//	return new AiMatchResult(
+		//		MatchScore: result!.MatchScore,
+		//		Decision: result.Decision,
+		//		MissingSkills: result.MissingSkills,
+		//		Explanation: result.Explanation);
+		//}
+
 		public async Task<AiMatchResult> MatchJobAsync(Stream fileStream, string jobDescription, CancellationToken cancellationToken = default)
 		{
+			// temprory cvId
+			var cvId = 1.ToString();
+
+
 			using var content = new MultipartFormDataContent();
-			content.Add(new StreamContent(fileStream), "cv", "cv.pdf");
+
+			
+			var fileContent = new StreamContent(fileStream);
+			// تأكد من تحديد الـ Media Type إذا كان السيرفر يدقق عليه
+			fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/pdf");
+			content.Add(fileContent, "cv", "cv.pdf");
+
+			// 2. إضافة الـ cv_id (مطلوب حسب الصورة)
+			content.Add(new StringContent(cvId), "cv_id");
+
+			// 3. إضافة الـ job_description
 			content.Add(new StringContent(jobDescription), "job_description");
 
-			var response = await _httpClient.PostAsync( "/api/ai/match-job", content, cancellationToken);
+			// 4. تغيير الرابط إلى الإندبوينت الفعلي وليس صفحة الـ docs
+			var url = "https://jeanne-unaddled-shawnee.ngrok-free.dev/api/ai/match-job";
 
-			response.EnsureSuccessStatusCode();
+			var response = await _httpClient.PostAsync(url, content, cancellationToken);
+
+			// التحقق من النجاح ومعالجة الأخطاء
+			if (!response.IsSuccessStatusCode)
+			{
+				var errorContent = await response.Content.ReadAsStringAsync();
+				throw new HttpRequestException($"Error: {response.StatusCode}, Content: {errorContent}");
+			}
 
 			var result = await response.Content
 				.ReadFromJsonAsync<AiMatchResult>(cancellationToken: cancellationToken);
@@ -53,12 +96,12 @@ namespace Jobs.Infrastructure.Services
 				MatchScore: result!.MatchScore,
 				Decision: result.Decision,
 				MissingSkills: result.MissingSkills,
-				Explanation: result.Explanation);
+				Explanation: result.Explanation
+			);
 		}
 
-		
 
-		 public async Task<IEnumerable<AiCandidateResult>> RankCandidatesAsync( List<(string CvId, Stream CvPdf)> cvs, string jobDescription,
+		public async Task<IEnumerable<AiCandidateResult>> RankCandidatesAsync( List<(string CvId, Stream CvPdf)> cvs, string jobDescription,
 					CancellationToken cancellationToken = default)
 				{
 					using var form = new MultipartFormDataContent();
@@ -72,8 +115,7 @@ namespace Jobs.Infrastructure.Services
 					form.Add(new StringContent(jobDescription), "job_description");
 
 					var response = await _httpClient.PostAsync(
-						"/api/ai/rank-candidates", form, cancellationToken);
-
+						"https://jeanne-unaddled-shawnee.ngrok-free.dev/docs", form, cancellationToken);
 					response.EnsureSuccessStatusCode();
 
 					var results = await response.Content

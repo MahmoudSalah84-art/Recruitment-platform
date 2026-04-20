@@ -26,5 +26,9 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.FirstOrDefaultAsync(r => r.Id == id, cancellationToken);
 		}
 
+		public async Task AddRangeAsync(IEnumerable<CVJobRecommendation> recommendations, CancellationToken cancellationToken)
+		{
+			await _set.AddRangeAsync(recommendations, cancellationToken);
+		}
 	}
 }

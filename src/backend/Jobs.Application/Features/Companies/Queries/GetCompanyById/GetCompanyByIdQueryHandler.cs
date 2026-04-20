@@ -21,7 +21,6 @@ namespace Jobs.Application.Features.Companies.Queries.GetCompanyById
 			var response = new CompanyResponse(
 				company.Id,
 				company.Name,
-				company.Email.Value,
 				company.Industry,
 				company.CompanyAddress.Street,
 				company.CompanyAddress.City,

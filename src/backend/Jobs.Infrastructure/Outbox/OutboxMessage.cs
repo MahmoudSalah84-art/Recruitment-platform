@@ -18,7 +18,6 @@ namespace Jobs.Infrastructure.Outbox
 			Type = type;
 			Content = content;
 			OccurredOn = DateTime.UtcNow;
-			Processed = false;
 		}
 
 		public void MarkProcessed()

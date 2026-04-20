@@ -37,7 +37,7 @@ namespace Jobs.Domain.Entities
 			Score = score;
 			IsActive = true;
 			
-			AddEvent(new CvRecommendedJobCreatedEvent(this));
+			AddEvent(new CvRecommendedJobCreatedEvent(this.Id));
 
 		}
 
@@ -52,7 +52,7 @@ namespace Jobs.Domain.Entities
 			IsActive = false;
 			DeactivatedAt = DateTime.UtcNow;
 
-			AddEvent(new CVRecommendationDeactivatedEvent(this));
+			AddEvent(new CVRecommendationDeactivatedEvent(this.Id));
 
 		}
 
@@ -70,15 +70,15 @@ namespace Jobs.Domain.Entities
 			//RaiseDomainEvent(new CVJobRecommendationReactivatedDomainEvent(Id, CvId, JobId));
 		}
 
-		public void Restore()
-		{
-			if (!IsDeleted)
-				throw new DomainException("Recommendation is not deleted.");
+		//public void Restore()
+		//{
+		//	if (!IsDeleted)
+		//		throw new DomainException("Recommendation is not deleted.");
 
-			IsDeleted = false;
-			DeletedAt = null;
+		//	IsDeleted = false;
+		//	DeletedAt = null;
 
-			//RaiseDomainEvent(new CVJobRecommendationRestoredDomainEvent(Id, CvId, JobId));
-		}
+		//	//RaiseDomainEvent(new CVJobRecommendationRestoredDomainEvent(Id, CvId, JobId));
+		//}
 	}
 }

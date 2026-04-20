@@ -8,8 +8,7 @@ namespace Jobs.Infrastructure.Data.Interceptors
     public class ConvertDomainEventsToOutboxMessagesInterceptor : SaveChangesInterceptor
 	{
 		public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
-			DbContextEventData eventData,
-			InterceptionResult<int> result,
+			DbContextEventData eventData, InterceptionResult<int> result,
 			CancellationToken cancellationToken = default)
 		{
 			var dbContext = eventData.Context;
@@ -18,19 +17,20 @@ namespace Jobs.Infrastructure.Data.Interceptors
 			var aggregates = dbContext.ChangeTracker
 				.Entries<AggregateRoot>()
 				.Select(x => x.Entity);
-			var outboxMessages = aggregates
+
+			var events = aggregates
 				.SelectMany(aggregateRoot => {
-					var events = aggregateRoot.Events;
-					//aggregateRoot.ClearEvents(); error
-					return events;
-				})
-				// convert entity to OutboxMessage Entity
+					return aggregateRoot.Events;
+				});
+
+			var outboxMessages = events
 				.Select(domainEvent => new OutboxMessage
 				(
 					domainEvent.GetType().Name,
 					JsonSerializer.Serialize(domainEvent)
 				))
 				.ToList();
+
 			foreach (var agg in aggregates)	agg.ClearEvents();
 				
 

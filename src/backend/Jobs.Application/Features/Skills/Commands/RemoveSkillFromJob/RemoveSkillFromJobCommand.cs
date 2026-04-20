@@ -4,6 +4,7 @@ namespace Jobs.Application.Features.Skills.Commands.RemoveSkillFromJob
 {
 	public record RemoveSkillFromJobCommand(
 	string JobId,
-	string SkillId) : ICommand;
+	string SkillId,
+	string CompanyId) : ICommand;
 
 }

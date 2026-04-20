@@ -2,6 +2,7 @@
 using Jobs.Application.Features.Users.Commands.UpdateUserProfile;
 using Jobs.Application.Features.Users.Queries.GetUserProfile;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Jobs.API.Controllers.Users
 {
@@ -12,11 +13,10 @@ namespace Jobs.API.Controllers.Users
 		[HttpGet("me")]
 		public async Task<IActionResult> GetMyProfile()
 		{
-			var userIdClaim = User.FindFirst("sub")?.Value;
-			if (string.IsNullOrEmpty(userIdClaim))
-				return Unauthorized();
+			string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			//if (CompanyId == null || CompanyId != id) return Unauthorized();
 
-			var query = new GetUserByIdQuery(userIdClaim);
+			var query = new GetUserByIdQuery(userId);
 			var result = await Sender.Send(query);
 
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);

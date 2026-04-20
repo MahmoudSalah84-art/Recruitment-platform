@@ -14,7 +14,7 @@ namespace Jobs.Application.Features.CV.Query.GetMyResume
 
 		public async Task<Result<UserResumeDto>> Handle(GetMyResumeQuery request, CancellationToken cancellationToken)
 		{
-			var resume = await _unitOfWork.CVs.GetByUserId(request.userId);
+			var resume = await _unitOfWork.CVs.GetByUserIdAsync(request.userId, cancellationToken);
 
 			if (resume is null)
 				return Result<UserResumeDto>.Failure("Resume not found");
@@ -22,7 +22,7 @@ namespace Jobs.Application.Features.CV.Query.GetMyResume
 			UserResumeDto result = new UserResumeDto
 			{
 				Title = resume.Title,
-				FilePath = resume.FilePath,
+				FilePath = resume.FilePath.Value,
 				Summary = resume.SummaryText
 			};
 

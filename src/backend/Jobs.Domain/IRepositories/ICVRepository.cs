@@ -13,6 +13,6 @@ namespace Jobs.Domain.IRepositories
 		Task<CV?> GetByIdWithParsedAsync(string id, CancellationToken ct = default);
 
 
-		Task<CV?> GetByUserId(string userId);
+		Task<CV?> GetByUserIdAsync(string userId, CancellationToken ct = default);
 	}
 }

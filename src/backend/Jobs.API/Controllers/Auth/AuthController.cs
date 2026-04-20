@@ -6,6 +6,7 @@ using Jobs.Application.Features.Identity.Command.ForgotPassword;
 using Jobs.Application.Features.Identity.Command.GenerateEmailConfirmationToken;
 using Jobs.Application.Features.Identity.Command.RefreshToken;
 using Jobs.Application.Features.Identity.Command.ResetPassword;
+using Jobs.Application.Features.Users.Commands.Login;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -98,6 +99,47 @@ namespace Jobs.API.Controllers.Auth
 
 
 			var response = result.ToApiResponse<object>();
+
+			return StatusCode(response.StatusCode, response);
+		}
+
+
+
+		// POST api/User/login
+		[HttpPost("login")]
+		public async Task<IActionResult> Login(LoginCommand command)
+		{
+			var result = await Sender.Send(command);
+
+			var response = result.ToApiResponse();
+
+			if (response.IsSuccess && response.Data is not null)
+			{
+				var accessToken = response.Data.AccessToken;
+				var refreshToken = response.Data.RefreshToken;
+				var accessTokenExpiry = response.Data.AccessTokenExpiry;
+
+				// Access Token
+				Response.Cookies.Append("accessToken", accessToken, new CookieOptions
+				{
+					HttpOnly = true,
+					Secure = false,
+					SameSite = SameSiteMode.Strict,
+					Expires = accessTokenExpiry
+				});
+
+				// Refresh Token
+				Response.Cookies.Append("refreshToken", refreshToken, new CookieOptions
+				{
+					HttpOnly = true,
+					Secure = false,
+					SameSite = SameSiteMode.Strict,
+					Expires = DateTime.UtcNow.AddDays(7)
+				});
+
+				response.Data.AccessToken = " null";
+				response.Data.RefreshToken = " null";
+			}
 
 			return StatusCode(response.StatusCode, response);
 		}

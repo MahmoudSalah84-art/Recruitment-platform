@@ -3,16 +3,16 @@ using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Skills.Queries.GetSkillsByJob
 {
-	public class GetSkillsByJobQueryHandler : ICommandHandler<GetSkillsByJobQuery, List<JobSkillResponse>>
+	public class GetJobSkillsQueryHandler : ICommandHandler<GetJobSkillsQuery, List<JobSkillResponse>>
 	{
 		private readonly IUnitOfWork _unitOfWork;
 
-		public GetSkillsByJobQueryHandler(IUnitOfWork unitOfWork)
+		public GetJobSkillsQueryHandler(IUnitOfWork unitOfWork)
 		{
 			_unitOfWork = unitOfWork;
 		}
 
-		public async Task<Result<List<JobSkillResponse>>> Handle(GetSkillsByJobQuery request, CancellationToken cancellationToken)
+		public async Task<Result<List<JobSkillResponse>>> Handle(GetJobSkillsQuery request, CancellationToken cancellationToken)
 		{
 			var job = await _unitOfWork.Jobs.GetByIdWithSkillsAsync(request.JobId, cancellationToken);
 

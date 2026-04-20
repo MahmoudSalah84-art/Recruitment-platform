@@ -6,14 +6,13 @@ using System.Text;
 
 namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
-	public class CVRecommendationDeactivatedEvent : DomainEvent
-	{
-		public string RecommendationId { get; }
+ 
 
-		public CVRecommendationDeactivatedEvent(CVJobRecommendation rec)
+	public record CVRecommendationDeactivatedEvent : DomainEvent
+	{
+		public CVRecommendationDeactivatedEvent(string RecommendationId)
 		{
-			RecommendationId = rec.Id;
-			OccurredOn = DateTime.UtcNow;
+			Id = RecommendationId;
 		}
 	}
 }

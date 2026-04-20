@@ -28,9 +28,9 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.IsRequired()
 				.HasMaxLength(36);
 
-			builder.Property(j => j.HrId)
-				.IsRequired()
-				.HasMaxLength(36);
+			//builder.Property(j => j.HrId)
+			//	.IsRequired()
+			//	.HasMaxLength(36);
 
 			builder.Property(j => j.Title)
 				.IsRequired()
@@ -91,10 +91,10 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.HasForeignKey(j => j.CompanyId)
 				.OnDelete(DeleteBehavior.Cascade);
 
-			builder.HasOne(j => j.HR)
-				.WithMany()
-				.HasForeignKey(j => j.HrId)
-				.OnDelete(DeleteBehavior.Restrict);
+			//builder.HasOne(j => j.HR)
+			//	.WithMany()
+			//	.HasForeignKey(j => j.HrId)
+			//	.OnDelete(DeleteBehavior.Restrict);
 
 			builder.HasMany(j => j.RequiredSkills)
 				.WithOne(js => js.Job)
@@ -113,7 +113,7 @@ namespace Jobs.Infrastructure.Data.Configurations
 
 			// ===== Indexes =====
 			builder.HasIndex(j => j.CompanyId);
-			builder.HasIndex(j => j.HrId);
+			//builder.HasIndex(j => j.HrId);
 			builder.HasIndex(j => j.IsPublished);
 			builder.HasIndex(j => j.ExpirationDate);
 

@@ -5,11 +5,11 @@ using System.Text;
 
 namespace Jobs.Application.Features.Skills.Queries.GetJobsBySkill
 {
-	public class GetJobsBySkillQueryValidator : AbstractValidator<GetJobsBySkillQuery>
+	public class GetAllSkillsQueryValidator : AbstractValidator<GetAllSkillsQuery>
 	{
-		public GetJobsBySkillQueryValidator()
+		public GetAllSkillsQueryValidator()
 		{
-			RuleFor(x => x.SkillId).NotEmpty();
+			
 			RuleFor(x => x.Page).GreaterThan(0);
 			RuleFor(x => x.PageSize).InclusiveBetween(1, 50);
 		}

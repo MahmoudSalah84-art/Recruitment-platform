@@ -1,26 +1,25 @@
 ﻿using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecommendation;
+using Jobs.Domain.Events.CV_Recommendation_Events;
 using Jobs.Domain.Events.JobEvents;
 using MediatR;
 
-//namespace Jobs.Application.Features.Jobs.EventHandlers
-//{
-//	internal sealed class JobPostedDomainEventHandler : INotificationHandler<JobCreatedEvent>
-//	{
-//		private readonly IBackgroundJobService _backgroundJobService;
+namespace Jobs.Application.Features.Jobs.EventHandlers
+{
+	public sealed class JobPostedDomainEventHandler : INotificationHandler<JobCreatedEvent>
+	{
+		private readonly ISender _sender;
 
-//		public JobPostedDomainEventHandler(IBackgroundJobService backgroundJobService)
-//		{
-//			_backgroundJobService = backgroundJobService;
-//		}
+		public JobPostedDomainEventHandler(ISender sender)
+		{
+			_sender = sender;
+		}
 
-//		public Task Handle(JobCreatedEvent notification, CancellationToken cancellationToken)
-//		{
-//			// Enqueue في الخلفية فوراً بدون await
-//			_backgroundJobService.Enqueue(
-//				new CreateCVJobRecommendationCommand(notification.JobId));
-
-//			return Task.CompletedTask;
-//		}
-//	}
-//}
+		public async Task Handle(JobCreatedEvent notification, CancellationToken cancellationToken)
+		{
+			await _sender.Send(
+				new CreateCVJobRecommendationCommand_job(notification.Id),
+				cancellationToken);
+		}
+	}
+}

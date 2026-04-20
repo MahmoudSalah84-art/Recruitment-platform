@@ -26,9 +26,6 @@ namespace Jobs.Application.Features.Identity.Command.Register
 			var user = new User(
 				firstName: cmd.FirstName,
 				lastName: cmd.LastName,
-				email: cmd.Email,
-				isEmailExists: await _unitOfWork.Companies.ExistsAsync(c => c.Email.Value == cmd.Email),
-				phoneNumber: cmd.PhoneNumber,
 				bio: cmd.Bio
 			);
 

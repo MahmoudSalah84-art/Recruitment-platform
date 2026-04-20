@@ -31,13 +31,7 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.IsRequired()
 				.HasMaxLength(200);
 
-			builder.OwnsOne(c => c.Email, email =>
-			{
-				email.Property(e => e.Value)
-					.HasColumnName("EmailAddress")
-					.IsRequired()
-					.HasMaxLength(256);
-			});
+
 
 			builder.Property(c => c.Industry)
 				.IsRequired()

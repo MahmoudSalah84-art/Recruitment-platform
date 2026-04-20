@@ -37,8 +37,8 @@ namespace Jobs.Application.Features.Jobs.Queries.GetJobsByCompany
 				job.IsExpired,
 				job.ExpirationDate,
 				job.RequiredSkills.Select(s => s.Skill.Name).ToList(),
-				job.CompanyId,
-				job.HrId)).ToList();
+				job.CompanyId
+				/*job.HrId*/)).ToList();
 
 			var paginatedList = new PaginatedList<JobResponse>(response, Count, request.Page, request.PageSize);
 			return Result<PaginatedList<JobResponse>>.Success(paginatedList);

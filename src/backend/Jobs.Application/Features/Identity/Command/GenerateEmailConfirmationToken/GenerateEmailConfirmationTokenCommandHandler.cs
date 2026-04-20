@@ -21,6 +21,7 @@ namespace Jobs.Application.Features.Identity.Command.GenerateEmailConfirmationTo
 			var result =await _svc.GetUserByIdAsync(request.UserId);
 			if (result.IsFailure)
 				return Result.Failure(result.Error);
+
 			
 			var tokenResult = await _svc.GenerateEmailConfirmationTokenAsync(request.UserId);
 

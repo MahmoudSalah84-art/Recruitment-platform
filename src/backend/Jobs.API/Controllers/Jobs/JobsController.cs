@@ -1,5 +1,6 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.API.Extensions;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Features.Jobs.Commands.CreateJob;
 using Jobs.Application.Features.Jobs.Commands.DeleteJob;
 using Jobs.Application.Features.Jobs.Commands.PublishJob;
@@ -7,14 +8,29 @@ using Jobs.Application.Features.Jobs.Commands.UnpublishJob;
 using Jobs.Application.Features.Jobs.Commands.UpdateJob;
 using Jobs.Application.Features.Jobs.Queries.GetJobById;
 using Jobs.Application.Features.Jobs.Queries.SearchJobs;
+using Jobs.Domain.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Jobs.API.Controllers.Jobs
 {
 	public class JobsController : ApiController
 	{
+		// GET: api/jobs/search?title=Developer&location=New%20York
+		[HttpGet("search")]
+
+		public async Task<IActionResult> SearchJobs([FromQuery] JobsWithFiltersSpecificationQuery query)
+		{
+			var result = await Sender.Send(query);
+
+			var response = result.ToApiResponse();
+
+			return StatusCode(response.StatusCode, response);
+		}
+
 		// GET: api/jobs/{id}
-		[HttpGet("{id}")]
+		[HttpGet("{id}", Name = "GetJobById")]
 		public async Task<IActionResult> GetJobById(string id)
 		{
 			var result = await Sender.Send(new GetJobByIdQuery(id));
@@ -27,28 +43,26 @@ namespace Jobs.API.Controllers.Jobs
 			return StatusCode(response.StatusCode, response);
 		}
 
-		// GET: api/jobs/search?title=Developer&location=New%20York
-		[HttpGet("search")]
-		public async Task<IActionResult> SearchJobs([FromQuery] JobsWithFiltersSpecificationQuery query)
-		{
-			var result = await Sender.Send(query);
-
-			var response = result.ToApiResponse();
-
-			return StatusCode(response.StatusCode, response);
-		}
-
-		// POST: api/jobs
+		// POST /api/companiesjobs/{companyId}
 		[HttpPost]
-		public async Task<IActionResult> CreateJob([FromBody] CreateJobCommand command)
+		[Authorize(Policy = Permissions.Jobs_Create)]
+		public async Task<IActionResult> CreateJob(string companyId, CreateJobCommand command)
 		{
-			var jobId = await Sender.Send(command);
+			string CompanyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			if (CompanyId == null || CompanyId != companyId) return Unauthorized();
 
-			return CreatedAtAction(nameof(GetJobById), new { id = jobId }, jobId);
+			if (companyId != command.CompanyId)
+				return BadRequest("CompanyId mismatch");
+
+			var result = await Sender.Send(command);
+
+			return result.IsSuccess ? CreatedAtRoute( "GetJobById", new { id = result.Value }, result.Value  ) : BadRequest(result.Error);
 		}
+
 
 		// DELETE: api/jobs/{id}
 		[HttpDelete("{id}")]
+		[Authorize(Policy = Permissions.Jobs_Delete)]
 		public async Task<IActionResult> DeleteJob(string id)
 		{
 			var result = await Sender.Send(new DeleteJobCommand(id));
@@ -80,6 +94,7 @@ namespace Jobs.API.Controllers.Jobs
 
 		// PUT: api/jobs/{id}
 		[HttpPut("{id}")]
+		[Authorize(Policy = Permissions.Jobs_Update)]
 		public async Task<IActionResult> UpdateJob(string id, [FromBody] UpdateJobCommand command)
 		{
 			if (id != command.JobId)
@@ -91,12 +106,3 @@ namespace Jobs.API.Controllers.Jobs
 		}
 	}
 }
-
-//| Method  |		Route					| Description					|
-//| ------  | -----------------------		| ---------------------------	|
-//| GET		| `/ api / jobs`                | Get all jobs(with filters)	|
-//| GET		| `/ api / jobs /{ id}`         | Job details					|
-//| POST	| `/ api / jobs`                | Create job(Employedr only)    |
-//| PUT		| `/ api / jobs /{ id}`         | Update job					|
-//| DELETE	| `/ api / jobs /{ id}`			| Delete job					|
-//| GET		| `/ api / jobs / recommended`  | Recommended jobs for user		|

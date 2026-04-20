@@ -24,8 +24,6 @@ namespace Jobs.Application.Features.Companies.Command.Register
 			var company = new Company(
 				name: request.UserName,
 				isNameExists: await _unitOfWork.Companies.ExistsAsync(c => c.Name == request.UserName),
-				email: request.Email,
-				isEmailExists: await _unitOfWork.Companies.ExistsAsync(c => c.Email.Value == request.Email),
 				industry: request.Industry,
 				Country: request.Country,
 				city: request.City,
@@ -36,8 +34,7 @@ namespace Jobs.Application.Features.Companies.Command.Register
 				description: request.Description
 			);
 
-			_unitOfWork.Companies.Add(company);
-			await _unitOfWork.SaveChangesAsync(cancellationToken);
+			
 
 
 			var registerRequest = new RegisterRequest(
@@ -51,6 +48,9 @@ namespace Jobs.Application.Features.Companies.Command.Register
 				Roles.Company
 			);
 
+			
+			_unitOfWork.Companies.Add(company);
+			await _unitOfWork.SaveChangesAsync(cancellationToken);
 			return await _identityService.RegisterAsync(registerRequest);
 		}
 	}

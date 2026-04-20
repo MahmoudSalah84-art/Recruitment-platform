@@ -18,8 +18,9 @@ namespace Jobs.Domain.Specifications.Jobs
 			(!Type.HasValue || j.EmploymentType == Type) &&
 
 			(j.IsPublished == OnlyPublished) &&
+			(j.ExpirationDate > DateTime.UtcNow) &&
 
-			(!j.IsExpired) &&
+			//(!j.IsExpired) &&
 
 			(!PostedInDays.HasValue || j.CreatedAt >= DateTime.UtcNow.AddDays(-PostedInDays.Value))
 			)

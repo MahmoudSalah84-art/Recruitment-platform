@@ -6,16 +6,13 @@ using System.Text;
 
 namespace Jobs.Domain.Events.JobEvents
 {
-    public class JobPostedEvent : DomainEvent
-    {
-        public Job Job { get; }
 
-        public JobPostedEvent(Job job)
-        {
-            Job = job;
-			OccurredOn = DateTime.UtcNow;
 
+	public record JobPostedEvent : DomainEvent
+	{
+		public JobPostedEvent(string JobId)
+		{
+			Id = JobId;
 		}
 	}
-
 }

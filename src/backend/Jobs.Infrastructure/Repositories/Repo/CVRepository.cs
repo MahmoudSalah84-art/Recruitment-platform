@@ -26,10 +26,10 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.FirstOrDefaultAsync(cv => cv.Id == id, ct);
 		}
 
-		public async Task<CV?> GetByUserId(string userId)
+		public async Task<CV?> GetByUserIdAsync(string userId, CancellationToken ct = default)
 		{
   				return await _set
-				.FirstOrDefaultAsync(cv => cv.UserId == userId);
+				.FirstOrDefaultAsync(cv => cv.UserId == userId, ct);
 		}
     }
 }

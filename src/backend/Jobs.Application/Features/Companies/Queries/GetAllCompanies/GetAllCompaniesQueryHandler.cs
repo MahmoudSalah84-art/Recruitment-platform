@@ -35,7 +35,6 @@ namespace Jobs.Application.Features.Companies.Queries.GetAllCompanies
 				.Select(c => new CompanyResponse(
 					c.Id,
 					c.Name,
-					c.Email.Value,
 					c.Industry,
 					c.CompanyAddress.Street,
 					c.CompanyAddress.City,

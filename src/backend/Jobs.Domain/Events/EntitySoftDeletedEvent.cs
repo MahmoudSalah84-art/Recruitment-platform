@@ -1,18 +1,12 @@
 ﻿using Jobs.Domain.Common;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.Events
 {
-	public sealed class EntitySoftDeletedEvent : DomainEvent
+	public record EntitySoftDeletedEvent : DomainEvent
 	{
-		public Guid EntityId { get; }
-
-		public EntitySoftDeletedEvent(Guid id)
+		public EntitySoftDeletedEvent(string EntityId)
 		{
-			EntityId = id;
-			OccurredOn = DateTime.UtcNow;
+			Id = EntityId;
 		}
 	}
 }

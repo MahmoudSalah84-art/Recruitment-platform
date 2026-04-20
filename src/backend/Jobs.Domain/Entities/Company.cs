@@ -13,8 +13,8 @@ namespace Jobs.Domain.Entities
     public class Company : AggregateRoot
 	{
 		// ========== Properties ==========
+		
 		public string Name { get; private set; }
-		public Email Email { get; private set; }
 		public string Industry { get; private set; }
         public Address CompanyAddress { get; private set; }
         public int EmployeesCount { get; private set; }
@@ -33,22 +33,19 @@ namespace Jobs.Domain.Entities
 		private Company(){}
 
 		public Company(string name,bool isNameExists, 
-			string email,bool isEmailExists, 
 			string industry,string Country, string city,
 			string Street, string BuildingNumber, string postalCode,
 			string? logoUrl = default, string? description = default)
 		{
 			CheckRule(new CompanyNameMustBeUniqueRule(isNameExists));
-			CheckRule(new UserEmailMustBeUniqueRule(isEmailExists));
 
 			Name = name;
-			Email = Email.Create(email);
 			Industry = industry;
 			CompanyAddress = Address.Create(Country, city, Street, BuildingNumber, postalCode);
 			Description = description ?? string.Empty;
 			LogoUrl = logoUrl ?? string.Empty;
 
-			AddEvent(new CompanyCreatedEvent(this));
+			AddEvent(new CompanyCreatedEvent(this.Id));
 		}
 
 		// ========== Behaviors ==========
@@ -76,7 +73,7 @@ namespace Jobs.Domain.Entities
 
 			_employees.Add(employee);
 
-			//RaiseDomainEvent(new CompanyEmployeeAddedDomainEvent(Id, employee.Id));
+			AddEvent(new CompanyEmployeeAddedDomainEvent(employee.Id));
 		}
 
 		public void RemoveEmployee(string employeeId)
@@ -87,51 +84,16 @@ namespace Jobs.Domain.Entities
 				throw new DomainException("Employee not found in this company.");
 
 			var hasActiveJobs = _jobs.Any(j =>
-				j.HrId == employeeId && j.IsPublished && !j.IsExpired);
+				/*j.HrId == employeeId*/  j.IsPublished && !j.IsExpired);
 
 			if (hasActiveJobs)
 				throw new DomainException("Cannot remove an employee who owns active published jobs.");
 
 			_employees.Remove(employee);
 
-			//RaiseDomainEvent(new CompanyEmployeeRemovedDomainEvent(Id, employeeId));
+			AddEvent(new CompanyEmployeeRemovedDomainEvent(employeeId));
+
 		}
-
-		// ==================== Jobs ====================
-		//public void AddJob(Job job)
-		//{
-		//	CheckRule(new CompanyCannotPostMoreThanNJobsRule(this));
-
-		//	ArgumentNullException.ThrowIfNull(job);
-
-		//	if (IsDeleted)
-		//		throw new DomainException("Cannot add jobs to a deleted company.");
-
-		//	if (_jobs.Any(j => j.Id == job.Id))
-		//		throw new DomainException("Job is already associated with this company.");
-
-		//	_jobs.Add(job);
-
-		//	AddEvent(new JobCreatedEvent(Id));
-
-		//	//RaiseDomainEvent(new CompanyJobAddedDomainEvent(Id, job.Id));
-		//}
-
-		//public void RemoveJob(string jobId)
-		//{
-		//	var job = _jobs.FirstOrDefault(j => j.Id == jobId);
-
-		//	if (job is null)
-		//		throw new DomainException("Job not found in this company.");
-
-		//	if (job.IsPublished)
-		//		throw new DomainException("Cannot remove a published job. Unpublish it first.");
-
-		//	_jobs.Remove(job);
-		//}
-
-		
-
 	}
 }
 

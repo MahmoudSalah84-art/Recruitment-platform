@@ -33,33 +33,6 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.IsRequired()
 				.HasMaxLength(150);
 
-
-			builder.OwnsOne(u => u.Email, email =>
-			{
-				email.Property(e => e.Value)
-					.HasColumnName("EmailAddress")
-					.IsRequired()
-					.HasMaxLength(256);
-				email.HasIndex(e => e.Value)
-						.IsUnique()
-						.HasFilter("[IsDeleted] = 0");
-
-			});
-
-			builder.Property(u => u.Role)
-					.IsRequired()
-					.HasConversion<string>()
-					.HasMaxLength(50);
-
-			builder.OwnsOne(u => u.PhoneNumber, phone =>
-			{
-				phone.Property(p => p.Value)
-					.HasColumnName("PhoneNumber")
-					.HasMaxLength(20)
-					.IsRequired(false);
-			});
-
-
 			builder.Property(u => u.ProfilePictureUrl)
 				.HasMaxLength(500)
 				.HasDefaultValue(string.Empty);
@@ -68,21 +41,6 @@ namespace Jobs.Infrastructure.Data.Configurations
 				.HasMaxLength(1000)
 				.HasDefaultValue(string.Empty);
 
-			builder.Property(u => u.LinkedInUrl)
-				.HasMaxLength(300)
-				.IsRequired(false);
-
-			builder.Property(u => u.GitHubUrl)
-				.HasMaxLength(300)
-				.IsRequired(false);
-
-			builder.Property(u => u.PortfolioUrl)
-				.HasMaxLength(300)
-				.IsRequired(false);
-
-			builder.Property(u => u.IsVerified)
-				.IsRequired()
-				.HasDefaultValue(false);
 
 			// ===== Soft Delete =====
 

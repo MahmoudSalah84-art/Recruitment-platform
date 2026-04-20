@@ -30,8 +30,8 @@ namespace Jobs.Application.Features.Jobs.Queries.GetJobById
 				job.IsExpired,
 				job.ExpirationDate,
 				[.. job.RequiredSkills.Select(s => s.Skill.Name)],
-				job.CompanyId,
-				job.HrId);
+				job.CompanyId
+				/*job.HrId*/);
 
 			return Result<JobResponse>.Success(jobResponse);
 

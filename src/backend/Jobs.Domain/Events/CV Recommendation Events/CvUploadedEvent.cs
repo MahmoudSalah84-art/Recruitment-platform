@@ -6,19 +6,13 @@ using System.Text;
 
 namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
-    public class CvUploadedEvent : DomainEvent
-    {
 
-		public string CvId { get; }
-		public string UserId { get; }
-		public string Title { get; }
-
-        public CvUploadedEvent(CV cv)
-        {
-			CvId = cv.Id;
-			UserId = cv.UserId;
-			Title = cv.Title;
-			OccurredOn = DateTime.UtcNow;
+	public record CvUploadedEvent : DomainEvent
+	{
+		public CvUploadedEvent(string UserId)
+		{
+			Id = UserId;
 		}
-    }
+	}
+
 }

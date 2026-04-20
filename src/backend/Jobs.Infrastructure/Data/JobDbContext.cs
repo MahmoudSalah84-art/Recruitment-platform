@@ -28,7 +28,7 @@ namespace Jobs.Infrastructure.Data
 			modelBuilder.Ignore<DomainEvent>();
 
 			modelBuilder.ApplyConfiguration(new UserConfiguration());
-			modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+			modelBuilder.ApplyConfiguration(new CompanyConfiguration());///
 			modelBuilder.ApplyConfiguration(new JobConfiguration());
 			modelBuilder.ApplyConfiguration(new ApplicationConfiguration());
 			modelBuilder.ApplyConfiguration(new SkillConfiguration());

@@ -12,7 +12,6 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 			_unitOfWork = unitOfWork;
 		}
 
-
 		public async Task<Result<UserResponse?>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
 		{
 
@@ -27,8 +26,6 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 				Id = user.Id,
 				FirsName = user.FirstName,
 				LastName = user.LastName,
-				Email = user.Email.Value,
-				PhoneNumber = user.PhoneNumber?.Value,
 				Bio = user.Bio,
 				ProfileImage = user.ProfilePictureUrl,
 				Skills = user.Skills,

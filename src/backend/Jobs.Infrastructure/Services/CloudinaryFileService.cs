@@ -22,7 +22,9 @@ namespace Jobs.Infrastructure.Services
 			{
 				File = new FileDescription(file.FileName, stream),
 				Folder = "users/images",
-				PublicId = Guid.NewGuid().ToString()
+				PublicId = Guid.NewGuid().ToString(),
+				Type = "upload",
+				AccessMode = "public"
 			};
 
 			var result = await _cloudinary.UploadAsync(uploadParams);
@@ -38,7 +40,9 @@ namespace Jobs.Infrastructure.Services
 			{
 				File = new FileDescription(file.FileName, stream),
 				Folder = "users/cv",
-				PublicId = Guid.NewGuid().ToString()
+				PublicId = Guid.NewGuid().ToString(),
+				Type = "upload",
+				AccessMode = "public"
 			};
 
 			var result = await _cloudinary.UploadAsync(uploadParams);

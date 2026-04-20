@@ -19,21 +19,18 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		public async Task<Job?> GetByIdWithSkillsAsync(string id, CancellationToken ct = default)
 		{
 			return await _set
-				.AsNoTracking()            
-				.Include(j => j.RequiredSkills) 
+				.AsNoTracking()
+				.Include(j => j.RequiredSkills)
 				.ThenInclude(js => js.Skill)
-				.FirstOrDefaultAsync(j => j.Id == id, ct); 
+				.FirstOrDefaultAsync(j => j.Id == id, ct);
 		}
 
-		/// <summary>
-		/// Searches for Jobs that match the query string, with pagination.
-		/// </summary>
-		/// <param name="query">Search query to match Job title or description.</param>
-		/// <param name="page">Page number (1-based).</param>
-		/// <param name="pageSize">Number of items per page.</param>
-		/// <param name="ct">Cancellation token to cancel the operation.</param>
-		/// <returns>List of Jobs matching the search query.</returns>
-	
-
+		public async Task<IEnumerable<Job>> GetAllActiveJobsAsync(CancellationToken ct = default)
+		{
+			return await _set
+				.AsNoTracking()
+				.Where(j => j.IsPublished && (j.ExpirationDate == null || j.ExpirationDate > DateTime.UtcNow))
+				.ToListAsync(ct);
+		}
 	}
 }

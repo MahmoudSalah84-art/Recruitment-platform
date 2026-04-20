@@ -5,5 +5,6 @@ namespace Jobs.Application.Features.Skills.Commands.AddSkillToJob
 {
 	public record AddSkillToJobCommand(
 	string JobId,
-	string SkillId) : ICommand;
+	string SkillId,
+	string CompanyId) : ICommand;
 }

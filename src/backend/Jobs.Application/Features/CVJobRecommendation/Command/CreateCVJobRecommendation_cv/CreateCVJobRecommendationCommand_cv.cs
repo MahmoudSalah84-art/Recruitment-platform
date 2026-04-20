@@ -2,6 +2,5 @@
 
 namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecommendation
 {
-	public record CreateCVJobRecommendationCommand(
-	string JobId) : ICommand<string>;
+	public sealed record CreateCVJobRecommendationCommand_cv(string UserId) : ICommand;
 }

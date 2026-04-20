@@ -31,7 +31,7 @@ namespace Jobs.Application.Features.Companies.Queries.GetCompanyEmployees
 			 
 
 			var response = result
-				.Select(e => new EmployeeResponse(e.Id, e.FirstName, e.LastName, e.Email.Value))
+				.Select(e => new EmployeeResponse(e.Id, e.FirstName, e.LastName))
 				.ToList();
 
 			var paginatedList = PaginatedList<EmployeeResponse>.Create(response, totalCount, request.Page, request.PageSize);

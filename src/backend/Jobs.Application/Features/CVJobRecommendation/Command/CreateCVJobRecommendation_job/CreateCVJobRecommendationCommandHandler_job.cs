@@ -6,14 +6,14 @@ using CVJobRecommendationEntity = Jobs.Domain.Entities.CVJobRecommendation;
 
 namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecommendation
 {
-	internal class CreateCVJobRecommendationCommandHandler : ICommandHandler<CreateCVJobRecommendationCommand, string>
+	public class CreateCVJobRecommendationCommandHandler_job : ICommandHandler<CreateCVJobRecommendationCommand_job, string>
 	{
 		private readonly IFileService _fileService;
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly ILogger<CreateCVJobRecommendationCommandHandler> _logger;
+		private readonly ILogger<CreateCVJobRecommendationCommandHandler_job> _logger;
 		private readonly IAiScoringService _aiScoringService;
-		public CreateCVJobRecommendationCommandHandler( IUnitOfWork unitOfWork ,
-		ILogger<CreateCVJobRecommendationCommandHandler> logger,
+		public CreateCVJobRecommendationCommandHandler_job( IUnitOfWork unitOfWork ,
+		ILogger<CreateCVJobRecommendationCommandHandler_job> logger,
 		IAiScoringService aiScoringService ,
 		IFileService fileService)
 		{
@@ -23,7 +23,7 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			_fileService = fileService;
 		}
 
-		public async Task<Result<string>> Handle(CreateCVJobRecommendationCommand request, CancellationToken cancellationToken)
+		public async Task<Result<string>> Handle(CreateCVJobRecommendationCommand_job request, CancellationToken cancellationToken)
 		{
 			var job = await _unitOfWork.Jobs.GetByIdAsync(request.JobId, cancellationToken);
 			if (job is null)
@@ -31,11 +31,11 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
 				return Result<string>.Failure(" not found.");
 			}
-			if (!job.IsPublished)
-			{
-				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
-				return Result<string>.Failure("Cannot recommend an unpublished job.");
-			}
+			//if (!job.IsPublished)
+			//{
+			//	_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
+			//	return Result<string>.Failure("Cannot recommend an unpublished job.");
+			//}
 
 			if (job.IsExpired)
 			{
@@ -44,6 +44,7 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			}
 
 			var cvs = _unitOfWork.CVs.Query().ToList();
+
 			if (!cvs.Any())
 			{
 				_logger.LogInformation("No CVs found to score for Job {JobId}.", request.JobId);

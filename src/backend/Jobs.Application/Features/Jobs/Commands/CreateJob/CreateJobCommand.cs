@@ -6,7 +6,6 @@ namespace Jobs.Application.Features.Jobs.Commands.CreateJob
 {
 	public record CreateJobCommand(
 	string CompanyId,
-	string HrId,
 	string Title,
 	string Description,
 	string Requirements,

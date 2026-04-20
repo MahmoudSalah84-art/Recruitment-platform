@@ -38,16 +38,13 @@ namespace Jobs.Infrastructure.BackgroundJobs
 			
 		}
 
-
-		
 		private async Task ProcessOutboxMessages(CancellationToken stoppingToken)
 		{
-			// إنشاء Scope يدوي لأن الـ DbContext والـ Mediator غالباً Scoped
 			using var scope = _scopeFactory.CreateScope();
 			var dbContext = scope.ServiceProvider.GetRequiredService<JobDbContext>();
 			var publisher = scope.ServiceProvider.GetRequiredService<IPublisher>(); // MediatR
 
-			// 1. جلب الرسائل غير المعالجة
+			// get unprocessed messages in batches (e.g., 20 at a time)
 			var messages = await dbContext.Set<OutboxMessage>()
 				.Where(m => !m.Processed)
 				.OrderBy(m => m.OccurredOn)
@@ -60,8 +57,6 @@ namespace Jobs.Infrastructure.BackgroundJobs
 			{
 				try
 				{
-					// 2. تحويل الـ JSON إلى كائن (Object)
-					// ملحوظة: نحتاج لمعرفة الـ Type الأصلي من الاسم المخزن
 					var eventType = GetEventTypeByName(message.Type);
 					if (eventType == null) continue;
 
@@ -69,11 +64,9 @@ namespace Jobs.Infrastructure.BackgroundJobs
 
 					if (domainEvent != null)
 					{
-						// 3. النشر داخلياً لمستخدمي MediatR Notification Handlers
 						await publisher.Publish(domainEvent, stoppingToken);
 					}
 
-					// 4. تحديث حالة الرسالة بنجاح
 					message.MarkProcessed();
 				}
 				catch (Exception ex)
@@ -88,7 +81,6 @@ namespace Jobs.Infrastructure.BackgroundJobs
 
 
 
-		// ميثود مساعدة لتحويل اسم الكلاس المخزن (String) إلى Type حقيقي
 		private Type? GetEventTypeByName(string typeName)
 		{
 			// ابحث في الـ Assembly الخاص بالـ Domain عن كلاس بهذا الاسم

@@ -6,15 +6,11 @@ using System.Text;
 
 namespace Jobs.Domain.Events.JobEvents
 {
-    public class JobUpdatedEvent : DomainEvent
-    {
-		public Job Job { get; }
-
-		public JobUpdatedEvent(Job job)
+	public record JobUpdatedEvent : DomainEvent
+	{
+		public JobUpdatedEvent(string JobId)
 		{
-			Job = job;
-			OccurredOn = DateTime.UtcNow;
+			Id = JobId;
 		}
 	}
-
 }
