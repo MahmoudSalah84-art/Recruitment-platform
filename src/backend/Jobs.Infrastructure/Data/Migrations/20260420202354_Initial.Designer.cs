@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Jobs.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(JobDbContext))]
-    [Migration("20260416135235_Initial")]
+    [Migration("20260420202354_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -219,11 +219,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                     b.Property<DateTime?>("ExpirationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("HrId")
-                        .IsRequired()
-                        .HasMaxLength(36)
-                        .HasColumnType("nvarchar(36)");
-
                     b.Property<bool>("IsDeleted")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
@@ -251,8 +246,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                     b.HasIndex("CompanyId");
 
                     b.HasIndex("ExpirationDate");
-
-                    b.HasIndex("HrId");
 
                     b.HasIndex("IsPublished");
 
@@ -408,6 +401,9 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)")
                         .HasDefaultValue("");
+
+                    b.Property<string>("CVId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyId")
                         .HasColumnType("nvarchar(36)");
@@ -639,12 +635,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Jobs.Domain.Entities.User", "HR")
-                        .WithMany()
-                        .HasForeignKey("HrId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.OwnsOne("Jobs.Domain.ValueObjects.SalaryRange", "Salary", b1 =>
                         {
                             b1.Property<string>("JobId")
@@ -667,8 +657,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                         });
 
                     b.Navigation("Company");
-
-                    b.Navigation("HR");
 
                     b.Navigation("Salary");
                 });

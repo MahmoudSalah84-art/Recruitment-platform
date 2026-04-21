@@ -399,6 +399,9 @@ namespace Jobs.Infrastructure.Data.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasDefaultValue("");
 
+                    b.Property<string>("CVId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CompanyId")
                         .HasColumnType("nvarchar(36)");
 

@@ -4,27 +4,29 @@ using Jobs.Application.Features.CVJobRecommendation.Queries.GetRecommendationByI
 using Jobs.Domain.IRepositories;
 using Jobs.Domain.Specifications.CVJobRecommendation;
 
-
-namespace Jobs.Application.Features.CVJobRecommendation.Queries.GetRecommendationsByCv
+namespace Jobs.Application.Features.CVJobRecommendation.Queries.GetRecommendationByUserId
 {
-	public class GetRecommendationsByCvQueryHandler : IQueryHandler<GetRecommendationsByCvQuery, PaginatedList<CVJobRecommendationResponse>>
+	public class GetRecommendationByUserIdQueryHandler : IQueryHandler<GetRecommendationByUserIdQuery, PaginatedList<CVJobRecommendationResponse>>
 	{
 		private readonly IUnitOfWork _unitOfWork;
 
-		public GetRecommendationsByCvQueryHandler(IUnitOfWork unitOfWork)
+		public GetRecommendationByUserIdQueryHandler(IUnitOfWork unitOfWork)
 		{
 			_unitOfWork = unitOfWork;
 		}
 
 		public async Task<Result<PaginatedList<CVJobRecommendationResponse>>> Handle(
-			GetRecommendationsByCvQuery request, CancellationToken cancellationToken)
+			GetRecommendationByUserIdQuery request, CancellationToken cancellationToken)
 		{
-			var cvExists = await _unitOfWork.CVs.ExistsAsync(x => x.Id == request.CvId);
-			if (!cvExists)
-				return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("CV not found.");
+			var user = await _unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken);
+			if (user is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("NotFound");
+			if (user.CVId is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("User does not have a CV.");
+
+			//var cv = await _unitOfWork.CVs.GetByIdAsync(user.CVId, cancellationToken);
+			//if (cv is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("CV not found.");
 
 			var spec = new GetRecommendationsByCvSpecification(
-				request.CvId, request.Page, request.PageSize, request.OnlyActive);
+				user.CVId, request.Page, request.PageSize);
 
 			var Count = await _unitOfWork.CVJobRecommendations.CountAsync(spec);
 

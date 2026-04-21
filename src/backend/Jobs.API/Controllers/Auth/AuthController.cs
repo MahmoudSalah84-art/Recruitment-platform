@@ -4,9 +4,9 @@ using Jobs.Application.Features.Identity.Command.ChangePassword;
 using Jobs.Application.Features.Identity.Command.ConfirmEmail;
 using Jobs.Application.Features.Identity.Command.ForgotPassword;
 using Jobs.Application.Features.Identity.Command.GenerateEmailConfirmationToken;
+using Jobs.Application.Features.Identity.Command.Login;
 using Jobs.Application.Features.Identity.Command.RefreshToken;
 using Jobs.Application.Features.Identity.Command.ResetPassword;
-using Jobs.Application.Features.Users.Commands.Login;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -105,7 +105,7 @@ namespace Jobs.API.Controllers.Auth
 
 
 
-		// POST api/User/login
+		// POST http://localhost:5000/api/User/login
 		[HttpPost("login")]
 		public async Task<IActionResult> Login(LoginCommand command)
 		{

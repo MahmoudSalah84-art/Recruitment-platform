@@ -16,7 +16,7 @@ namespace Jobs.API.Controllers.CVs
 		// POST /api/UserProfile/CreateOrUpdate
 		[HttpPost()]
 		[Authorize(Policy = Permissions.CVs_Upload)]
-		public async Task<IActionResult> CreateOrUpdate(CreateOrUpdateResumeDto command)
+		public async Task<IActionResult> CreateOrUpdate(CreateOrUpdateFileDto command)
 		{
 
 			string seekerId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;

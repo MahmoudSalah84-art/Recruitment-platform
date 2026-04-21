@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Jobs.API.DTOs
 {
-	public class CreateOrUpdateResumeDto : IRequest<Result<object>>
+	public class CreateOrUpdateFileDto : IRequest<Result<object>>
 	{
 		public string UserId { get; set; }
 		public IFormFile File { get; set; }

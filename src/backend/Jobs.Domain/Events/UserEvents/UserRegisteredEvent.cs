@@ -6,9 +6,8 @@ namespace Jobs.Domain.Events.Events
 
 	public record UserRegisteredEvent : DomainEvent
 	{
-		public UserRegisteredEvent(string UserId)
+		public UserRegisteredEvent(string UserId) : base(UserId)
 		{
-			Id = UserId;
 		}
 	}
 

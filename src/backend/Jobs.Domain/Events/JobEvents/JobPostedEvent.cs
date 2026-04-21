@@ -10,9 +10,8 @@ namespace Jobs.Domain.Events.JobEvents
 
 	public record JobPostedEvent : DomainEvent
 	{
-		public JobPostedEvent(string JobId)
+		public JobPostedEvent(string JobId) : base(JobId)
 		{
-			Id = JobId;
 		}
 	}
 }

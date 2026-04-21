@@ -1,5 +1,6 @@
 ﻿using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
+using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
 using Microsoft.Extensions.Logging;
 using CVJobRecommendationEntity = Jobs.Domain.Entities.CVJobRecommendation;
@@ -31,11 +32,11 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
 				return Result<string>.Failure(" not found.");
 			}
-			//if (!job.IsPublished)
-			//{
-			//	_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
-			//	return Result<string>.Failure("Cannot recommend an unpublished job.");
-			//}
+			if (!job.IsPublished)
+			{
+				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
+				return Result<string>.Failure("Cannot recommend an unpublished job.");
+			}
 
 			if (job.IsExpired)
 			{
@@ -53,25 +54,25 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 
 			_logger.LogInformation("Scoring {Count} CVs for Job {JobId}...", cvs.Count, request.JobId);
 
-			// Await all file-stream tasks and produce the required List<(string CvId, Stream CvPdf)>
-			var cvStreamsArray = await Task.WhenAll(
-				cvs.Select(async cv => (CvId: cv.Id, CvPdf: await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value)))
-			);
+			var recommendations = new List<CVJobRecommendationEntity>();
 
-			var cvStreams = cvStreamsArray.ToList();
+			foreach (var cv in cvs)
+			{
+				//// reset stream position لكل request
+				//cv.FileStream.Seek(0, SeekOrigin.Begin);
 
-			var results = await _aiScoringService.RankCandidatesAsync(
-								cvStreams,
-								job.Description,
-								cancellationToken);
+				var fileStream = await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value);
 
-			// احفظ الـ recommendations
-			var recommendations = results.Select(result => new
-				CVJobRecommendationEntity(
-					cvId: result.CvId,
+				var result = await _aiScoringService.MatchJobAsync(
+					fileStream,
+					job.Description + " " + job.Requirements,
+					cancellationToken);
+
+				recommendations.Add(new CVJobRecommendationEntity(
+					cvId: cv.Id,
 					jobId: job.Id,
-					score: result.MatchScore))
-				.ToList();
+					score: (int)result.MatchScore));
+			}
 
 			await _unitOfWork.CVJobRecommendations.AddRangeAsync(recommendations);
 

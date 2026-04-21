@@ -5,9 +5,8 @@ namespace Jobs.Domain.Events.ApplicationEvents
 
 	public record WithdrewApplicationDomainEvent : DomainEvent
 	{
-		public WithdrewApplicationDomainEvent(string ApplicationId)
+		public WithdrewApplicationDomainEvent(string ApplicationId) : base(ApplicationId)
 		{
-			Id = ApplicationId;
 		}
 	}
 }

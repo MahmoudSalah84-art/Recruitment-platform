@@ -48,7 +48,3 @@ namespace Jobs.API.Controllers.Users
 //GET,/api/UserApplications/{id},جلب تفاصيل طلب توظيف معين ومتابعة الـ Feedback عليه.
 //POST,/api/UserApplications/{jobId},التقديم على وظيفة جديدة باستخدام الـ JobId.
 //DELETE,/api/UserApplications/{id},سحب طلب التقديم (Withdraw Application).
-
-////GET / api / users / me / applications
-////POST / api / jobs /{ jobId}/ apply
-////DELETE / api / users / me / applications /{ id}

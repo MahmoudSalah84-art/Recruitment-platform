@@ -10,9 +10,8 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 
 	public record CVRecommendationDeactivatedEvent : DomainEvent
 	{
-		public CVRecommendationDeactivatedEvent(string RecommendationId)
+		public CVRecommendationDeactivatedEvent(string RecommendationId) : base(RecommendationId)
 		{
-			Id = RecommendationId;
 		}
 	}
 }

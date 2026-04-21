@@ -73,7 +73,7 @@ namespace Jobs.API.Controllers.Jobs
 			return NoContent();
 		}
 
-		// POST: api/jobs/{id}/publish
+		// POST: http://localhost:5077//api/jobs/{id}/publish
 		[HttpPost("{id}/publish")]
 		public async Task<IActionResult> PublishJob(string id)
 		{

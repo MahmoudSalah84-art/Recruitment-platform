@@ -1,5 +1,6 @@
 ﻿
 using Jobs.Application.Abstractions.Messaging;
+using Jobs.Application.Common.DTOs;
 
 namespace Jobs.Application.Features.Users.Commands.UpdateUserProfile
 {
@@ -11,4 +12,5 @@ namespace Jobs.Application.Features.Users.Commands.UpdateUserProfile
 		public string? Bio { get; set; }
 		public string? ProfilePictureUrl { get; set; }
 	}
+
 }

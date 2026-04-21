@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Jobs.Application.Features.Jobs.EventHandlers
 {
-	public sealed class JobPostedDomainEventHandler : INotificationHandler<JobCreatedEvent>
+	public sealed class JobPostedDomainEventHandler : INotificationHandler<JobPostedEvent>
 	{
 		private readonly ISender _sender;
 
@@ -15,7 +15,7 @@ namespace Jobs.Application.Features.Jobs.EventHandlers
 			_sender = sender;
 		}
 
-		public async Task Handle(JobCreatedEvent notification, CancellationToken cancellationToken)
+		public async Task Handle(JobPostedEvent notification, CancellationToken cancellationToken)
 		{
 			await _sender.Send(
 				new CreateCVJobRecommendationCommand_job(notification.Id),

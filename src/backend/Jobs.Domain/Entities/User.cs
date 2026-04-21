@@ -1,11 +1,6 @@
 ﻿using Jobs.Domain.Common;
-using Jobs.Domain.Enums;
 using Jobs.Domain.Events.Events;
-using Jobs.Domain.Events.UserEvents;
 using Jobs.Domain.Exceptions;
-using Jobs.Domain.Rules;
-using Jobs.Domain.Rules.UserRules;
-using Jobs.Domain.ValueObjects;
 
 namespace Jobs.Domain.Entities
 {
@@ -25,6 +20,7 @@ namespace Jobs.Domain.Entities
 		private readonly List<UserSkill> _skills = new();
 		public IReadOnlyCollection<UserSkill> Skills => _skills.AsReadOnly();
 
+		public string? CVId { get; private set; }
 		public CV CV { get; private set; }
 
 

@@ -9,10 +9,8 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 
 	public record CvUploadedEvent : DomainEvent
 	{
-		public CvUploadedEvent(string UserId)
+		public CvUploadedEvent(string Id) : base(Id)
 		{
-			Id = UserId;
 		}
 	}
-
 }

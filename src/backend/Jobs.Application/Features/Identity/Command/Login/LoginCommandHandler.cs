@@ -2,7 +2,7 @@
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Common.DTOs;
 
-namespace Jobs.Application.Features.Users.Commands.Login
+namespace Jobs.Application.Features.Identity.Command.Login
 {
 	public class LoginCommandHandler : ICommandHandler<LoginCommand, AuthResponse>
 	{

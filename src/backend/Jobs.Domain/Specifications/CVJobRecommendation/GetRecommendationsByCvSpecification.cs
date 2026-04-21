@@ -5,7 +5,7 @@ namespace Jobs.Domain.Specifications.CVJobRecommendation
 	public class GetRecommendationsByCvSpecification : BaseSpecifications<global::Jobs.Domain.Entities.CVJobRecommendation>
 	{
 
-		public GetRecommendationsByCvSpecification(string CvId,bool OnlyActive, int PageNumber, int PageSize)
+		public GetRecommendationsByCvSpecification(string CvId, int PageNumber, int PageSize, bool OnlyActive = true)
 			: base(j =>
 			(j.CvId == CvId && j.IsActive == OnlyActive) )
 		{

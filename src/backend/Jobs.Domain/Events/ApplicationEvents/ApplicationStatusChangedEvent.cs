@@ -7,9 +7,8 @@ namespace Jobs.Domain.Events.ApplicationEvents
 
 	public record ApplicationStatusChangedEvent : DomainEvent
 	{
-		public ApplicationStatusChangedEvent(string ApplicationId)
+		public ApplicationStatusChangedEvent(string ApplicationId) : base(ApplicationId)
 		{
-			Id = ApplicationId;
 		}
 	}
 }

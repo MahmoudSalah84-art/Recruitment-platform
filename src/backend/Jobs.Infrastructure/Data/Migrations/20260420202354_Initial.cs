@@ -68,6 +68,37 @@ namespace Jobs.Infrastructure.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Jobs",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    CompanyId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EmploymentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    ExperienceLevel = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    SalaryMin = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    SalaryMax = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    IsPublished = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Jobs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Jobs_Companies_CompanyId",
+                        column: x => x.CompanyId,
+                        principalTable: "Companies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -77,6 +108,7 @@ namespace Jobs.Infrastructure.Data.Migrations
                     ProfilePictureUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false, defaultValue: ""),
                     Bio = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false, defaultValue: ""),
                     CompanyId = table.Column<string>(type: "nvarchar(36)", nullable: true),
+                    CVId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -91,6 +123,35 @@ namespace Jobs.Infrastructure.Data.Migrations
                         principalTable: "Companies",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JobSkills",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    JobId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    SkillId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JobSkills", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_JobSkills_Jobs_JobId",
+                        column: x => x.JobId,
+                        principalTable: "Jobs",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JobSkills_Skills_SkillId",
+                        column: x => x.SkillId,
+                        principalTable: "Skills",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -117,44 +178,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Jobs",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
-                    CompanyId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
-                    HrId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Requirements = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EmploymentType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    ExperienceLevel = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    SalaryMin = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    SalaryMax = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    IsPublished = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Jobs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Jobs_Companies_CompanyId",
-                        column: x => x.CompanyId,
-                        principalTable: "Companies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Jobs_Users_HrId",
-                        column: x => x.HrId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -257,35 +280,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "JobSkills",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
-                    JobId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
-                    SkillId = table.Column<string>(type: "nvarchar(36)", maxLength: 36, nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_JobSkills", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_JobSkills_Jobs_JobId",
-                        column: x => x.JobId,
-                        principalTable: "Jobs",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_JobSkills_Skills_SkillId",
-                        column: x => x.SkillId,
-                        principalTable: "Skills",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_Companies_Industry",
                 table: "Companies",
@@ -355,11 +349,6 @@ namespace Jobs.Infrastructure.Data.Migrations
                 name: "IX_Jobs_ExpirationDate",
                 table: "Jobs",
                 column: "ExpirationDate");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Jobs_HrId",
-                table: "Jobs",
-                column: "HrId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Jobs_IsPublished",

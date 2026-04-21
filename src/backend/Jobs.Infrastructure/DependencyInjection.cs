@@ -56,8 +56,9 @@ namespace Jobs.Infrastructure
 			services.AddScoped<IApplicationRepository, ApplicationRepository>();
 			services.AddScoped<ICVRepository, CVRepository>();
 			services.AddScoped<ISkillRepository, SkillRepository>();
+			services.AddScoped<ICVJobRecommendationRepository, CVJobRecommendationRepository>();
 
-			
+
 
 			// Unit of Work
 			services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -92,16 +93,14 @@ namespace Jobs.Infrastructure
 			});
 			
 			// Background Service
-			//services.AddHostedService<OutboxProcessor>();
+			services.AddHostedService<OutboxProcessor>();
 
 			// Infrastructure/DependencyInjection.cs
 			services.AddHttpClient<IAiScoringService, AiScoringService>(client =>
 			{
-				client.BaseAddress = new Uri(configuration["AiService:BaseUrl"]!);
-				client.Timeout = TimeSpan.FromMinutes(5); // AI calls ممكن تاخد وقت
+				client.BaseAddress = new Uri("https://jeanne-unaddled-shawnee.ngrok-free.dev");
+				//client.DefaultRequestHeaders.Add("ngrok-skip-browser-warning", "true"); // ← مهم
 			});
-
-
 
 
 			// Email Settings

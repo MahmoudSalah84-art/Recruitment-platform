@@ -9,9 +9,8 @@ namespace Jobs.Domain.Events.Skills_Events
 
 	public record UserSkillAddedEvent : DomainEvent
 	{
-		public UserSkillAddedEvent(string UserSkillId)
+		public UserSkillAddedEvent(string UserSkillId) : base(UserSkillId)
 		{
-			Id = UserSkillId;
 		}
 	}
 }

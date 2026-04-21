@@ -6,23 +6,19 @@ using CVJobRecommendationEntity = Jobs.Domain.Entities.CVJobRecommendation;
 
 namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecommendation
 {
-	public sealed class ScoreJobsForCvCommandHandler_cv : ICommandHandler<CreateCVJobRecommendationCommand_cv>
+	public sealed class CreateCVJobRecommendationCommandHandler_cv : ICommandHandler<CreateCVJobRecommendationCommand_cv>
 	{
-		private readonly IJobRepository _jobRepository;
 		private readonly IAiScoringService _aiScoringService;
 		private readonly IUnitOfWork _unitOfWork;
-		private readonly ILogger<ScoreJobsForCvCommandHandler_cv> _logger;
+		private readonly ILogger<CreateCVJobRecommendationCommandHandler_cv> _logger;
 		private readonly IFileService _fileService;
 
-
-		public ScoreJobsForCvCommandHandler_cv(
-			IJobRepository jobRepository,
+		public CreateCVJobRecommendationCommandHandler_cv(
 			IAiScoringService aiScoringService,
 			IUnitOfWork unitOfWork,
-			ILogger<ScoreJobsForCvCommandHandler_cv> logger,
+			ILogger<CreateCVJobRecommendationCommandHandler_cv> logger,
 			IFileService fileService)
 		{
-			_jobRepository = jobRepository;
 			_aiScoringService = aiScoringService;
 			_unitOfWork = unitOfWork;
 			_logger = logger;
@@ -52,23 +48,21 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			_logger.LogInformation( "Scoring CV {CvId} against {Count} jobs...", cv.Id, jobs.Count());
 
 			var recommendations = new List<CVJobRecommendationEntity>();
-
+			var fileStream = await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value);
 			foreach (var job in jobs)
 			{
 				//// reset stream position لكل request
 				//cv.FileStream.Seek(0, SeekOrigin.Begin);
 
-				var fileStream = await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value);
-
 				var result = await _aiScoringService.MatchJobAsync(
 					fileStream,
-					job.Description + " " + job.Requirements,
+					job.Description + " " + job.Requirements ,
 					cancellationToken);
 
 				recommendations.Add(new CVJobRecommendationEntity(
 					cvId: cv.Id,
 					jobId: job.Id,
-					score: result.MatchScore));
+					score: (int)result.MatchScore));
 			}
 
 			await _unitOfWork.CVJobRecommendations.AddRangeAsync(recommendations, cancellationToken);
