@@ -25,6 +25,7 @@ namespace Jobs.Application.Features.Jobs.Commands.UnpublishJob
 				return Result.Failure("Job not found.");
 
 			job.Unpublish();
+			
 
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -2,5 +2,5 @@
 
 namespace Jobs.Application.Features.Applications.Commands.WithdrawApplication
 {
-	public record WithdrawApplicationCommand(String ApplicationId) : ICommand;
+	public record WithdrawApplicationCommand(string ApplicantId,string ApplicationId) : ICommand;
 }

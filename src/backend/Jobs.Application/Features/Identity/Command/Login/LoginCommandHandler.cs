@@ -10,6 +10,6 @@ namespace Jobs.Application.Features.Identity.Command.Login
 		public LoginCommandHandler(IIdentityService svc) => _svc = svc;
 
 		public async Task<Result<AuthResponse>> Handle(LoginCommand cmd, CancellationToken ct)
-			=> await _svc.LoginAsync(new LoginRequest(cmd.Email, cmd.Password));
+			=> await _svc.LoginAsync( cmd.Email, cmd.Password);
 	}
 }

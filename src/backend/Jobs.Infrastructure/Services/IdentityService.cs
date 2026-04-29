@@ -1,7 +1,9 @@
-﻿using Jobs.Application.Abstractions.Interfaces;
+﻿using Google.Apis.Auth;
+using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Common.DTOs;
 using Jobs.Application.Common.Interfaces;
+using Jobs.Domain.ValueObjects;
 using Jobs.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -58,15 +60,51 @@ namespace Jobs.Infrastructure.Services
 			return await BuildAuthAsync(user);
 		}
 		// ── Login ─────────────────────────────────────────────────────────────────
-		public async Task<Result<AuthResponse>> LoginAsync(LoginRequest req)
+		public async Task<Result<AuthResponse>> LoginAsync(string Email, string Password)
 		{
-			var user = await _userManager.FindByEmailAsync(req.Email);
+			var user = await _userManager.FindByEmailAsync(Email);
 			if (user == null || !user.IsActive) return 
-					Result<AuthResponse>.Failure("Invalid credentials.");
+					Result<AuthResponse>.Failure("Email or password is incorrect.");
 
-			if (!await _userManager.CheckPasswordAsync(user, req.Password)) 
-				return Result<AuthResponse>.Failure("Invalid credentials.");
+			if (!await _userManager.CheckPasswordAsync(user, Password)) 
+				return Result<AuthResponse>.Failure("Email or password is incorrect.");
 
+			return await BuildAuthAsync(user);
+		}
+
+		public async Task<Result<AuthResponse>> LoginWithGoogleAsync(string idToken)
+		{
+			GoogleJsonWebSignature.Payload payload;
+
+			try
+			{
+				// 1. Validate token with Google
+				payload = await GoogleJsonWebSignature.ValidateAsync(idToken);
+			}
+			catch (Exception)
+			{
+				return Result<AuthResponse>.Failure("Invalid Google token.");
+			}
+
+			// 2. Check email existence
+			if (string.IsNullOrEmpty(payload.Email))
+			{
+				return Result<AuthResponse>.Failure("Email not found in token.");
+			}
+
+			//if (!payload.EmailVerified)
+			//{
+			//	return Result<AuthResponse>.Failure("Email is not verified.");
+			//}
+
+			// 4. Check user in system
+			var user = await _userManager.FindByEmailAsync(payload.Email);
+			if (user == null)
+			{
+				return Result<AuthResponse>.Failure("User not found.");
+			}
+
+			// 5. Generate auth response
 			return await BuildAuthAsync(user);
 		}
 		// ── Refresh Token ─────────────────────────────────────────────────────────
@@ -95,16 +133,18 @@ namespace Jobs.Infrastructure.Services
 		}
 
 		// ── Revoke Token ──────────────────────────────────────────────────────────
-		public async Task<Result> RevokeRefreshTokenAsync(string refreshToken)
+		public async Task<Result> RevokeRefreshTokenAsync(string UserId)
 		{
-			var token = await _context.RefreshTokens.FirstOrDefaultAsync(t => t.TokenHash == refreshToken);
-			if (token == null) return Result.Failure("Token not found.");
-			if (!token.IsActive) return Result.Failure("Token already inactive.");
+			var token = await _context.RefreshTokens
+				.FirstOrDefaultAsync(t => t.UserId == UserId && !t.IsRevoked);
+
+			if (token == null)
+				return Result.Failure("No active refresh token found.");
 
 			token.IsRevoked = true;
 
-			_context.RefreshTokens.Update(token);
 			await _context.SaveChangesAsync();
+
 			return Result.Success();
 		}
 

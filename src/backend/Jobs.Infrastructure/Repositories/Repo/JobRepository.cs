@@ -19,7 +19,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		public async Task<Job?> GetByIdWithSkillsAsync(string id, CancellationToken ct = default)
 		{
 			return await _set
-				.AsNoTracking()
+				//.AsNoTracking()
 				.Include(j => j.RequiredSkills)
 				.ThenInclude(js => js.Skill)
 				.FirstOrDefaultAsync(j => j.Id == id, ct);
@@ -29,7 +29,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		{
 			return await _set
 				.AsNoTracking()
-				//.Where(j => j.IsPublished && (j.ExpirationDate == null || j.ExpirationDate > DateTime.UtcNow))
+				.Where(j => j.IsPublished && (j.ExpirationDate == null || j.ExpirationDate > DateTime.UtcNow))
 				.ToListAsync(ct);
 		}
 	}

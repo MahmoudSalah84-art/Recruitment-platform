@@ -8,7 +8,6 @@ namespace Jobs.Application.Features.Applications.Commands.SubmitApplication
 		{
 			RuleFor(x => x.ApplicantId).NotEmpty();
 			RuleFor(x => x.JobId).NotEmpty();
-			RuleFor(x => x.MatchScore).InclusiveBetween(0, 100);
 		}
 	}
 }

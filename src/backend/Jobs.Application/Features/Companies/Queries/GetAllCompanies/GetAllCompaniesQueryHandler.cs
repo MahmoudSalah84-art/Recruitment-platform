@@ -33,7 +33,6 @@ namespace Jobs.Application.Features.Companies.Queries.GetAllCompanies
 
 			var response = result
 				.Select(c => new CompanyResponse(
-					c.Id,
 					c.Name,
 					c.Industry,
 					c.CompanyAddress.Street,

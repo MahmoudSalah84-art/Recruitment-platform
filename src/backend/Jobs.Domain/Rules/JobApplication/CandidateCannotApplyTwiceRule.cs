@@ -4,21 +4,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Jobs.Domain.Rules.UserRules
+namespace Jobs.Domain.Rules.JobApplication
 {
 	public class CandidateCannotApplyTwiceRule : IBusinessRule
 	{
-		private readonly User _candidate;
-		private readonly string _jobId;
+		private readonly User _user;
+		private readonly Job _job;
 
-		public CandidateCannotApplyTwiceRule(User candidate, string jobId)
+		public CandidateCannotApplyTwiceRule(User user, Job jobId)
 		{
-			_candidate = candidate ;
-			_jobId = jobId;
+			_user = user;
+			_job = jobId;
 		}
 
 		public bool IsBroken() =>
-			_candidate.Applications.Any(a => a.JobId == _jobId);
+			_user.Applications.Any(a => a.JobId == _job.Id);
 		public string Message => 
 			"Candidate has already applied to this job.";
 	}

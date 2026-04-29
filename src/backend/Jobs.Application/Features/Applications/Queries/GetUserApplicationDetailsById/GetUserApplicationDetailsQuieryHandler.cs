@@ -26,13 +26,18 @@ namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 				CvId: a.CvId,
 				MatchScore: a.MatchScore,
 				Status: a.Status.ToString(),
+				CompanyId: a.Job.Company.Id,
 				CompanyName: a.Job.Company.Name
 			))
 			.FirstOrDefault();
 
-
 			if (dto is null)
 				return Result<GetUserApplicationDetailsDTO>.Failure( "Application not found.");
+			// Ensure that the requesting user is either the applicant or the company to which the job was posted
+			if (dto.ApplicantId != request.CompanyId || dto.CompanyId != request.CompanyId)
+				return Result<GetUserApplicationDetailsDTO>.Failure("Unauthorized access.");
+
+
 
 			return Result<GetUserApplicationDetailsDTO>.Success(dto);
 		}

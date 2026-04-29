@@ -21,8 +21,8 @@ namespace Jobs.Application.Features.Applications.Commands.WithdrawApplication
 			if (application is null)
 				return Result.Failure("Application not found.");
 
-			//if (application.ApplicantId != userId)
-			//	return Result<Unit>.Failure("you don't have athourization for this application.");
+			if (application.ApplicantId != request.ApplicantId)
+				return Result.Failure("you don't have athourization for this application.");
 
 			if (application.Status != ApplicationStatus.Pending)
 				return Result.Failure("Cannot withdraw an application that has already been processed.");

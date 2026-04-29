@@ -2,7 +2,6 @@
 using Jobs.Domain.Exceptions;
 using Jobs.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Model;
 
 namespace Jobs.API.Middlewares
 {

@@ -2,5 +2,5 @@
 
 namespace Jobs.Application.Features.Skills.Commands.DeleteUserSkill
 {
-	public record DeleteUserSkillCommand(string Id) : ICommand;
+	public record DeleteUserSkillCommand(string SeekerId, string SkillId) : ICommand;
 }

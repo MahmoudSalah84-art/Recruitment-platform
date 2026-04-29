@@ -1,0 +1,957 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jobs.API</name>
+    </assembly>
+    <members>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.RefreshToken(Jobs.Application.Features.Identity.Command.RefreshToken.RefreshTokenCommand)">
+            <summary>
+            Refreshes the authentication tokens using a valid refresh token.
+            </summary>
+            <param name="command">The refresh token request containing the refresh token.</param>
+            <returns>
+            Returns a new access token (and optionally a new refresh token).
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - Uses CQRS pattern via RefreshTokenCommand.
+            - Typically used when the access token has expired.
+            </remarks>
+            <response code="200">Tokens refreshed successfully.</response>
+            <response code="400">Invalid or expired refresh token.</response>
+            <response code="401">Unauthorized - refresh token is missing or invalid.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.Logout">
+            <summary>
+            Logs out the currently authenticated user by clearing authentication cookies.
+            </summary>
+            <returns>
+            Returns a success response after clearing authentication tokens.
+            </returns>
+            <remarks>
+            - Clears access token and refresh token cookies.
+            - Works with cookie-based JWT authentication.
+            - After logout, user must re-authenticate to access secured endpoints.
+            </remarks>
+            <response code="200">Logged out successfully.</response>
+            <response code="401">User is not authenticated.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.ConfirmEmail(System.String)">
+            <summary>
+            Confirms a user's email address using a verification token.
+            </summary>
+            <param name="token">The email confirmation token sent to the user.</param>
+            <returns>
+            Returns the result of the email confirmation operation.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - The confirmation is performed using CQRS via ConfirmEmailCommand.
+            - Typically invoked via a link sent to the user's email.
+            </remarks>
+            <response code="200">Email confirmed successfully.</response>
+            <response code="400">Invalid or expired confirmation token.</response>
+            <response code="404">User not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.GenerateEmailConfirmationToken(System.String)">
+            <summary>
+            Generates an email confirmation token for a specific user.
+            </summary>
+            <param name="userId">The unique identifier of the user.</param>
+            <returns>
+            Returns a generated email confirmation token.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - Uses CQRS pattern via GenerateEmailConfirmationTokenCommand.
+            - The token is typically sent to the user's email for verification.
+            </remarks>
+            <response code="200">Token generated successfully.</response>
+            <response code="400">Invalid user ID supplied.</response>
+            <response code="404">User not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.ForgotPassword(Jobs.Application.Features.Identity.Command.ForgotPassword.ForgotPasswordCommand)">
+            <summary>
+            Initiates the password reset process for a user.
+            </summary>
+            <param name="command">The forgot password request containing the user's email.</param>
+            <returns>
+            Returns a response indicating whether the password reset process was initiated successfully.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - Uses CQRS pattern via ForgotPasswordCommand.
+            - If the email exists, a password reset token is generated and sent to the user's email.
+            - For security reasons, the response should not reveal whether the email exists or not.
+            </remarks>
+            <response code="200">Request processed successfully (check email if it exists).</response>
+            <response code="400">Invalid request data.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.ResetPassword(Jobs.Application.Features.Identity.Command.ResetPassword.ResetPasswordCommand)">
+            <summary>
+            Resets the user's password using a valid reset token.
+            </summary>
+            <param name="command">The reset password request containing user email, reset token, and new password.</param>
+            <returns>
+            Returns the result of the password reset operation.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - Uses CQRS pattern via ResetPasswordCommand.
+            - The reset token must be valid, unexpired, and unused.
+            - After successful reset, the token becomes invalid.
+            </remarks>
+            <response code="200">Password reset successfully.</response>
+            <response code="400">Invalid request or expired token.</response>
+            <response code="404">User not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.ChangePassword(System.String,System.String)">
+            <summary>
+            Changes the password for the currently authenticated user.
+            </summary>
+            <param name="currentPassword">The user's current password.</param>
+            <param name="newPassword">The new password to be set.</param>
+            <returns>
+            Returns the result of the password change operation.
+            </returns>
+            <remarks>
+            - This endpoint requires authentication.
+            - Uses CQRS pattern via ChangePasswordCommand.
+            - The current password must be correct before allowing the change.
+            </remarks>
+            <response code="200">Password changed successfully.</response>
+            <response code="400">Invalid input or new password does not meet requirements.</response>
+            <response code="401">Unauthorized or incorrect current password.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.Login(Jobs.Application.Features.Identity.Command.Login.LoginCommand)">
+            <summary>
+            Authenticates a user and issues access and refresh tokens.
+            </summary>
+            <param name="command">The login credentials (email/username and password).</param>
+            <returns>
+            Returns authentication tokens and user information upon successful login.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible.
+            - Uses CQRS pattern via LoginCommand.
+            - On successful authentication, access and refresh tokens are stored in HttpOnly cookies.
+            - Access token is short-lived, while refresh token is used to renew sessions.
+            </remarks>
+            <response code="200">Login successful.</response>
+            <response code="400">Invalid credentials or request data.</response>
+            <response code="401">Unauthorized - incorrect email or password.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Auth.ExternalAuthController.GoogleLogin(Jobs.API.Controllers.Auth.ExternalAuthController.GoogleLoginRequest)">
+             <summary>
+             Authenticates a user using a Google ID Token.
+             </summary>
+             <remarks>
+             Flow:
+             1. Receives an ID Token from the client (generated after Google Sign-In).
+             2. Sends the token to the application layer (GoogleLoginCommand) to validate it with Google.
+             3. If the token is valid:
+                - Authenticates or retrieves the user from the system.
+                - Generates Access Token and Refresh Token.
+             4. Stores the tokens in HttpOnly cookies for secure usage.
+            
+             Cookies:
+             - accessToken:
+               Used to authenticate API requests. Short-lived.
+             - refreshToken:
+               Used to obtain new access tokens. Longer-lived (7 days).
+            
+             Security Notes:
+             - HttpOnly: Prevents access via JavaScript (protects against XSS).
+             - SameSite=Strict: Prevents sending cookies in cross-site requests.
+             - Secure=false: Should be set to true in production (HTTPS only).
+             </remarks>
+             <param name="request">
+             Contains the Google ID Token received from the frontend.
+             </param>
+             <returns>
+             Returns the result of the operation (success or failure) with token data if successful.
+             </returns>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompaniesController.GetAllCompanies(System.Int32,System.Int32,System.String,System.String)">
+            <summary>
+            Retrieves a paginated list of companies with optional filtering.
+            </summary>
+            <param name="page">Page number (default is 1).</param>
+            <param name="pageSize">Number of records per page (default is 10).</param>
+            <param name="name">Optional filter by company name.</param>
+            <param name="industry">Optional filter by industry.</param>
+            <returns>
+            Returns a paginated list of companies based on the provided filters.
+            </returns>
+            <remarks>
+            Requires Companies_View permission.
+            </remarks>
+            <response code="200">Companies retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompaniesController.GetCompanyById(System.String)">
+            <summary>
+            Retrieves a specific company by its unique identifier.
+            </summary>
+            <param name="companyid">The unique identifier of the company.</param>
+            <returns>
+            Returns the company details if found.
+            </returns>
+            <remarks>
+            Requires Companies_View permission.
+            </remarks>
+            <response code="200">Company retrieved successfully.</response>
+            <response code="400">Invalid company ID supplied.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Company not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompaniesController.RegisterCompany(Jobs.Application.Features.Companies.Command.Register.RegisterCompanyCommand)">
+            <summary>
+            Registers a new company account.
+            </summary>
+            <param name="command">The company registration data.</param>
+            <returns>
+            Returns authentication tokens and company details upon successful registration.
+            </returns>
+            <remarks>
+            This endpoint creates a new company account and issues authentication tokens.
+            Access and refresh tokens are stored securely in HttpOnly cookies.
+            </remarks>
+            <response code="200">Company registered successfully.</response>
+            <response code="400">Invalid input data.</response>
+            <response code="409">Company already exists.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompaniesController.DeleteCompany">
+            <summary>
+            Deletes the currently authenticated company account.
+            </summary>
+            <returns>
+            Returns the result of the delete operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via DeleteCompanyCommand.
+            - Requires Companies_Delete permission.
+            </remarks>
+            <response code="200">Company deleted successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Company not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompaniesController.UpdateCompany(Jobs.Application.Features.Companies.Command.UpdateCompany.UpdateCompanyCommand)">
+            <summary>
+            Updates the currently authenticated company's information.
+            </summary>
+            <param name="command">The updated company data.</param>
+            <returns>
+            Returns the result of the update operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Ensures that the authenticated company can only update its own data.
+            - Uses CQRS pattern via UpdateCompanyCommand.
+            - Requires Companies_Update permission.
+            </remarks>
+            <response code="200">Company updated successfully.</response>
+            <response code="400">Invalid input data.</response>
+            <response code="401">Unauthorized - user is not authenticated or trying to update another company.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Company not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompanyEmployeesController.GetCompanyEmployees(System.Int32,System.Int32)">
+            <summary>
+            Retrieves a paginated list of employees for the currently authenticated company.
+            </summary>
+            <param name="page">Page number (default is 1).</param>
+            <param name="pageSize">Number of records per page (default is 10).</param>
+            <returns>
+            Returns a paginated list of employees belonging to the authenticated company.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetCompanyEmployeesQuery.
+            - Requires Companies_View permission.
+            </remarks>
+            <response code="200">Employees retrieved successfully.</response>
+            <response code="400">Invalid pagination parameters.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Company not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompanyEmployeesController.AddEmployeeToCompany(System.String)">
+            <summary>
+            Adds an employee to the currently authenticated company.
+            </summary>
+            <param name="employeeId">The unique identifier of the employee to be added.</param>
+            <returns>
+            Returns the result of the add operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via AddEmployeeCommand.
+            - Requires Companies_View permission.
+            </remarks>
+            <response code="200">Employee added to company successfully.</response>
+            <response code="400">Invalid employee ID supplied.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Employee or company not found.</response>
+            <response code="409">Employee is already assigned to the company.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompanyEmployeesController.RemoveEmployeeFromCompany(System.String)">
+            <summary>
+            Removes an employee from the currently authenticated company.
+            </summary>
+            <param name="employeeId">The unique identifier of the employee to be removed.</param>
+            <returns>
+            Returns the result of the remove operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via RemoveEmployeeCommand.
+            - Requires Companies_View permission (preferably Companies_Update or Companies_ManageEmployees).
+            </remarks>
+            <response code="200">Employee removed from company successfully.</response>
+            <response code="400">Invalid employee ID supplied.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Employee or company not found.</response>
+            <response code="409">Employee is not associated with the company.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompanyJobsController.GetJobs">
+            <summary>
+            Retrieves all jobs for the currently authenticated company.
+            </summary>
+            <returns>
+            Returns a list of jobs associated with the authenticated company.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetJobsByCompanyQuery.
+            - Requires Jobs_View permission.
+            </remarks>
+            <response code="200">Jobs retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Company not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompanyProfileController.GetProfile">
+            <summary>
+            Retrieves the profile of the currently authenticated company.
+            </summary>
+            <returns>
+            Returns the company profile information.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetCompanyProfileQuery.
+            - Requires Companies_View permission.
+            </remarks>
+            <response code="200">Company profile retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Company not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Companies.CompanyProfileController.UploadImage(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Uploads or updates the company profile image (logo).
+            </summary>
+            <param name="File">The image file to be uploaded.</param>
+            <returns>
+            Returns the result of the upload operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - The file is streamed and mapped to a FileUploadDto before processing.
+            - Uses CQRS pattern via UpdateCompanyLogoCommand.
+            - Requires Companies_Update permission.
+            </remarks>
+            <response code="200">Company image uploaded successfully.</response>
+            <response code="400">Invalid file or unsupported format.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="413">File size too large.</response>
+            <response code="415">Unsupported media type.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.CVs.CVController.CreateOrUpdate(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Uploads or updates the CV (resume) for the currently authenticated user.
+            </summary>
+            <param name="File">The CV file to be uploaded.</param>
+            <returns>
+            Returns the result of the create or update operation.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - The uploaded file is streamed and mapped to a FileUploadDto.
+            - Uses CQRS pattern via CreateOrUpdateResumeCommand.
+            - Requires CVs_Upload permission.
+            </remarks>
+            <response code="200">CV uploaded or updated successfully.</response>
+            <response code="400">Invalid file or unsupported format.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="413">File size too large.</response>
+            <response code="415">Unsupported media type.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.CVs.CVController.GetCv">
+            <summary>
+            Retrieves the CV (resume) of the currently authenticated user.
+            </summary>
+            <returns>
+            Returns the user's uploaded CV details.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetMyResumeQuery.
+            - Requires CVs_View permission.
+            </remarks>
+            <response code="200">CV retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">CV not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.JobRecomendation.JobRecomendationController.GetRecommendations(System.Int32,System.Int32)">
+            <summary>
+            Retrieves job recommendations for the currently authenticated user.
+            </summary>
+            <param name="page">Page number for pagination (default is 1).</param>
+            <param name="pageSize">Number of items per page (default is 10).</param>
+            <returns>
+            Returns a paginated list of recommended jobs for the user.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetRecommendationByUserIdQuery.
+            - Recommendations are typically based on user profile, CV, and preferences.
+            </remarks>
+            <response code="200">Recommendations retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">User not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.SearchJobs(Jobs.Application.Features.Jobs.Queries.SearchJobs.JobsWithFiltersSpecificationQuery)">
+            <summary>
+            Searches and retrieves jobs based on dynamic filters.
+            </summary>
+            <param name="query">The filtering and pagination parameters for job search.</param>
+            <returns>
+            Returns a paginated list of jobs matching the specified filters.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via JobsWithFiltersSpecificationQuery.
+            - Supports dynamic filtering (e.g., title, location, type, etc.).
+            - Typically used for job discovery and search functionality.
+            </remarks>
+            <response code="200">Jobs retrieved successfully.</response>
+            <response code="400">Invalid query parameters.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.GetJobById(System.String)">
+            <summary>
+            Retrieves a specific job by its unique identifier.
+            </summary>
+            <param name="jobid">The unique identifier of the job.</param>
+            <returns>
+            Returns the job details if found.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via GetJobByIdQuery.
+            - This endpoint is publicly accessible unless restricted at a higher level.
+            </remarks>
+            <response code="200">Job retrieved successfully.</response>
+            <response code="400">Invalid job ID supplied.</response>
+            <response code="404">Job not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.CreateJob(Jobs.Application.Features.Jobs.Commands.CreateJob.CreateJobCommand)">
+            <summary>
+            Creates a new job posting for the authenticated company.
+            </summary>
+            <param name="command">The job creation data.</param>
+            <returns>
+            Returns the created job identifier and details upon success.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via CreateJobCommand.
+            - Requires Jobs_Create permission.
+            - On success, returns a CreatedAtRoute response pointing to GetJobByJobId.
+            </remarks>
+            <response code="201">Job created successfully.</response>
+            <response code="400">Invalid input data or creation failed.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.DeleteJob(System.String)">
+            <summary>
+            Deletes a job posting belonging to the authenticated company.
+            </summary>
+            <param name="jobId">The unique identifier of the job to be deleted.</param>
+            <returns>
+            Returns the result of the delete operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Ensures that only the owning company can delete its own job postings.
+            - Uses CQRS pattern via DeleteJobCommand.
+            - Requires Jobs_Delete permission.
+            </remarks>
+            <response code="200">Job deleted successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission or not job owner.</response>
+            <response code="404">Job not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.PublishJob(System.String)">
+            <summary>
+            Publishes a job posting, making it visible to job seekers.
+            </summary>
+            <param name="id">The unique identifier of the job to be published.</param>
+            <returns>
+            Returns the result of the publish operation.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via PublishJobCommand.
+            - Typically changes the job status from Draft to Published.
+            - May trigger downstream processes such as indexing or notifications.
+            </remarks>
+            <response code="200">Job published successfully.</response>
+            <response code="400">Invalid job state or request data.</response>
+            <response code="404">Job not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.UnpublishJob(System.String)">
+            <summary>
+            Unpublishes a job posting, making it no longer visible to job seekers.
+            </summary>
+            <param name="id">The unique identifier of the job to be unpublished.</param>
+            <returns>
+            Returns the result of the unpublish operation.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via UnpublishJobCommand.
+            - Typically changes the job status from Published back to Draft or Hidden.
+            - May affect job visibility in search results and recommendations.
+            </remarks>
+            <response code="200">Job unpublished successfully.</response>
+            <response code="400">Invalid job state or request data.</response>
+            <response code="404">Job not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.UpdateJob(System.String,Jobs.Application.Features.Jobs.Commands.UpdateJob.UpdateJobCommand)">
+            <summary>
+            Updates an existing job posting.
+            </summary>
+            <param name="id">The unique identifier of the job (from route).</param>
+            <param name="command">The updated job data.</param>
+            <returns>
+            Returns the result of the update operation.
+            </returns>
+            <remarks>
+            - Ensures route ID matches the request body JobId for consistency.
+            - Uses CQRS pattern via UpdateJobCommand.
+            - Requires Jobs_Update permission.
+            </remarks>
+            <response code="200">Job updated successfully.</response>
+            <response code="400">Invalid input data or mismatched job IDs.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission.</response>
+            <response code="404">Job not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobSkillsController.GetJobSkills(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves the skills required for a specific job.
+            </summary>
+            <param name="jobId">The unique identifier of the job.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns a list of skills associated with the specified job.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via GetJobSkillsQuery.
+            - Requires Skills_View permission.
+            - Typically used to display required skills in job details.
+            </remarks>
+            <response code="200">Job skills retrieved successfully.</response>
+            <response code="400">Invalid job ID supplied.</response>
+            <response code="404">Job not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobSkillsController.AddJobSkill(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Adds a skill to a specific job posting.
+            </summary>
+            <param name="jobId">The unique identifier of the job.</param>
+            <param name="skillId">The unique identifier of the skill to be added.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns the result of the add operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via AddSkillToJobCommand.
+            - Requires Jobs_Update permission.
+            - Ensures that only the owning company can modify its job skills.
+            </remarks>
+            <response code="200">Skill added to job successfully.</response>
+            <response code="400">Invalid job or skill ID supplied.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission or not job owner.</response>
+            <response code="404">Job or skill not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Jobs.JobSkillsController.RemoveJobSkill(System.String,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Removes a skill from a specific job posting.
+            </summary>
+            <param name="jobId">The unique identifier of the job.</param>
+            <param name="skillId">The unique identifier of the skill to be removed.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns the result of the remove operation.
+            </returns>
+            <remarks>
+            - The company is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via RemoveSkillFromJobCommand.
+            - Requires Jobs_Update permission (recommended at controller or policy level).
+            - Ensures only the owning company can modify its job skills.
+            </remarks>
+            <response code="200">Skill removed from job successfully.</response>
+            <response code="400">Invalid job or skill ID supplied.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have required permission or not job owner.</response>
+            <response code="404">Job or skill not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Skills.SkillsController.GetSkills(System.Int32,System.Int32,System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a paginated list of skills with optional search filtering.
+            </summary>
+            <param name="page">Page number for pagination (default is 1).</param>
+            <param name="pageSize">Number of items per page (default is 10).</param>
+            <param name="search">Optional search term to filter skills by name.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns a paginated list of skills matching the search criteria.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - Uses CQRS pattern via GetAllSkillsQuery.
+            - Typically used for job creation or filtering job requirements.
+            </remarks>
+            <response code="200">Skills retrieved successfully.</response>
+            <response code="400">Invalid pagination or query parameters.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Skills.SkillsController.GetSkillById(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Retrieves a specific skill by its unique identifier.
+            </summary>
+            <param name="skillId">The unique identifier of the skill.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns the skill details if found.
+            </returns>
+            <remarks>
+            - This endpoint is publicly accessible (AllowAnonymous).
+            - Uses CQRS pattern via GetSkillByIdQuery.
+            - Typically used when displaying skill details or job requirements.
+            </remarks>
+            <response code="200">Skill retrieved successfully.</response>
+            <response code="400">Invalid skill ID supplied.</response>
+            <response code="404">Skill not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Skills.SkillsController.CreateSkill(Jobs.Application.Features.Skills.Commands.CreateSkill.CreateSkillCommand,System.Threading.CancellationToken)">
+            <summary>
+            Creates a new skill.
+            </summary>
+            <param name="request">The skill creation data.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns the created skill details or identifier.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via CreateSkillCommand.
+            - Typically used to add new skills to the system for job matching and profiling.
+            - Authorization policy (Skills_Create) is recommended for securing this endpoint.
+            </remarks>
+            <response code="201">Skill created successfully.</response>
+            <response code="400">Invalid input data.</response>
+            <response code="403">Forbidden - user does not have permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Skills.SkillsController.UpdateSkill(System.String,Jobs.Application.Features.Skills.Commands.RenameSkill.RenameSkillCommand,System.Threading.CancellationToken)">
+            <summary>
+            Updates (renames) an existing skill.
+            </summary>
+            <param name="skillId">The unique identifier of the skill to be updated.</param>
+            <param name="request">The rename skill request data.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns the result of the update operation.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via RenameSkillCommand.
+            - Typically used to correct or standardize skill naming.
+            - Authorization policy (Skills_Update) is recommended for securing this endpoint.
+            </remarks>
+            <response code="200">Skill updated successfully.</response>
+            <response code="400">Invalid input or skill ID mismatch.</response>
+            <response code="404">Skill not found.</response>
+            <response code="403">Forbidden - user does not have permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Skills.SkillsController.DeleteSkill(System.String,System.Threading.CancellationToken)">
+            <summary>
+            Deletes a skill from the system.
+            </summary>
+            <param name="skillId">The unique identifier of the skill to be deleted.</param>
+            <param name="cancellationToken">Token to cancel the request if needed.</param>
+            <returns>
+            Returns the result of the delete operation.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via DeleteSkillCommand.
+            - This operation should typically be restricted to admin or authorized users only.
+            - Deleting a skill may affect jobs and user profiles that reference it.
+            </remarks>
+            <response code="200">Skill deleted successfully.</response>
+            <response code="400">Invalid skill ID supplied.</response>
+            <response code="404">Skill not found.</response>
+            <response code="403">Forbidden - user does not have permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserApplicationsController.ApplyForJob(System.String)">
+            <summary>
+            Submits a job application for the currently authenticated user.
+            </summary>
+            <param name="jobId">The unique identifier of the job being applied to.</param>
+            <returns>
+            Returns the result of the job application submission.
+            </returns>
+            <remarks>
+            - The applicant is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via SubmitApplicationCommand.
+            - Requires Applications_Apply permission.
+            </remarks>
+            <response code="200">Application submitted successfully.</response>
+            <response code="400">Invalid job ID or already applied.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserApplicationsController.GetApplicationById(System.String)">
+            <summary>
+            Retrieves details of a specific job application.
+            </summary>
+            <param name="applicationId">The unique identifier of the application.</param>
+            <returns>
+            Returns detailed information about the specified application.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via GetUserApplicationDetailsQuery.
+            - Requires Applications_View permission.
+            - Access is restricted based on ownership or company role.
+            </remarks>
+            <response code="200">Application retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - access denied.</response>
+            <response code="404">Application not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserApplicationsController.GetAllApplicationsOfApplicant">
+            <summary>
+            Retrieves all job applications for the currently authenticated user.
+            </summary>
+            <returns>
+            Returns a list of the user's job applications.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetUserApplicationsQuery.
+            - Endpoint scoped to the current user (/me).
+            </remarks>
+            <response code="200">Applications retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserApplicationsController.WithdrawApplication(System.String)">
+            <summary>
+            Withdraws a previously submitted job application.
+            </summary>
+            <param name="Applicationid">The unique identifier of the application to withdraw.</param>
+            <returns>
+            Returns the result of the withdrawal operation.
+            </returns>
+            <remarks>
+            - The applicant is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via WithdrawApplicationCommand.
+            - Allows users to cancel their own job applications.
+            </remarks>
+            <response code="200">Application withdrawn successfully.</response>
+            <response code="400">Invalid application state or already processed.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user is not allowed to withdraw this application.</response>
+            <response code="404">Application not found.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserController.Register(Jobs.Application.Features.Users.Commands.Register.RegisterCommand,System.Threading.CancellationToken)">
+            <summary>
+            Registers a new user account and issues authentication tokens.
+            </summary>
+            <param name="command">The user registration data.</param>
+            <param name="ct">Cancellation token for request cancellation.</param>
+            <returns>
+            Returns authentication tokens and user details upon successful registration.
+            </returns>
+            <remarks>
+            - This endpoint creates a new user account.
+            - Uses CQRS pattern via RegisterCommand.
+            - On success, access and refresh tokens are stored in HttpOnly cookies.
+            - Access token is short-lived, refresh token is valid for longer session renewal.
+            </remarks>
+            <response code="200">User registered successfully.</response>
+            <response code="400">Invalid input data or registration failed.</response>
+            <response code="409">User already exists.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserProfileController.GetMyProfile">
+            <summary>
+            Retrieves the profile of the currently authenticated user.
+            </summary>
+            <returns>
+            Returns the user's profile information.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetUserByIdQuery.
+            - This endpoint is scoped to the currently logged-in user (/me).
+            </remarks>
+            <response code="200">User profile retrieved successfully.</response>
+            <response code="400">Failed to retrieve user profile.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserProfileController.UpdateProfile(Jobs.Application.Features.Users.Commands.UpdateUserProfile.UpdateProfileCommand)">
+            <summary>
+            Updates the profile of the currently authenticated user.
+            </summary>
+            <param name="command">The updated profile data.</param>
+            <returns>
+            Returns the result of the profile update operation.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via UpdateProfileCommand.
+            - Requires Users_Update permission.
+            - This endpoint updates personal user information (e.g. name, phone, etc.).
+            </remarks>
+            <response code="200">Profile updated successfully.</response>
+            <response code="400">Invalid input data.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have permission.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserProfileController.CreateOrUpdateUserImage(Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Uploads or updates the profile image of the currently authenticated user.
+            </summary>
+            <param name="File">The image file to be uploaded.</param>
+            <returns>
+            Returns the result of the image upload operation.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - The file is streamed and mapped to a FileUploadDto.
+            - Uses CQRS pattern via UpdateUserImageCommand.
+            - Requires Users_Update permission.
+            </remarks>
+            <response code="200">User image uploaded successfully.</response>
+            <response code="400">Invalid file or unsupported format.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - user does not have permission.</response>
+            <response code="413">File size too large.</response>
+            <response code="415">Unsupported media type.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserSkillsController.Get">
+            <summary>
+            Retrieves all skills for the currently authenticated user.
+            </summary>
+            <returns>
+            Returns a list of skills associated with the user.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via GetUserSkillsQuery.
+            </remarks>
+            <response code="200">User skills retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserSkillsController.Add(System.String)">
+            <summary>
+            Adds a skill to the currently authenticated user.
+            </summary>
+            <param name="skillid">The unique identifier of the skill to be added.</param>
+            <returns>
+            Returns the result of the add operation.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via AddUserSkillCommand.
+            - Prevents duplicate skill assignments (recommended at domain level).
+            </remarks>
+            <response code="200">Skill added successfully.</response>
+            <response code="400">Invalid or duplicate skill.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+        </member>
+        <member name="M:Jobs.API.Controllers.Users.UserSkillsController.Delete(System.String)">
+            <summary>
+            Removes a skill from the currently authenticated user.
+            </summary>
+            <param name="skillid">The unique identifier of the skill to be removed.</param>
+            <returns>
+            Returns the result of the delete operation.
+            </returns>
+            <remarks>
+            - The user is identified using the authenticated user's claims (NameIdentifier).
+            - Uses CQRS pattern via DeleteUserSkillCommand.
+            </remarks>
+            <response code="200">Skill removed successfully.</response>
+            <response code="400">Invalid skill ID.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+        </member>
+        <member name="T:Program">
+            <summary>
+            Auto-generated public partial Program class for top-level statement apps.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type)">
+            <summary>
+            Generates a documentation comment ID for a type.
+            Example: T:Namespace.Outer+Inner`1 becomes T:Namespace.Outer.Inner`1
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.PropertyInfo)">
+            <summary>
+            Generates a documentation comment ID for a property.
+            Example: P:Namespace.ContainingType.PropertyName or for an indexer P:Namespace.ContainingType.Item(System.Int32)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Type,System.String)">
+            <summary>
+            Generates a documentation comment ID for a property given its container type and property name.
+            Example: P:Namespace.ContainingType.PropertyName
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.CreateDocumentationId(System.Reflection.MethodInfo)">
+            <summary>
+            Generates a documentation comment ID for a method (or constructor).
+            For example:
+              M:Namespace.ContainingType.MethodName(ParamType1,ParamType2)~ReturnType
+              M:Namespace.ContainingType.#ctor(ParamType)
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.GetTypeDocId(System.Type,System.Boolean,System.Boolean)">
+            <summary>
+            Generates a documentation ID string for a type.
+            This method handles nested types (replacing '+' with '.'),
+            generic types, arrays, pointers, by-ref types, and generic parameters.
+            The <paramref name="includeGenericArguments"/> flag controls whether
+            constructed generic type arguments are emitted, while <paramref name="omitGenericArity"/>
+            controls whether the generic arity marker (e.g. "`1") is appended.
+            </summary>
+        </member>
+        <member name="M:Microsoft.AspNetCore.OpenApi.Generated.DocumentationCommentIdHelper.NormalizeDocId(System.String)">
+            <summary>
+            Normalizes a documentation comment ID to match the compiler-style format.
+            Strips the return type suffix for ordinary methods but retains it for conversion operators.
+            </summary>
+            <param name="docId">The documentation comment ID to normalize.</param>
+            <returns>The normalized documentation comment ID.</returns>
+        </member>
+    </members>
+</doc>

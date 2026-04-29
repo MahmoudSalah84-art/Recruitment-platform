@@ -1,7 +1,7 @@
 ﻿using Jobs.Domain.Common;
 using Jobs.Domain.Entities;
 
-namespace Jobs.Domain.Rules.UserRules
+namespace Jobs.Domain.Rules.JobApplication
 {
 	public class CannotApplyToExpiredJobRule : IBusinessRule
 	{

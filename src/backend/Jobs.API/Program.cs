@@ -5,6 +5,7 @@ using Jobs.Infrastructure;
 using Jobs.Infrastructure.Identity;
 using Jobs.Infrastructure.Identity.Seeder;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,7 +44,24 @@ builder.Services.AddCors(options =>
 
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(doc =>
+{
+	var xmlFile = Path.Combine(AppContext.BaseDirectory,"ApiDocumentation.xml");
+	doc.IncludeXmlComments(xmlFile);
+
+	doc.SwaggerDoc("v1",
+		new OpenApiInfo
+		{
+			Version = "v1",
+			Title = "Jooobs API",
+			Description = "API for managing job applications, user profiles, and related functionalities.",
+			Contact = new OpenApiContact
+			{
+				Name = "mahmoud mohamed salah"
+			}
+		});
+
+});
 
 
 var app = builder.Build();

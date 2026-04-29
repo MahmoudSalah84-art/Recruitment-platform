@@ -11,6 +11,7 @@ namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 	string? CvId,
 	int MatchScore,
 	string Status,
+	string CompanyId,
 	string CompanyName
 	);
 }

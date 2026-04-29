@@ -7,5 +7,6 @@ namespace Jobs.Domain.IRepositories
 {
 	public interface IJobSkillRepository : IRepository<JobSkill>
 	{
+		
 	}
 }

@@ -19,7 +19,6 @@ namespace Jobs.Application.Features.Companies.Queries.GetCompanyById
 				return Result<CompanyResponse>.Failure( "Company not found.");
 
 			var response = new CompanyResponse(
-				company.Id,
 				company.Name,
 				company.Industry,
 				company.CompanyAddress.Street,

@@ -5,7 +5,6 @@ using System.Text;
 namespace Jobs.Application.Features.Companies.Queries.GetCompanyById
 {
 	public record CompanyResponse(
-	string Id,
 	string Name,
 	string Industry,
 	string Street,

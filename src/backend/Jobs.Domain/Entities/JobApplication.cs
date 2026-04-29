@@ -34,27 +34,35 @@ namespace Jobs.Domain.Entities
 		// ========= Constructors =========
 		private JobApplication() { }
 
-		public JobApplication(string applicantId, string jobId, int matchScore, string? cvId = null)
+		public JobApplication(User applicant, Job job)
 		{
 
-		    //CheckRule(new CandidateCannotApplyTwiceRule(this, application.JobId));
-			//CheckRule(new CannotApplyToExpiredJobRule(application.Job));
-			CheckRule(new NotEmptyGuidRule(applicantId));
-			CheckRule(new NotEmptyGuidRule(jobId));
-			if (matchScore < 0 || matchScore > 100)
-				throw new DomainException("Match score must be between 0 and 100.");
+		    CheckRule(new CandidateCannotApplyTwiceRule(applicant, job));
+			CheckRule(new CannotApplyToExpiredJobRule(job));
+			CheckRule(new CannotApplyToUnpublishedJobRule(job));
+			CheckRule(new CannotApplyToJobWithoutCVRule(applicant));
 
-			ApplicantId = applicantId;
-			JobId = jobId;
-			MatchScore = matchScore;
-			CvId = cvId;
+			ApplicantId = applicant.Id;
+			JobId = job.Id;
+			CvId = applicant.CV?.Id;
 			Status = ApplicationStatus.Pending;
 			StatusHistory = DateTime.UtcNow;
 
-			AddEvent(new ApplicationSubmittedEvent(Id));
+			//AddEvent(new ApplicationSubmittedEvent(Id));
 		}
 
 		// ========= Behaviors =========
+
+		public void AddMatchScore(int score)
+		{
+			if (score < 0 || score > 100)
+				throw new DomainException("Match score must be between 0 and 100.");
+
+			MatchScore = score;
+			//AddEvent(new ApplicationMatchScoreUpdatedEvent(Id));
+		}
+
+
 
 		public void WithdrawApplication()
 		{

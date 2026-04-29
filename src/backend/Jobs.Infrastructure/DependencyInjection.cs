@@ -1,6 +1,7 @@
 ﻿using CloudinaryDotNet;
 using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Common.Interfaces;
+using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
 using Jobs.Infrastructure.BackgroundJobs;
 using Jobs.Infrastructure.Data;
@@ -56,8 +57,8 @@ namespace Jobs.Infrastructure
 			services.AddScoped<IApplicationRepository, ApplicationRepository>();
 			services.AddScoped<ICVRepository, CVRepository>();
 			services.AddScoped<ISkillRepository, SkillRepository>();
-			services.AddScoped<ICVJobRecommendationRepository, CVJobRecommendationRepository>();
-
+			services.AddScoped<ICVJobRecommendationRepository, CVJobRecommendationRepository>(); 
+			services.AddScoped<IUserSkillRepository, UserSkillsRepository>();
 
 
 			// Unit of Work

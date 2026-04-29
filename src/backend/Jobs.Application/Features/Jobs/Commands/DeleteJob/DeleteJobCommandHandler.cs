@@ -1,5 +1,4 @@
 ﻿using Jobs.Application.Abstractions.Messaging;
-using Jobs.Domain.Entities;
 using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Jobs.Commands.DeleteJob
@@ -19,6 +18,8 @@ namespace Jobs.Application.Features.Jobs.Commands.DeleteJob
 
 			if (job is null)
 				return Result.Failure( "Job not found.");
+			if (job.CompanyId != request.CompanyId)
+				return Result.Failure("Unauthorized to delete this job.");
 
 			_unitOfWork.Jobs.Remove(job);
 

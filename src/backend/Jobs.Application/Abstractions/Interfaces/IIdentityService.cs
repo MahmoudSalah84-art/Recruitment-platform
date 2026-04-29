@@ -8,11 +8,12 @@ namespace Jobs.Application.Abstractions.Interfaces
 	{
 		// ── Register & Login ──────────────────────────────────────────────────────
 		Task<Result<AuthResponse>> RegisterAsync(RegisterRequest req);
-		Task<Result<AuthResponse>> LoginAsync(LoginRequest req);
+		Task<Result<AuthResponse>> LoginAsync(string Email, string Password);
+		Task<Result<AuthResponse>> LoginWithGoogleAsync(string idToken);
 
 		// ── Tokens ────────────────────────────────────────────────────────────────
 		Task<Result<AuthResponse>> RefreshTokenAsync(string accessToken, string refreshToken);
-		Task<Result> RevokeRefreshTokenAsync(string refreshToken);
+		Task<Result> RevokeRefreshTokenAsync(string UserId);
 
 		// ── Roles ─────────────────────────────────────────────────────────────────
 		Task<Result> CreateRoleAsync(string Name, string Description);
@@ -55,4 +56,3 @@ namespace Jobs.Application.Abstractions.Interfaces
 //Task<Result> Verify2FAAsync(string userId, Enable2FARequest request);
 //Task<Result> Disable2FAAsync(string userId);
 //Task<Result<AuthResponse>> ExternalLoginAsync(ExternalLoginRequest request);
-//Task<Result> RevokeRefreshTokenAsync(string userId);

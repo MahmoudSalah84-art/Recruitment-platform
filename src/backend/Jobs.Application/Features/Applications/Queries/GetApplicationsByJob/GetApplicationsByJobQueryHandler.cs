@@ -16,9 +16,12 @@ namespace Jobs.Application.Features.Applications.Queries.GetApplicationsByJob
 
 		public async Task<Result<PaginatedList<UserApplicationDTO>>> Handle(GetApplicationsByJobQuery request, CancellationToken cancellationToken)
 		{
-			var jobExists = await _unitOfWork.Jobs.ExistsAsync(x => request.JobId == x.Id);
-			if (!jobExists)
+
+			var job = await _unitOfWork.Jobs.GetByIdAsync(request.JobId);
+			if (job == null)
 				return Result<PaginatedList<UserApplicationDTO>>.Failure("Job not found.");
+			if(job.CompanyId != request.companyId)
+				return Result<PaginatedList<UserApplicationDTO>>.Failure("Unauthorized access.");
 
 			var spec = new UserApplicationsWithDetailsByJobIdSpec(request.JobId, request.PageSize, request.Page);
 

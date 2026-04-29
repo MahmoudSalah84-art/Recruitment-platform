@@ -10,6 +10,6 @@ namespace Jobs.Application.Features.Identity.Command.RevokeToken
 		public RevokeTokenCommandHandler(IIdentityService svc) => _svc = svc;
 
 		public async Task<Result> Handle(RevokeTokenCommand cmd, CancellationToken ct)
-			=> await _svc.RevokeRefreshTokenAsync(cmd.RefreshToken);
+			=> await _svc.RevokeRefreshTokenAsync(cmd.UserId);
 	}
 }
