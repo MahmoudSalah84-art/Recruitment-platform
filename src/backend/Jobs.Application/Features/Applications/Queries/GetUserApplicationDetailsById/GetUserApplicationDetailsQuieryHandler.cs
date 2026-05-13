@@ -34,7 +34,7 @@ namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 			if (dto is null)
 				return Result<GetUserApplicationDetailsDTO>.Failure( "Application not found.");
 			// Ensure that the requesting user is either the applicant or the company to which the job was posted
-			if (dto.ApplicantId != request.CompanyId || dto.CompanyId != request.CompanyId)
+			if (dto.ApplicantId != request.userId || dto.CompanyId != request.userId)
 				return Result<GetUserApplicationDetailsDTO>.Failure("Unauthorized access.");
 
 

@@ -18,15 +18,15 @@ namespace Jobs.Application.Features.CVJobRecommendation.Queries.GetRecommendatio
 		public async Task<Result<PaginatedList<CVJobRecommendationResponse>>> Handle(
 			GetRecommendationByUserIdQuery request, CancellationToken cancellationToken)
 		{
-			var user = await _unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken);
-			if (user is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("NotFound");
-			if (user.CVId is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("User does not have a CV.");
+			//var user = await _unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken);
+			var cv = await _unitOfWork.CVs.GetByUserIdAsync(request.UserId, cancellationToken);
+			if (cv is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("User does not have a CV.");
 
 			//var cv = await _unitOfWork.CVs.GetByIdAsync(user.CVId, cancellationToken);
 			//if (cv is null) return Result<PaginatedList<CVJobRecommendationResponse>>.Failure("CV not found.");
 
 			var spec = new GetRecommendationsByCvSpecification(
-				user.CVId, request.Page, request.PageSize);
+				cv.Id, request.Page, request.PageSize);
 
 			var Count = await _unitOfWork.CVJobRecommendations.CountAsync(spec);
 

@@ -24,10 +24,9 @@ namespace Jobs.Application.Features.Applications.Commands.WithdrawApplication
 			if (application.ApplicantId != request.ApplicantId)
 				return Result.Failure("you don't have athourization for this application.");
 
-			if (application.Status != ApplicationStatus.Pending)
-				return Result.Failure("Cannot withdraw an application that has already been processed.");
+			//_unitOfWork.Applications.Remove(application);
+			application.WithdrawApplication();
 
-			_unitOfWork.Applications.Remove(application);
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 
 			return Result.Success();

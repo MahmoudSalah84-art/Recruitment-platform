@@ -20,10 +20,8 @@ namespace Jobs.Application.Features.Companies.Command.Register
 
 		public async Task<Result<AuthResponse>> Handle(RegisterCompanyCommand request, CancellationToken cancellationToken)
 		{
-
 			var company = new Company(
 				name: request.UserName,
-				isNameExists: await _unitOfWork.Companies.ExistsAsync(c => c.Name == request.UserName),
 				industry: request.Industry,
 				Country: request.Country,
 				city: request.City,
@@ -33,8 +31,6 @@ namespace Jobs.Application.Features.Companies.Command.Register
 				logoUrl: null,
 				description: request.Description
 			);
-
-			
 
 
 			var registerRequest = new RegisterRequest(
@@ -48,10 +44,15 @@ namespace Jobs.Application.Features.Companies.Command.Register
 				Roles.Company
 			);
 
-			
+			var result = await _identityService.RegisterAsync(registerRequest);
+			if (!result.IsSuccess)
+				return Result<AuthResponse>.Failure(result.Error);	
+
+
 			_unitOfWork.Companies.Add(company);
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
-			return await _identityService.RegisterAsync(registerRequest);
+
+			return result;
 		}
 	}
 }

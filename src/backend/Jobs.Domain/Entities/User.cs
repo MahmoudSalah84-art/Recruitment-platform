@@ -20,7 +20,7 @@ namespace Jobs.Domain.Entities
 		private readonly List<UserSkill> _skills = new();
 		public IReadOnlyCollection<UserSkill> Skills => _skills.AsReadOnly();
 
-		public string? CVId { get; private set; }
+		public string? CVId { get; private set; } // error
 		public CV CV { get; private set; }
 
 
@@ -43,15 +43,6 @@ namespace Jobs.Domain.Entities
 		}
 
 		// ========= Behaviors =========
-
-		//public void UpdateEmail(Email newEmail , bool isEmailExists)
-  //      {
-		//	CheckRule(new NotNullRule<Email>(newEmail));
-		//	CheckRule(new EmailFormatRule(newEmail));
-		//	CheckRule(new UserEmailMustBeUniqueRule(isEmailExists));
-
-		//	Email = newEmail;
-		//}
 
 		public void UpdateProfile(
 		string firstName,

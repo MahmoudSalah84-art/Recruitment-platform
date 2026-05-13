@@ -2,6 +2,6 @@
 
 namespace Jobs.Application.Features.Identity.Command.ForgotPassword
 {
-	public record ForgotPasswordCommand(string Email) : ICommand<string>;
+	public record ForgotPasswordCommand(string Email) : ICommand;
 
 }

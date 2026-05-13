@@ -337,10 +337,13 @@ namespace Jobs.Infrastructure.Services
 
 
 		//_______ Password Reset ───────────────────────────────────────────────────────────
-		public async Task<string> GeneratePasswordResetTokenAsync(string email)
+		public async Task<string?> GeneratePasswordResetTokenAsync(string email)
 		{
 			var user = await _userManager.FindByEmailAsync(email);
-			return await _userManager.GeneratePasswordResetTokenAsync(user!);
+			if (user is null || !await _userManager.IsEmailConfirmedAsync(user))
+				return null;
+
+			return await _userManager.GeneratePasswordResetTokenAsync(user);
 		}
 
 		public async Task<Result> ResetPasswordAsync(ResetPasswordRequest request)

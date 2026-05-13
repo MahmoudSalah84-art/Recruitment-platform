@@ -39,6 +39,7 @@ namespace Jobs.Application.Features.Applications.Commands.SubmitApplication
 			var application = new JobApplication( applicant, job);
 
 			 _unitOfWork.Applications.Add(application);
+
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 
 			return Result<string>.Success( application.Id);

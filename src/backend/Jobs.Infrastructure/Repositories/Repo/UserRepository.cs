@@ -13,8 +13,8 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		public async Task<User?> GetUserWithDetailsAsync(string userId, CancellationToken cancellationToken)
 		{
 			return await _set
-				//.AsNoTracking()
 				.Include(u => u.CV)
+				.Include(u => u.Applications)
 				.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 		}
 

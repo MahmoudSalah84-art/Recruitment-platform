@@ -30,5 +30,10 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		{
 			await _set.AddRangeAsync(recommendations, cancellationToken);
 		}
+
+		public async Task<CVJobRecommendation?> GetByCvIdAndJobIdAsync(string cvId, string jobId, CancellationToken cancellationToken)
+		{
+  			return await _set.FirstOrDefaultAsync(r => r.CvId == cvId && r.JobId == jobId, cancellationToken);
+		}
 	}
 }

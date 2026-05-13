@@ -2,7 +2,7 @@
 
 namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 {
-    public record GetUserApplicationDetailsQuery(string CompanyId,string ApplicationId) : IQuery<GetUserApplicationDetailsDTO>
+    public record GetUserApplicationDetailsQuery(string userId,string ApplicationId) : IQuery<GetUserApplicationDetailsDTO>
 	{
 
     }

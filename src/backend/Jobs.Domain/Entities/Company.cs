@@ -32,12 +32,11 @@ namespace Jobs.Domain.Entities
 		// ========== Constructor ==========
 		private Company(){}
 
-		public Company(string name,bool isNameExists, 
+		public Company(string name ,
 			string industry,string Country, string city,
 			string Street, string BuildingNumber, string postalCode,
 			string? logoUrl = default, string? description = default)
 		{
-			CheckRule(new CompanyNameMustBeUniqueRule(isNameExists));
 
 			Name = name;
 			Industry = industry;

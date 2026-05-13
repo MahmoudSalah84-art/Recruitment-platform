@@ -108,7 +108,6 @@ namespace Jobs.Infrastructure.Services
 			content.Add(new StringContent(jobDescription), "job_description");
 
 			var response = await _httpClient.PostAsync(_url, content, cancellationToken);
-			
 
 			if (!response.IsSuccessStatusCode)
 			{

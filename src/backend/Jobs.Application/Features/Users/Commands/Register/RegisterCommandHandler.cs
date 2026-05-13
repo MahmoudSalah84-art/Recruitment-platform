@@ -30,9 +30,6 @@ namespace Jobs.Application.Features.Identity.Command.Register
 			);
 
 
-			_unitOfWork.Users.Add(user);
-			await _unitOfWork.SaveChangesAsync(ct);
-
 			var registerRequest = new RegisterRequest(
 				Id: user.Id,
 				FirstName: cmd.FirstName,
@@ -44,7 +41,16 @@ namespace Jobs.Application.Features.Identity.Command.Register
 				Roles.User
 			);
 
-			return await _identityService.RegisterAsync(registerRequest);
+			var result = await _identityService.RegisterAsync(registerRequest);
+			if(!result.IsSuccess)
+			{
+				return Result<AuthResponse>.Failure(result.Error);
+			}
+
+			_unitOfWork.Users.Add(user);
+			await _unitOfWork.SaveChangesAsync(ct);
+
+			return result;
 		}
 	}
 }

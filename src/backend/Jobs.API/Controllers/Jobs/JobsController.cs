@@ -95,7 +95,11 @@ namespace Jobs.API.Controllers.Jobs
 
 			var result = await Sender.Send(command);
 
-			return result.IsSuccess ? CreatedAtRoute("GetJobByJobId", new { id = result.Value }, result.Value  ) : BadRequest(result.Error);
+			var response = result.ToApiResponse<object>();
+
+			return StatusCode(response.StatusCode, response);
+
+			//return result.IsSuccess ? CreatedAtRoute("GetJobByJobId", new { id = result.Value }, result.Value  ) : BadRequest(result.Error);
 		}
 
 		/// <summary>

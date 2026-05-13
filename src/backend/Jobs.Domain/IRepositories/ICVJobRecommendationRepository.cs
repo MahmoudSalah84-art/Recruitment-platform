@@ -13,5 +13,7 @@ namespace Jobs.Domain.IRepositories
 		Task<CVJobRecommendation?> GetByIdWithDetailsAsync( string id, CancellationToken cancellationToken);
 
 		Task AddRangeAsync(IEnumerable<CVJobRecommendation> recommendations, CancellationToken cancellationToken);
+
+		Task<CVJobRecommendation?> GetByCvIdAndJobIdAsync(string cvId, string jobId, CancellationToken cancellationToken);
 	}
 }

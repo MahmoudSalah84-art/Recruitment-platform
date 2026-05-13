@@ -31,7 +31,6 @@ namespace Jobs.Infrastructure.Identity.Seeder
 		{
 			var allPermissions = PermissionsHelper.GetAllPermissions();
 
-			//  Admin ياخد كل حاجة
 			var adminRole = await roleManager.FindByNameAsync(Roles.Admin) ?? throw new ArgumentException("there is not this role yet");
 
 			foreach (var permission in allPermissions)
@@ -43,7 +42,9 @@ namespace Jobs.Infrastructure.Identity.Seeder
 			var companyRole = await roleManager.FindByNameAsync(Roles.Company) ?? throw new ArgumentException("there is not this role yet"); ;
 
 			var companyPermissions = allPermissions
-				.Where(p => p!.StartsWith("Jobs") || p.StartsWith("Applications") || p.StartsWith("Companies"))
+				.Where(p => p!.StartsWith("Jobs") ||
+				p == Permissions.Applications_View ||
+				p.StartsWith("Companies"))
 				.ToList();
 
 			foreach (var permission in companyPermissions)
@@ -57,7 +58,7 @@ namespace Jobs.Infrastructure.Identity.Seeder
 			var userPermissions = allPermissions
 				.Where(p =>
 					p == Permissions.Jobs_View ||
-					p == Permissions.Applications_Apply ||
+					p!.StartsWith("Applications") ||
 					p!.StartsWith("CVs") ||
 					p.StartsWith("Users"))
 				.ToList();
@@ -69,6 +70,7 @@ namespace Jobs.Infrastructure.Identity.Seeder
 		}
 
 
+		// ---------helper method to add permission to role if it does not exist
 		private static async Task AddPermissionIfNotExists( RoleManager<AppRole> roleManager, AppRole role, string permission)
 		{
 			var claims = await roleManager.GetClaimsAsync(role);

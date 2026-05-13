@@ -48,7 +48,7 @@ namespace Jobs.Domain.Entities
 			Status = ApplicationStatus.Pending;
 			StatusHistory = DateTime.UtcNow;
 
-			//AddEvent(new ApplicationSubmittedEvent(Id));
+			AddEvent(new ApplicationSubmittedEvent(Id));
 		}
 
 		// ========= Behaviors =========
@@ -74,7 +74,7 @@ namespace Jobs.Domain.Entities
 			IsDeleted = true;
 			DeletedAt = DateTime.UtcNow;
 
-			AddEvent(new WithdrewApplicationDomainEvent(Id));
+			//AddEvent(new WithdrewApplicationDomainEvent(Id));
 		}
 
 
