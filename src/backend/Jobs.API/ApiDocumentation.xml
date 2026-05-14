@@ -71,7 +71,7 @@
             <response code="400">Invalid or expired confirmation token.</response>
             <response code="404">User not found.</response>
         </member>
-        <member name="M:Jobs.API.Controllers.Auth.AuthController.GenerateEmailConfirmationToken(System.String)">
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.GenerateEmailConfirmationToken(Jobs.Application.Features.Identity.Command.GenerateEmailConfirmationToken.GenerateEmailConfirmationTokenCommand)">
             <summary>
             Generates an email confirmation token for a specific user.
             </summary>

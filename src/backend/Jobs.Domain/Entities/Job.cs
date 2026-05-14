@@ -68,7 +68,7 @@ namespace Jobs.Domain.Entities
 			ExpirationDate = expirationDate ?? DateTime.UtcNow.AddMonths(1);
 			IsPublished = false;
 
-			AddEvent(new JobCreatedEvent(Id));
+			//AddEvent(new JobCreatedEvent(Id));
 
 		}
 		 

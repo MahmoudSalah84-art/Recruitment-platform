@@ -5,11 +5,6 @@ namespace Jobs.Domain.Events.ApplicationEvents
 {
 
 
-	public record ApplicationSubmittedEvent : DomainEvent
-	{
-		public ApplicationSubmittedEvent(string ApplicationId) : base(ApplicationId)
-		{
-		}
-	}
-
+	public record ApplicationSubmittedEvent(string Id) : DomainEvent;
+	
 }

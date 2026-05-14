@@ -291,6 +291,25 @@ namespace Jobs.Infrastructure.Services
 				Roles = roles.ToList(),
 			});
 		}
+		public async Task<Result<UserDto>> GetUserByEmailAsync(string email)
+		{
+			var user = await _userManager.FindByEmailAsync(email);
+			if (user == null || user.EmailConfirmed) 
+				return Result<UserDto>.Failure("User not found.");
+
+			var roles = await _userManager.GetRolesAsync(user);
+			return Result<UserDto>.Success(new UserDto
+			{
+				Id = user.Id,
+				Email = user.Email!,
+				UserName = user.UserName!,
+				FirstName = user.FirstName,
+				LastName = user.LastName,
+				IsEmailVerified = user.EmailConfirmed,
+				IsActive = user.IsActive,
+				Roles = roles.ToList(),
+			});
+		}
 
 		public async Task<Result> ToggleUserActiveAsync(string userId)
 		{
@@ -327,6 +346,9 @@ namespace Jobs.Infrastructure.Services
 			var user = await _userManager.FindByIdAsync(userId);
 			if (user == null)
 				return Result.Failure("User not found");
+
+			if (user.EmailConfirmed)
+				return Result.Failure( "Email is already confirmed.");
 
 			var result = await _userManager.ConfirmEmailAsync(user, token);
 
@@ -413,5 +435,7 @@ namespace Jobs.Infrastructure.Services
 				accessToken, refreshToken, DateTime.UtcNow.AddMinutes(60),
 				user.Id, user.Email!, roleNames, perms));
 		}
+
+		
 	}
 }

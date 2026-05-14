@@ -6,12 +6,6 @@ using System.Text;
 
 namespace Jobs.Domain.Events.JobEvents
 {
-
-
-	public record JobPostedEvent : DomainEvent
-	{
-		public JobPostedEvent(string JobId) : base(JobId)
-		{
-		}
-	}
+	public record JobPostedEvent(string Id) : DomainEvent;
+	
 }

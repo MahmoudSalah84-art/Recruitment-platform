@@ -9,7 +9,7 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 
 	public record CvParsedEvent : DomainEvent
 	{
-		public CvParsedEvent(string CvId) : base(CvId)
+		public CvParsedEvent(string CvId) 
 		{
 		}
 	}

@@ -35,5 +35,15 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		{
   			return await _set.FirstOrDefaultAsync(r => r.CvId == cvId && r.JobId == jobId, cancellationToken);
 		}
+
+		public async Task<IEnumerable<CVJobRecommendation>> GetByCvIdAsync(string cvId, CancellationToken cancellationToken)
+		{
+			return await _set.Where(r => r.CvId == cvId).ToListAsync(cancellationToken);
+		}
+
+		public async Task<IEnumerable<CVJobRecommendation>> GetByJobIdAsync(string jobId, CancellationToken cancellationToken)
+		{
+			return await _set.Where(r => r.JobId == jobId).ToListAsync(cancellationToken);
+		}
 	}
 }

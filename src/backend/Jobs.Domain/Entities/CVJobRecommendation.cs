@@ -37,7 +37,7 @@ namespace Jobs.Domain.Entities
 			Score = score;
 			IsActive = true;
 			
-			AddEvent(new CvRecommendedJobCreatedEvent(this.Id));
+			//AddEvent(new CvRecommendedJobCreatedEvent(this.Id));
 
 		}
 
@@ -52,7 +52,7 @@ namespace Jobs.Domain.Entities
 			IsActive = false;
 			DeactivatedAt = DateTime.UtcNow;
 
-			AddEvent(new CVRecommendationDeactivatedEvent(this.Id));
+			//AddEvent(new CVRecommendationDeactivatedEvent(this.Id));
 
 		}
 

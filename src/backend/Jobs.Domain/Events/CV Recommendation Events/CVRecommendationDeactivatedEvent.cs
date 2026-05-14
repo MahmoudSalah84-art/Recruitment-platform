@@ -6,12 +6,8 @@ using System.Text;
 
 namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
- 
 
-	public record CVRecommendationDeactivatedEvent : DomainEvent
-	{
-		public CVRecommendationDeactivatedEvent(string RecommendationId) : base(RecommendationId)
-		{
-		}
-	}
+
+	public record CVRecommendationDeactivatedEvent(string RecommendationId) : DomainEvent;
+
 }

@@ -30,37 +30,53 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			if (job is null)
 			{
 				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
-				return Result<string>.Failure(" not found.");
+				return Result<string>.Failure("Job not found.");
 			}
 			if (!job.IsPublished)
 			{
-				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
+				_logger.LogWarning("Job {JobId} is not published.", request.JobId);
 				return Result<string>.Failure("Cannot recommend an unpublished job.");
 			}
-
 			if (job.IsExpired)
 			{
-				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
+				_logger.LogWarning("Job {JobId} is expired.", request.JobId);
 				return Result<string>.Failure("Cannot recommend an expired job.");
 			}
 
 			var cvs = _unitOfWork.CVs.Query().ToList();
-
 			if (!cvs.Any())
 			{
 				_logger.LogInformation("No CVs found to score for Job {JobId}.", request.JobId);
-				return Result<string>.Failure("No CVs found .");
+				return Result<string>.Failure("No CVs found.");
 			}
 
-			_logger.LogInformation("Scoring {Count} CVs for Job {JobId}...", cvs.Count, request.JobId);
+
+
+
+			// get existing recommendations for the job to avoid re-scoring the same CVs
+			var existingRecommendations = await _unitOfWork.CVJobRecommendations
+				.GetByJobIdAsync(request.JobId, cancellationToken);
+
+			var existingCvIds = existingRecommendations
+				.Select(r => r.CvId)
+				.ToHashSet();
+
+			// filter the new CVs only
+			var newCvs = cvs.Where(cv => !existingCvIds.Contains(cv.Id)).ToList();
+
+			if (!newCvs.Any())
+			{
+				_logger.LogInformation("All CVs already scored for Job {JobId}. Skipping.", request.JobId);
+				return Result<string>.Success("All CVs already scored.");
+			}
+
+
+			_logger.LogInformation("Scoring {Count} new CVs for Job {JobId}...", newCvs.Count, request.JobId);
 
 			var recommendations = new List<CVJobRecommendationEntity>();
 
-			foreach (var cv in cvs)
+			foreach (var cv in newCvs)
 			{
-				//// reset stream position لكل request
-				//cv.FileStream.Seek(0, SeekOrigin.Begin);
-
 				var fileStream = await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value);
 
 				var result = await _aiScoringService.MatchJobAsync(
@@ -74,11 +90,14 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 					score: (int)result.MatchScore));
 			}
 
-			await _unitOfWork.CVJobRecommendations.AddRangeAsync(recommendations);
 
+			await _unitOfWork.CVJobRecommendations.AddRangeAsync(recommendations);
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-			return Result<string>.Success("success");
+			_logger.LogInformation("Saved {Count} new CV recommendations for Job {JobId}.",
+				recommendations.Count, request.JobId);
+
+			return Result<string>.Success("Success");
 		}
 	}
 }

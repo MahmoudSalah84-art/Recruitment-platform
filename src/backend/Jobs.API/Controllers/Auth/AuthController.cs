@@ -128,11 +128,11 @@ namespace Jobs.API.Controllers.Auth
 		/// <response code="400">Invalid user ID supplied.</response>
 		/// <response code="404">User not found.</response>
 		//http://localhost:5000/api/auth/generate-email-confirmation-token?userId=123
-		[HttpGet("generate-email-confirmation-token")]
+		[HttpPost("generate-email-confirmation-token")]
 		[AllowAnonymous]
-		public async Task<IActionResult> GenerateEmailConfirmationToken([FromQuery] string userId)
+		public async Task<IActionResult> GenerateEmailConfirmationToken( GenerateEmailConfirmationTokenCommand command)
 		{
-			var result = await Sender.Send(new GenerateEmailConfirmationTokenCommand(userId));
+			var result = await Sender.Send(command);
 
 			var response = result.ToApiResponse<object>();
 

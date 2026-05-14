@@ -4,12 +4,5 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
 
 
-	public record CvRecommendedJobCreatedEvent : DomainEvent
-	{
-		public CvRecommendedJobCreatedEvent(string RecommendationId) : base(RecommendationId)
-		{
-			{
-			}
-		}
-	}
+	public record CvRecommendedJobCreatedEvent(string RecommendationId) : DomainEvent;
 }
