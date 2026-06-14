@@ -101,9 +101,9 @@ namespace Jobs.API.Controllers.Auth
 		// http://localhost:5000/api/auth/confirm-email?userId=123&token=abc
 		[HttpGet("confirm-email")]
 		[AllowAnonymous]
-		public async Task<IActionResult> ConfirmEmail( [FromQuery] string token)
+		public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
 		{
-			string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			//string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
 			var result = await Sender.Send(new ConfirmEmailCommand(userId, token));
 
@@ -129,7 +129,7 @@ namespace Jobs.API.Controllers.Auth
 		/// <response code="404">User not found.</response>
 		//http://localhost:5000/api/auth/generate-email-confirmation-token?userId=123
 		[HttpPost("generate-email-confirmation-token")]
-		[AllowAnonymous]
+		[Authorize]
 		public async Task<IActionResult> GenerateEmailConfirmationToken( GenerateEmailConfirmationTokenCommand command)
 		{
 			var result = await Sender.Send(command);

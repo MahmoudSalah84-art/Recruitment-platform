@@ -30,24 +30,24 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			if (job is null)
 			{
 				_logger.LogWarning("Job {JobId} not found for AI scoring.", request.JobId);
-				return Result<string>.Failure("Job not found.");
+				throw new Exception($"Job with ID {request.JobId} not found.");
 			}
 			if (!job.IsPublished)
 			{
 				_logger.LogWarning("Job {JobId} is not published.", request.JobId);
-				return Result<string>.Failure("Cannot recommend an unpublished job.");
+				throw new Exception($"Job with ID {request.JobId} is not published.");
 			}
 			if (job.IsExpired)
 			{
 				_logger.LogWarning("Job {JobId} is expired.", request.JobId);
-				return Result<string>.Failure("Cannot recommend an expired job.");
+				throw new Exception($"Job with ID {request.JobId} is expired.");
 			}
 
 			var cvs = _unitOfWork.CVs.Query().ToList();
 			if (!cvs.Any())
 			{
 				_logger.LogInformation("No CVs found to score for Job {JobId}.", request.JobId);
-				return Result<string>.Failure("No CVs found.");
+				throw new Exception("No CVs found.");
 			}
 
 
@@ -77,6 +77,9 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 
 			foreach (var cv in newCvs)
 			{
+
+				
+
 				var fileStream = await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value);
 
 				var result = await _aiScoringService.MatchJobAsync(
@@ -88,6 +91,8 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 					cvId: cv.Id,
 					jobId: job.Id,
 					score: (int)result.MatchScore));
+
+				
 			}
 
 

@@ -77,8 +77,9 @@ namespace Jobs.Domain.Entities
 			//AddEvent(new WithdrewApplicationDomainEvent(Id));
 		}
 
+		
 
-		public void ChangeStatus(ApplicationStatus newStatus)
+		public void UpdateStatus(ApplicationStatus newStatus)
 		{
 			CheckRule(new ApplicationStatusTransitionRule(Status, newStatus));
 
@@ -86,7 +87,7 @@ namespace Jobs.Domain.Entities
 			Status = newStatus;
 			StatusHistory = DateTime.UtcNow;
 
-			AddEvent(new ApplicationStatusChangedEvent(Id));
+			//AddEvent(new ApplicationStatusChangedEvent(Id));
 		}
 	}
 }

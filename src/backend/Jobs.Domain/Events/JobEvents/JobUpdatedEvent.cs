@@ -5,7 +5,7 @@ namespace Jobs.Domain.Events.JobEvents
 {
 	public record JobUpdatedEvent : DomainEvent
 	{
-		public JobUpdatedEvent(string JobId)  
+		public JobUpdatedEvent(string JobId) : base(JobId)
 		{
 		}
 	}

@@ -13,6 +13,10 @@ namespace Jobs.Infrastructure.Identity.Seeder
 			await SeedPermissions(roleManager);
 		}
 
+		
+
+
+
 
 		private static async Task SeedRoles(RoleManager<AppRole> roleManager)
 		{
@@ -33,10 +37,17 @@ namespace Jobs.Infrastructure.Identity.Seeder
 
 			var adminRole = await roleManager.FindByNameAsync(Roles.Admin) ?? throw new ArgumentException("there is not this role yet");
 
+
+
+
+			// admin
 			foreach (var permission in allPermissions)
 			{
 				await AddPermissionIfNotExists(roleManager, adminRole, permission!);
 			}
+
+
+
 
 			//  Company
 			var companyRole = await roleManager.FindByNameAsync(Roles.Company) ?? throw new ArgumentException("there is not this role yet"); ;
@@ -46,11 +57,15 @@ namespace Jobs.Infrastructure.Identity.Seeder
 				p == Permissions.Applications_View ||
 				p.StartsWith("Companies"))
 				.ToList();
-
 			foreach (var permission in companyPermissions)
 			{
 				await AddPermissionIfNotExists(roleManager, companyRole, permission!);
 			}
+
+
+
+
+
 
 			// Seeker
 			var userRole = await roleManager.FindByNameAsync(Roles.User) ?? throw new ArgumentException("there is not this role yet"); ;

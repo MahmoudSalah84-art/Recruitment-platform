@@ -19,7 +19,9 @@ namespace Jobs.Application.Features.Jobs.Queries.GetJobById
 			if (job is null)
 				return Result<JobResponse>.Failure("Job not found.");
 
-			var jobResponse = new JobResponse(job.Id,
+			var jobResponse = new JobResponse(
+				job.Id,
+				job.Company.Name,
 				job.Title,
 				job.Description,
 				job.Requirements,

@@ -8,6 +8,6 @@ namespace Jobs.Domain.Events.CV_Recommendation_Events
 {
 
 
-	public record CVRecommendationDeactivatedEvent(string RecommendationId) : DomainEvent;
+	public record CVRecommendationDeactivatedEvent(string RecommendationId) : DomainEvent(RecommendationId);
 
 }

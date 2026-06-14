@@ -17,7 +17,7 @@ namespace Jobs.Application.Features.Skills.Commands.AddSkillToJob
 
 		public async Task<Result> Handle(AddSkillToJobCommand request, CancellationToken cancellationToken)
 		{
-			var job = await _unitOfWork.Jobs.GetByIdAsync(request.JobId, cancellationToken);
+			var job = await _unitOfWork.Jobs.GetByIdWithSkillsAsync(request.JobId, cancellationToken);
 			if (job is null)
 				return Result.Failure("Job not found.");
 

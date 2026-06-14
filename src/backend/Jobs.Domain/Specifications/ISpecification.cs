@@ -6,6 +6,8 @@ namespace Jobs.Domain.Specifications
     {
 		Expression<Func<T, bool>> Criteria { get; }
 		List<Expression<Func<T, object>>> Includes { get; }
+		List<string> thenIncludes { get; }
+
 		Expression<Func<T, object>> OrderBy { get; }
 		Expression<Func<T, object>> OrderByDescending { get; }
 		int Take { get; }

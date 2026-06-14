@@ -30,5 +30,11 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.FirstOrDefaultAsync(c => c.Id == companyId, cancellationToken);
 		}
 
+		//public Task<bool> ownsJob(string jobId, CancellationToken cancellationToken)
+		//{
+		//	return _set
+		//		.AsNoTracking()
+		//		.AnyAsync(j => j.Jobs.Id == jobId , cancellationToken);
+		//}
 	}
 }

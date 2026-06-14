@@ -1,12 +1,13 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.API.Extensions;
+using Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecommendation;
 using Jobs.Application.Features.Identity.Command.GoogleLogin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Jobs.API.Controllers.Auth
 {
-    public class ExternalAuthController : ApiController
+	public class ExternalAuthController : ApiController
 	{
 		/// <summary>
 		/// Authenticates a user using a Google ID Token.
@@ -74,8 +75,40 @@ namespace Jobs.API.Controllers.Auth
 		}
 
 		public sealed record GoogleLoginRequest(string IdToken);
+
+
+
+
+		//CreateCVJobRecommendationCommand_cv
+		//CreateCVJobRecommendationCommand_job
+
+		[HttpPost("testingforJob")]
+		[AllowAnonymous]
+		public async Task<IActionResult> testingforJob([FromBody] string JobIdThatCreated)
+		{
+			var result = await Sender.Send(new CreateCVJobRecommendationCommand_job(JobIdThatCreated));
+
+			var response = result.ToApiResponse<object>();
+			return StatusCode(response.StatusCode, response);
+		}
+
+
+		[HttpPost("testingforCv")]
+		[AllowAnonymous]
+		public async Task<IActionResult> testingforCv([FromQuery] string userIdThatUplodeCv)
+		{
+			var result = await Sender.Send(new CreateCVJobRecommendationCommand_cv(userIdThatUplodeCv));
+
+			var response = result.ToApiResponse<object>();
+			return StatusCode(response.StatusCode, response);
+		}
 	}
+
+
 }
+
+
+	
 
 //| Method | Route                      | Description        |
 //| ------ | --------------------       | ------------------- |

@@ -33,11 +33,10 @@ namespace Jobs.API.Controllers.Companies
 		public async Task<IActionResult> GetProfile()
 		{
 			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			if (companyId == null) return Unauthorized();
 
 			var result = await Sender.Send(new GetCompanyProfileQuery(companyId));
 
-			var response = result.ToApiResponse<object>();
+			var response = result.ToApiResponse();
 
 			return StatusCode(response.StatusCode, response);
 		}

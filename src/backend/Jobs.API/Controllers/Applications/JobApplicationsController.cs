@@ -1,8 +1,10 @@
 ﻿using Jobs.API.Controllers.Abstractions;
 using Jobs.API.Extensions;
+using Jobs.Application.Features.Applications.Commands.UpdateApplicationStatus;
 using Jobs.Application.Features.Applications.Queries.GetApplicationById;
 using Jobs.Application.Features.Applications.Queries.GetApplicationsByJob;
 using Jobs.Domain.Common;
+using Jobs.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -13,6 +15,7 @@ namespace Jobs.API.Controllers.Applications
 	{
 		// GET: api/JobApplications/
 		[HttpGet]
+		[Authorize(Policy = Permissions.Applications_View)]
 		public async Task<IActionResult> GetAllApplicationsByJobId(string jobId, int page = 1, int pageSize = 10)
 		{
 			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -44,12 +47,35 @@ namespace Jobs.API.Controllers.Applications
 		[Authorize(Policy = Permissions.Applications_View)]
 		public async Task<IActionResult> GetApplicationById(string applicationId)
 		{
-			string companyOrUserId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			if (companyOrUserId == null) return Unauthorized();
+			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-			var result = await Sender.Send(new GetUserApplicationDetailsQuery(companyOrUserId, applicationId));
+			var result = await Sender.Send(new GetUserApplicationDetailsQuery(companyId, applicationId));
 
 			var response = result.ToApiResponse();
+			return StatusCode(response.StatusCode, response);
+		}
+
+
+
+
+
+
+
+		// API/Controllers/JobApplicationsController.cs
+		[HttpPatch("{applicationId}/status")]
+		[Authorize(Policy = Permissions.Applications_UpdateStatus)] 
+		public async Task<IActionResult> UpdateStatus(
+			string applicationId,
+			[FromBody] ApplicationStatus NewStatus,
+			CancellationToken cancellationToken)
+		{
+			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+
+			var command = new UpdateApplicationStatusCommand(companyId, applicationId, NewStatus);
+			var result = await Sender.Send(command, cancellationToken);
+
+			var response = result.ToApiResponse<object>();
 			return StatusCode(response.StatusCode, response);
 		}
 

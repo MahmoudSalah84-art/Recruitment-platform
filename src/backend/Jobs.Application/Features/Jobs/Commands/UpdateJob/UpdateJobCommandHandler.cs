@@ -17,10 +17,15 @@ namespace Jobs.Application.Features.Jobs.Commands.UpdateJob
 
 		public async Task<Result> Handle(UpdateJobCommand request, CancellationToken cancellationToken)
 		{
+			
+
 			var job = await _jobRepository.GetByIdAsync(request.JobId, cancellationToken);
 
 			if (job is null)
 				return Result.Failure( "Job not found.");
+			if (request.CompanyId != job.CompanyId)
+				return Result.Failure("unotherized.");
+
 
 			job.UpdateDetails(
 				request.Title,

@@ -2,6 +2,6 @@
 
 namespace Jobs.Application.Features.Skills.Queries.GetUserSkills
 {
-	public record GetUserSkillsQuery : IQuery<List<UserSkillDto>>;
+	public record GetUserSkillsQuery(string UserId) : IQuery<List<UserSkillDto>>;
 
 }

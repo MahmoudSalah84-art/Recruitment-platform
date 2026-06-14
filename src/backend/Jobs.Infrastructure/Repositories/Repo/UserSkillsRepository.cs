@@ -13,5 +13,12 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		{
 			return await _set.FirstOrDefaultAsync(x => x.UserId == userId && x.SkillId == skillId);
 		}
+
+		public Task<List<string>> GetSkillsByUserId(string userId, CancellationToken cancellationToken)
+		{
+			return _set.Where(x => x.UserId == userId)
+                       .Select(x => x.Skill.Name)
+                       .ToListAsync(cancellationToken);
+		}
 	}
 }

@@ -15,9 +15,13 @@ namespace Jobs.Application.Features.CV.EventHandlers
 
 		public async Task Handle(CvUploadedEvent notification, CancellationToken cancellationToken)
 		{
-			await _sender.Send(
-				new CreateCVJobRecommendationCommand_cv(notification.Id),
-				cancellationToken);
+			var result = await _sender.Send(new CreateCVJobRecommendationCommand_cv(notification.Id), cancellationToken);
+
+			if (result.IsFailure)
+			{
+				// إجبر الـ Outbox Processor إنه يعرف إن فيه مصيبة حصلت عشان ميعلمش عليها كـ True
+				throw new Exception($"Failed to process CV recommendations: {result.Error}");
+			}
 		}
 	}
-}
+}	

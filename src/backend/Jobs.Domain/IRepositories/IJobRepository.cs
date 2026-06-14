@@ -1,7 +1,4 @@
 ﻿using Jobs.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Jobs.Domain.IRepositories
 {
@@ -22,5 +19,7 @@ namespace Jobs.Domain.IRepositories
 		/// <param name="ct">Cancellation token to cancel the operation.</param>
 		/// <returns>List of active Jobs.</returns>
 		Task<IEnumerable<Job>> GetAllActiveJobsAsync(CancellationToken ct = default);
+
+		Task<int> GetCountOfJobsPostedByUserIdAsync(string companyId);
 	}
 }

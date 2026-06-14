@@ -5,7 +5,7 @@ using Jobs.Domain.ValueObjects;
 namespace Jobs.Application.Features.Jobs.Queries.SearchJobs
 {
 	public record JobsResponse(
-	string Id,
+	string CompanyName,
 	string Title,
 	string Description,
 	string Requirements,

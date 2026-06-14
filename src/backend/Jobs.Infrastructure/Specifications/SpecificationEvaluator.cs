@@ -12,10 +12,23 @@ namespace Jobs.Infrastructure.Specifications
 			if (spec.Criteria != null)
 				query = query.Where(spec.Criteria);
 
-			foreach (var include in spec.Includes)
-			{
-				query = query.Include(include);
-			}
+
+
+			if(spec.Includes != null)
+				//query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+				foreach (var include in spec.Includes)
+				{
+					query = query.Include(include);
+				}
+
+
+
+			if(spec.thenIncludes != null)
+				foreach (var thenInclude in spec.thenIncludes)
+				{
+					query = query.Include(thenInclude);
+				}
+			
 
 			if (spec.OrderBy != null)
 				query = query.OrderBy(spec.OrderBy);

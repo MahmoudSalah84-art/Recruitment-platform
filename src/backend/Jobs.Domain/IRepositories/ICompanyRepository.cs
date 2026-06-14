@@ -14,5 +14,7 @@ namespace Jobs.Domain.IRepositories
 
 		Task<Company?> GetByIdWithEmployeeAsync(string companyId, CancellationToken cancellationToken);
 		
+
+		//Task<bool> ownsJob(string jobId, CancellationToken cancellationToken);
 	}
 }

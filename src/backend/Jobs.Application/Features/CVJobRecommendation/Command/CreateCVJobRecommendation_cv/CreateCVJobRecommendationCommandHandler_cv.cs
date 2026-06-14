@@ -32,14 +32,14 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			if (cv is null)
 			{
 				_logger.LogWarning("CV of user {UserId} not found for AI scoring.", request.UserId);
-				return Result.Failure("CV not found.");
+				throw new Exception("CV not found for user.");
 			}
 
 			var jobs = await _unitOfWork.Jobs.GetAllActiveJobsAsync(cancellationToken);
 			if (!jobs.Any())
 			{
 				_logger.LogInformation("No active jobs found to score CV {CvId} against.", cv.Id);
-				return Result.Failure("No active jobs found.");
+				throw new Exception("No active jobs found.");
 			}
 
 			// get existing recommendations for this CV to avoid re-scoring the same jobs
@@ -65,10 +65,21 @@ namespace Jobs.Application.Features.CVJobRecommendation.Command.CreateCVJobRecom
 			var recommendations = new List<CVJobRecommendationEntity>();
 			var fileStream = await _fileService.GetFileStreamFromUrlAsync(cv.FilePath.Value);
 
+
+			// 2. حول الملف بالكامل لـ Byte Array عشان يفضل معانا ثابت في الذاكرة
+			using var tempMemoryStream = new MemoryStream();
+			await fileStream.CopyToAsync(tempMemoryStream, cancellationToken);
+			byte[] cvBytes = tempMemoryStream.ToArray();
+
 			foreach (var job in newJobs)
 			{
+				// 3. في كل لفة، بنعمل Stream جديد طازة من الـ bytes
+				// الـ using بتضمن إنه يتمسح بعد اللفة، وحتى لو الـ AI service قفلته مش هيأثر على اللفة الجاية
+				using var chunkStream = new MemoryStream(cvBytes);
+
+
 				var result = await _aiScoringService.MatchJobAsync(
-					fileStream,
+					chunkStream,
 					job.Description + " " + job.Requirements,
 					cancellationToken);
 

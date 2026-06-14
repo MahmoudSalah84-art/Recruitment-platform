@@ -24,5 +24,30 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.AnyAsync(ja => ja.JobId == jobId && ja.ApplicantId == applicantId, ct);
 		}
 
+		public async Task<JobApplication?> GetApplicationWithCVAsync(string applicationId ,CancellationToken ct = default)
+		{
+			return await _set
+			.AsNoTracking()
+			.Include(x => x.CV)
+			.FirstOrDefaultAsync(a => a.Id == applicationId, ct);
+		}
+
+
+		public async Task<JobApplication?> GetApplicationWithJobTitleAsync(string applicationId, CancellationToken ct = default)
+		{
+			return await _set
+				.AsNoTracking()
+				.Where(a => a.Id == applicationId)
+				.Include(a => a.Job)
+				.FirstOrDefaultAsync(ct);
+		}
+
+		public async Task<int> GetCountOfApplicationsByUserId(string userId)
+		{
+			
+			return await _set
+				.AsNoTracking()
+				.CountAsync(a => a.ApplicantId == userId);
+		}
 	}
 }

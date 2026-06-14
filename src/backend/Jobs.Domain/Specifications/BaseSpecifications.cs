@@ -1,8 +1,5 @@
 ﻿using Jobs.Domain.Common;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace Jobs.Domain.Specifications
 {
@@ -10,6 +7,8 @@ namespace Jobs.Domain.Specifications
 	{
 		public Expression<Func<T, bool>>? Criteria { get; set; }
 		public List<Expression<Func<T, object>>> Includes { get; private set; } = new();
+		public List<string> thenIncludes { get; private set; } = new();
+
 		public Expression<Func<T, object>>? OrderBy { get; private set; }
 		public Expression<Func<T, object>>? OrderByDescending { get; private set; }
 		public int Take { get; set; }
@@ -23,6 +22,9 @@ namespace Jobs.Domain.Specifications
 
 		protected void AddInclude(Expression<Func<T, object>> includeExpression)
 			=> Includes.Add(includeExpression);
+
+		protected void AddThenInclude(string _thenIncludes)
+			=> thenIncludes.Add(_thenIncludes);
 		public void AddOrderBy(Expression<Func<T, object>> OrderByExpression) 
 			=> OrderBy = OrderByExpression;
 		public void AddOrderByDescending(Expression<Func<T, object>> OrderByDescExpression) 

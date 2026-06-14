@@ -1,4 +1,6 @@
 ﻿
+using Jobs.Domain.ValueObjects;
+
 namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 {
 
@@ -6,12 +8,10 @@ namespace Jobs.Application.Features.Applications.Queries.GetApplicationById
 	string Id,
 	string ApplicantId,
 	string ApplicantName,
-	string JobId,
+	string Email,
 	string JobTitle,
-	string? CvId,
+	string? CvPath,
 	int MatchScore,
-	string Status,
-	string CompanyId,
-	string CompanyName
+	string Status
 	);
 }

@@ -1,6 +1,6 @@
 ﻿using Jobs.API.Controllers.Abstractions;
+using Jobs.API.DTOs;
 using Jobs.API.Extensions;
-using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Features.Jobs.Commands.CreateJob;
 using Jobs.Application.Features.Jobs.Commands.DeleteJob;
 using Jobs.Application.Features.Jobs.Commands.PublishJob;
@@ -10,7 +10,6 @@ using Jobs.Application.Features.Jobs.Queries.GetJobById;
 using Jobs.Application.Features.Jobs.Queries.SearchJobs;
 using Jobs.Domain.Common;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -88,12 +87,19 @@ namespace Jobs.API.Controllers.Jobs
 		// POST /api/companiesjobs/{companyId}
 		[HttpPost]
 		[Authorize(Policy = Permissions.Jobs_Create)]
-		public async Task<IActionResult> CreateJob(CreateJobCommand command)
+		public async Task<IActionResult> CreateJob(CreateJobRequest command)
 		{
 			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			if (companyId == null ) return Unauthorized();
-
-			var result = await Sender.Send(command);
+			var result = await Sender.Send(new CreateJobCommand(
+				companyId,
+				command.Title,
+				command.Description,
+				command.Requirements,
+				command.EmploymentType,
+				command.ExperienceLevel,
+				command.minSalary,
+				command.maxSalary,
+				command.ExpirationDate));
 
 			var response = result.ToApiResponse<object>();
 
@@ -101,6 +107,16 @@ namespace Jobs.API.Controllers.Jobs
 
 			//return result.IsSuccess ? CreatedAtRoute("GetJobByJobId", new { id = result.Value }, result.Value  ) : BadRequest(result.Error);
 		}
+
+		
+
+
+
+
+
+
+
+
 
 		/// <summary>
 		/// Deletes a job posting belonging to the authenticated company.
@@ -125,7 +141,7 @@ namespace Jobs.API.Controllers.Jobs
 		public async Task<IActionResult> DeleteJob(string jobId)
 		{
 			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			if (companyId == null) return Unauthorized();
+			
 
 			var result = await Sender.Send(new DeleteJobCommand(companyId, jobId));
 
@@ -207,10 +223,27 @@ namespace Jobs.API.Controllers.Jobs
 		// PUT: api/jobs/{id}
 		[HttpPut("{id}")]
 		[Authorize(Policy = Permissions.Jobs_Update)]
-		public async Task<IActionResult> UpdateJob(string id, [FromBody] UpdateJobCommand command)
+		public async Task<IActionResult> UpdateJob(string id, 
+		[FromBody] UpdateJobRequest request,
+		CancellationToken cancellationToken)
 		{
-			if (id != command.JobId)
+			if (id != request.JobId)
 				return BadRequest("Route id and body id must match");
+
+			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+
+			var command = new UpdateJobCommand(
+				JobId: request.JobId,
+				CompanyId: companyId,
+				Title: request.Title,
+				Description: request.Description,
+				Requirements: request.Requirements,
+				EmploymentType: request.EmploymentType,
+				ExperienceLevel: request.ExperienceLevel,
+				minSalary: request.minSalary,
+				maxSalary: request.maxSalary,
+				ExpirationDate: request.ExpirationDate
+			);
 
 			var result = await Sender.Send(command);
 

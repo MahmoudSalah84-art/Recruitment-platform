@@ -28,14 +28,13 @@ namespace Jobs.API.Controllers.Companies
 		// GET /api/companiesjobs/{companyId}
 		[HttpGet]
 		[Authorize(Policy = Permissions.Jobs_View)]
-		public async Task<IActionResult> GetJobs()
+		public async Task<IActionResult> GetJobs(int Page , int PageSize )
 		{
 			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			if (companyId == null) return Unauthorized();
 
-			var result = await Sender.Send(new GetJobsByCompanyQuery(companyId));
+			var result = await Sender.Send(new GetJobsByCompanyQuery(companyId, Page, PageSize));
 
-			var response = result.ToApiResponse<object>();
+			var response = result.ToApiResponse();
 
 			return StatusCode(response.StatusCode, response);
 		}

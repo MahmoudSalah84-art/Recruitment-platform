@@ -57,12 +57,14 @@ namespace Jobs.Infrastructure.Services
 			content.Add(new StringContent(cvId), "cv_id");
 			content.Add(new StringContent(jobDescription), "job_description");
 						
+
 			var response = await _httpClient.PostAsync(_url, content, cancellationToken);
 
 			if (!response.IsSuccessStatusCode)
 			{
 				var errorContent = await response.Content.ReadAsStringAsync(cancellationToken);
-				_logger.LogError($"Failed to match job.  Error: {response.StatusCode}, Content: {errorContent}");
+				_logger.LogError($"Failed to match job. Error: {response.StatusCode}, Content: {errorContent}");
+				throw new HttpRequestException($"AI scoring service returned {(int)response.StatusCode} {response.ReasonPhrase}: {errorContent}");
 			}
 
 			var jsonOptions = new JsonSerializerOptions
@@ -70,8 +72,24 @@ namespace Jobs.Infrastructure.Services
 				PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
 			};
 
-			var raw = await response.Content
-				.ReadFromJsonAsync<AiMatchRawResponse>(jsonOptions, cancellationToken);
+
+
+			
+			// Read the response as string first so we can log non-JSON responses and avoid
+			// System.Text.Json throwing a JsonReaderException with an unhelpful message.
+			var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
+
+			AiMatchRawResponse raw;
+			try
+			{
+				raw = JsonSerializer.Deserialize<AiMatchRawResponse>(responseString, jsonOptions)
+					  ?? throw new JsonException("Deserialized AI match response was null.");
+			}
+			catch (JsonException ex)
+			{
+				_logger.LogError(ex, "Failed to deserialize AI scoring response. Response content: {Response}", responseString);
+				throw;
+			}
 
 			return new AiMatchResult(
 				MatchScore: raw!.MatchScore,

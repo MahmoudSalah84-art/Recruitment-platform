@@ -171,7 +171,7 @@ namespace Jobs.Domain.Entities
 		{
 
 			if (_requiredSkills.Any(s => s.SkillId == skill.SkillId))
-				throw new DomainException("Skill is already added to this job.");
+				throw new DomainException($"Skill is already added to this job.");
 
 			_requiredSkills.Add(skill);
 		}
@@ -184,7 +184,7 @@ namespace Jobs.Domain.Entities
 			var skill = _requiredSkills.FirstOrDefault(s => s.SkillId == skillId);
 
 			if (skill is null)
-				throw new DomainException("Skill not found in this job.");
+				throw new DomainException($"Skill not found in this job.");
 
 			_requiredSkills.Remove(skill);
 		}

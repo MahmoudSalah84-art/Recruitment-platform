@@ -7,6 +7,7 @@ namespace Jobs.Application.Features.Jobs.Queries.GetJobById
 {
 	public record JobResponse(
 	string Id,
+	string companyName,
 	string Title,
 	string Description,
 	string Requirements,

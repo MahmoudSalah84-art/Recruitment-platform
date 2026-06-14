@@ -27,6 +27,7 @@ namespace Jobs.Application.Features.Jobs.Queries.GetJobsByCompany
 
 			var response = jobs.Select(job => new JobResponse(
 				job.Id,
+				job.Company.Id,
 				job.Title,
 				job.Description,
 				job.Requirements,

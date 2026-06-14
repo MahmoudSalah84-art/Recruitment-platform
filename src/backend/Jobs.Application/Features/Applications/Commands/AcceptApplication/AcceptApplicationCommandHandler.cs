@@ -21,7 +21,7 @@ namespace Jobs.Application.Features.Applications.Commands.AcceptApplication
 			if (application is null)
 				return Result.Failure( "Application not found.");
 
-			application.ChangeStatus(ApplicationStatus.Accepted);
+			application.UpdateStatus(ApplicationStatus.Accepted);
 
 			await _unitOfWork.SaveChangesAsync(cancellationToken);
 

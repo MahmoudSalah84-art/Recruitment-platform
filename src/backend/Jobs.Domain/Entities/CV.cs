@@ -60,7 +60,8 @@ namespace Jobs.Domain.Entities
 
 			ParsedData = null;
 
-			AddEvent(new CvUploadedEvent( UserId));
+			AddEvent(new CvUploadedEvent(UserId));
+			//AddEvent(new CvUploadedEvent( UserId));
 		}
 
 

@@ -10,6 +10,10 @@ namespace Jobs.Domain.Specifications.Jobs
 			)
 		{
 			AddInclude(j => j.Company);
+			AddThenInclude("RequiredSkills.Skill");
+
+
+
 
 			ApplyPagination(PageSize * (PageNumber - 1), PageSize);
 

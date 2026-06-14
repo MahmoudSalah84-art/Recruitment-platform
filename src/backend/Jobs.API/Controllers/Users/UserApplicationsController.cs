@@ -2,7 +2,9 @@
 using Jobs.API.Extensions;
 using Jobs.Application.Features.Applications.Commands.SubmitApplication;
 using Jobs.Application.Features.Applications.Commands.WithdrawApplication;
+using Jobs.Application.Features.Applications.Queries.GetApplicationById;
 using Jobs.Application.Features.Applications.Queries.GetMyApplications;
+using Jobs.Application.Features.Applications.Queries.GetUseAppForSeekerById;
 using Jobs.Domain.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -70,6 +72,37 @@ namespace Jobs.API.Controllers.Users
 			return StatusCode(response.StatusCode, response);
 		}
 
+
+
+
+		/// <summary>
+		/// Retrieves details of a specific job application.
+		/// </summary>
+		/// <param name="applicationId">The unique identifier of the application.</param>
+		/// <returns>
+		/// Returns detailed information about the specified application.
+		/// </returns>
+		/// <remarks>
+		/// - Uses CQRS pattern via GetUserApplicationDetailsQuery.
+		/// - Requires Applications_View permission.
+		/// - Access is restricted based on ownership or company role.
+		/// </remarks>
+		/// <response code="200">Application retrieved successfully.</response>
+		/// <response code="401">Unauthorized - user is not authenticated.</response>
+		/// <response code="403">Forbidden - access denied.</response>
+		/// <response code="404">Application not found.</response>
+		// GET: api/UserApplications/{userId}
+		[HttpGet("{applicationId}")]
+		[Authorize(Policy = Permissions.Applications_View)]
+		public async Task<IActionResult> GetMyApplicationById( string applicationId)
+		{
+			string UserId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+			var result = await Sender.Send(new GetUserApplicationForSeekerQuiery(UserId, applicationId));
+
+			var response = result.ToApiResponse();
+			return StatusCode(response.StatusCode, response);
+		}
+
 		/// <summary>
 		/// Withdraws a previously submitted job application.
 		/// </summary>
@@ -89,6 +122,7 @@ namespace Jobs.API.Controllers.Users
 		/// <response code="404">Application not found.</response>
 		// DELETE: api/UserApplications/{id}
 		[HttpDelete("me/Withdraw/{Applicationid}")]
+		[Authorize(Policy = Permissions.Applications_Delete)]
 		public async Task<IActionResult> WithdrawApplication(string Applicationid)
 		{
 			string applicandId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;

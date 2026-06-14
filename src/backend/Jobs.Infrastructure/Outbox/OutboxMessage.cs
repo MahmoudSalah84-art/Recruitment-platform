@@ -7,7 +7,7 @@ namespace Jobs.Infrastructure.Outbox
 		public DateTime OccurredOn { get; private set; } 
 		public string Type { get; private set; } = string.Empty; // event name
 		public string Content { get; private set; } = string.Empty; // Jason
-		public bool Processed { get; private set; }
+		public bool Processed { get; private set; } 
 		public DateTime? ProcessedOn { get; private set; }
 		public string? Error { get; private set; }
 
@@ -18,6 +18,7 @@ namespace Jobs.Infrastructure.Outbox
 			Type = type;
 			Content = content;
 			OccurredOn = DateTime.UtcNow;
+			
 		}
 
 		public void MarkProcessed()

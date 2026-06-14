@@ -20,6 +20,7 @@ namespace Jobs.Infrastructure.Repositories.Repo
 		{
 			return await _set
 				//.AsNoTracking()
+				.Include(j => j.Company)
 				.Include(j => j.RequiredSkills)
 				.ThenInclude(js => js.Skill)
 				.FirstOrDefaultAsync(j => j.Id == id, ct);
@@ -31,6 +32,13 @@ namespace Jobs.Infrastructure.Repositories.Repo
 				.AsNoTracking()
 				.Where(j => j.IsPublished && (j.ExpirationDate == null || j.ExpirationDate > DateTime.UtcNow))
 				.ToListAsync(ct);
+		}
+
+		public async Task<int> GetCountOfJobsPostedByUserIdAsync(string companyId)
+		{
+			return await _set
+				.Where(j => j.CompanyId == companyId)
+				.CountAsync();
 		}
 	}
 }

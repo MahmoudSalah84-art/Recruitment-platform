@@ -10,6 +10,8 @@ namespace Jobs.Domain.IRepositories
 		// Retrieve by Id
 		Task<TEntity?> GetByIdAsync(string id, CancellationToken ct = default);
 
+		
+
 		// Add entity
 		void Add(TEntity entity);
 

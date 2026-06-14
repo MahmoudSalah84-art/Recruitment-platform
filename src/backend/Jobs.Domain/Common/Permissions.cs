@@ -14,7 +14,8 @@ namespace Jobs.Domain.Common
 		public const string Companies_Update = "Companies.Update";
 		public const string Companies_Delete = "Companies.Delete";
 
-		// Jobs
+		//
+		// 
 		public const string Jobs_View = "Jobs.View";
 		public const string Jobs_Create = "Jobs.Create";
 		public const string Jobs_Update = "Jobs.Update";
@@ -24,7 +25,10 @@ namespace Jobs.Domain.Common
 		public const string Applications_View = "Applications.View";
 		public const string Applications_Apply = "Applications.Apply";
 		public const string Applications_UpdateStatus = "Applications.UpdateStatus";
-		public const string Applications_Delete = "Applications.Delete";
+		public const string Applications_Delete = "Applications.Delete"; 
+		public const string UserApplications_View = "Users.Applications.View"; 
+
+
 
 		// CVs
 		public const string CVs_View = "CVs.View";
@@ -48,6 +52,14 @@ namespace Jobs.Domain.Common
 		public const string Skills_Create = "Skills.Create";
 		public const string Skills_Update = "Skills.Update";
 		public const string Skills_Delete = "Skills.Delete";
+
+
+		
+		public const string Admin_Access = "Admin.Access";
+		public const string Admin_ViewUsers = "Admin.Users.View";
+		public const string Admin_ManageUsers = "Admin.Users.Manage";
+		public const string Admin_ViewDashboard = "Admin.Dashboard.View";
+		
 
 
 

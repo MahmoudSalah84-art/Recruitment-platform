@@ -29,6 +29,7 @@ namespace Jobs.Application.Features.Jobs.Queries.SearchJobs
 
 			var response = jobs.Select(job => new JobResponse(
 			job.Id,
+			job.Company.Name,
 			job.Title,
 			job.Description,
 			job.Requirements,

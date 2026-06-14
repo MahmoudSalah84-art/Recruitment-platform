@@ -9,7 +9,7 @@ namespace Jobs.Domain.Events.Company_Events
 
 	public record CompanyEmployeeRemovedDomainEvent : DomainEvent
 	{
-		public CompanyEmployeeRemovedDomainEvent(string EmployeeId)  
+		public CompanyEmployeeRemovedDomainEvent(string EmployeeId) : base(EmployeeId)
 		{
 		}
 	}

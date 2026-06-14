@@ -1,8 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Jobs.Domain.Enums
+﻿namespace Jobs.Domain.Enums
 {
-    public enum ApplicationStatus { Pending, Accepted, Rejected }
+	public enum ApplicationStatus
+	{
+		Pending = 0,
+		Accepted = 1,
+		Rejected = 2
+	}
 }

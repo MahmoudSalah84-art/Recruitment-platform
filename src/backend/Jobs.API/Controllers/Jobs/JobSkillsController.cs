@@ -31,7 +31,7 @@ namespace Jobs.API.Controllers.Jobs
 		/// <response code="404">Job not found.</response>
 		// GET api/jobs/{jobId}/skills
 		[HttpGet]
-		[Authorize(Policy = Permissions.Skills_View)]
+		//[Authorize(Policy = Permissions.Skills_View)]
 		public async Task<IActionResult> GetJobSkills(string jobId, CancellationToken cancellationToken)
 		{
 			var query = new GetJobSkillsQuery(jobId);
@@ -69,7 +69,6 @@ namespace Jobs.API.Controllers.Jobs
 		public async Task<IActionResult> AddJobSkill( string jobId,string skillId, CancellationToken cancellationToken)
 		{
 			string companyId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			if (companyId == null ) return Unauthorized();
 	
 			var result = await Sender.Send(new AddSkillToJobCommand( jobId, skillId,companyId), cancellationToken);
 

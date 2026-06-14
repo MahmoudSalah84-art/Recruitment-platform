@@ -3,7 +3,6 @@ using Jobs.Application.Abstractions.Interfaces;
 using Jobs.Application.Abstractions.Messaging;
 using Jobs.Application.Common.DTOs;
 using Jobs.Application.Common.Interfaces;
-using Jobs.Domain.ValueObjects;
 using Jobs.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -272,6 +271,22 @@ namespace Jobs.Infrastructure.Services
 			return Result<IEnumerable<UserDto>>.Success(dtos);
 		}
 
+		
+		public async Task UpdateUserAsync(string id,string? PhoneNumber, string? Email, string? userName, string? FirstName, string? LastName)
+		{
+			var user = await _userManager.FindByIdAsync(id);
+			if (user == null)
+				return;
+
+			user.PhoneNumber = PhoneNumber ?? user.PhoneNumber;
+			user.Email = Email ?? user.Email;
+			user.FirstName = FirstName ?? user.FirstName;
+			user.LastName = LastName ?? user.LastName;
+			userName = userName ?? user.UserName;
+
+			var resulr = await _userManager.UpdateAsync(user);
+		}
+
 		public async Task<Result<UserDto>> GetUserByIdAsync(string userId)
 		{
 			var user = await _userManager.FindByIdAsync(userId);
@@ -354,7 +369,7 @@ namespace Jobs.Infrastructure.Services
 
 			return result.Succeeded
 				? Result.Success()
-				: Result.Failure(result.Errors.Select(e => e.Description).ToString()!);
+				: Result.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
 		}
 
 
@@ -379,7 +394,7 @@ namespace Jobs.Infrastructure.Services
 
 			return result.Succeeded
 				? Result.Success()
-				: Result.Failure(result.Errors.Select(e => e.Description).ToString()!);
+				: Result.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
 		}
 
 		public async Task<Result> ChangePasswordAsync(string userId,string currentPassword,string newPassword)
@@ -390,7 +405,7 @@ namespace Jobs.Infrastructure.Services
 			var result = await _userManager.ChangePasswordAsync(user,currentPassword,newPassword);
 
 			if (!result.Succeeded)
-				return Result.Failure(result.Errors.Select(e => e.Description).ToString()!);
+				return Result.Failure(string.Join(", ", result.Errors.Select(e => e.Description)));
 			
 			return Result.Success();
 		}

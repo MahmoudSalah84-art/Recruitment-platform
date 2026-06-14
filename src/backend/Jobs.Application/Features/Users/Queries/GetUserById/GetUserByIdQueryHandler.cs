@@ -1,4 +1,5 @@
-﻿using Jobs.Application.Abstractions.Messaging;
+﻿using Jobs.Application.Abstractions.Interfaces;
+using Jobs.Application.Abstractions.Messaging;
 using Jobs.Domain.IRepositories;
 
 namespace Jobs.Application.Features.Users.Queries.GetUserProfile
@@ -6,10 +7,12 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 	public class GetUserByIdQueryHandler : IQueryHandler<GetUserByIdQuery, UserResponse?>
 	{
 		private readonly IUnitOfWork _unitOfWork;
+		private readonly IIdentityService _svc;
 
-		public GetUserByIdQueryHandler(IUnitOfWork unitOfWork)
+		public GetUserByIdQueryHandler(IUnitOfWork unitOfWork, IIdentityService svc)
 		{
 			_unitOfWork = unitOfWork;
+			_svc = svc;
 		}
 
 		public async Task<Result<UserResponse?>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
@@ -19,6 +22,7 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 
 			if (user is null)
 				return Result<UserResponse?>.Failure("user isn't here");
+			var otherDitelseOfUder =await _svc.GetUserByIdAsync(request.UserId);
 
 
 			var userResponse = new UserResponse
@@ -29,7 +33,9 @@ namespace Jobs.Application.Features.Users.Queries.GetUserProfile
 				Bio = user.Bio,
 				ProfileImage = user.ProfilePictureUrl,
 				Skills = user.Skills,
-			
+				Email = otherDitelseOfUder.Value.Email,
+				PhoneNumber = "01078945612"
+
 			};
 
 			return Result<UserResponse?>.Success(userResponse);

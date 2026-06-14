@@ -54,7 +54,7 @@
             <response code="200">Logged out successfully.</response>
             <response code="401">User is not authenticated.</response>
         </member>
-        <member name="M:Jobs.API.Controllers.Auth.AuthController.ConfirmEmail(System.String)">
+        <member name="M:Jobs.API.Controllers.Auth.AuthController.ConfirmEmail(System.String,System.String)">
             <summary>
             Confirms a user's email address using a verification token.
             </summary>
@@ -338,7 +338,7 @@
             <response code="404">Employee or company not found.</response>
             <response code="409">Employee is not associated with the company.</response>
         </member>
-        <member name="M:Jobs.API.Controllers.Companies.CompanyJobsController.GetJobs">
+        <member name="M:Jobs.API.Controllers.Companies.CompanyJobsController.GetJobs(System.Int32,System.Int32)">
             <summary>
             Retrieves all jobs for the currently authenticated company.
             </summary>
@@ -482,7 +482,7 @@
             <response code="400">Invalid job ID supplied.</response>
             <response code="404">Job not found.</response>
         </member>
-        <member name="M:Jobs.API.Controllers.Jobs.JobsController.CreateJob(Jobs.Application.Features.Jobs.Commands.CreateJob.CreateJobCommand)">
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.CreateJob(Jobs.API.DTOs.CreateJobRequest)">
             <summary>
             Creates a new job posting for the authenticated company.
             </summary>
@@ -554,7 +554,7 @@
             <response code="400">Invalid job state or request data.</response>
             <response code="404">Job not found.</response>
         </member>
-        <member name="M:Jobs.API.Controllers.Jobs.JobsController.UpdateJob(System.String,Jobs.Application.Features.Jobs.Commands.UpdateJob.UpdateJobCommand)">
+        <member name="M:Jobs.API.Controllers.Jobs.JobsController.UpdateJob(System.String,Jobs.Application.Features.Jobs.Commands.UpdateJob.UpdateJobRequest,System.Threading.CancellationToken)">
             <summary>
             Updates an existing job posting.
             </summary>
@@ -763,6 +763,24 @@
             <response code="200">Applications retrieved successfully.</response>
             <response code="401">Unauthorized - user is not authenticated.</response>
         </member>
+        <member name="M:Jobs.API.Controllers.Users.UserApplicationsController.GetMyApplicationById(System.String)">
+            <summary>
+            Retrieves details of a specific job application.
+            </summary>
+            <param name="applicationId">The unique identifier of the application.</param>
+            <returns>
+            Returns detailed information about the specified application.
+            </returns>
+            <remarks>
+            - Uses CQRS pattern via GetUserApplicationDetailsQuery.
+            - Requires Applications_View permission.
+            - Access is restricted based on ownership or company role.
+            </remarks>
+            <response code="200">Application retrieved successfully.</response>
+            <response code="401">Unauthorized - user is not authenticated.</response>
+            <response code="403">Forbidden - access denied.</response>
+            <response code="404">Application not found.</response>
+        </member>
         <member name="M:Jobs.API.Controllers.Users.UserApplicationsController.WithdrawApplication(System.String)">
             <summary>
             Withdraws a previously submitted job application.
@@ -903,6 +921,29 @@
             <response code="200">Skill removed successfully.</response>
             <response code="400">Invalid skill ID.</response>
             <response code="401">Unauthorized - user is not authenticated.</response>
+        </member>
+        <member name="T:Jobs.API.Extensions.ResultExtensions">
+            <summary>
+            Extension helpers to convert Result and Result&lt;T&gt; values into ApiResponse&lt;T&gt;.
+            </summary>
+        </member>
+        <member name="M:Jobs.API.Extensions.ResultExtensions.ToApiResponse``1(Jobs.Application.Abstractions.Messaging.Result{``0},System.Int32)">
+            <summary>
+            Converts a <see cref="T:Jobs.Application.Abstractions.Messaging.Result`1"/> to an <see cref="T:Jobs.API.Middlewares.ApiResponse`1"/>.
+            </summary>
+            <typeparam name="T">Type of the response data.</typeparam>
+            <param name="result">The result to convert.</param>
+            <param name="successStatusCode">HTTP status code to set when the result is successful. Default is 200.</param>
+            <returns>An <see cref="T:Jobs.API.Middlewares.ApiResponse`1"/> representing the provided result.</returns>
+        </member>
+        <member name="M:Jobs.API.Extensions.ResultExtensions.ToApiResponse``1(Jobs.Application.Abstractions.Messaging.Result,System.Int32)">
+            <summary>
+            Converts a non-generic <see cref="T:Jobs.Application.Abstractions.Messaging.Result"/> to an <see cref="T:Jobs.API.Middlewares.ApiResponse`1"/>.
+            </summary>
+            <typeparam name="T">Type parameter for the returned <see cref="T:Jobs.API.Middlewares.ApiResponse`1"/> (may be null for no data).</typeparam>
+            <param name="result">The result to convert.</param>
+            <param name="successStatusCode">HTTP status code to set when the result is successful. Default is 200.</param>
+            <returns>An <see cref="T:Jobs.API.Middlewares.ApiResponse`1"/> representing the provided result.</returns>
         </member>
         <member name="T:Program">
             <summary>

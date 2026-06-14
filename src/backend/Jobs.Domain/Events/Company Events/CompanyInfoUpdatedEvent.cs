@@ -6,7 +6,7 @@ namespace Jobs.Domain.Rules
 
 	public record CompanyInfoUpdatedEvent : DomainEvent
 	{
-		public CompanyInfoUpdatedEvent(string EmployeeId)  
+		public CompanyInfoUpdatedEvent(string EmployeeId) : base(EmployeeId)
 		{
 		}
 	}

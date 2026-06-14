@@ -55,7 +55,7 @@ namespace Jobs.Domain.Entities
 			CompanyAddress = address ?? CompanyAddress;
 			EmployeesCount = employeesCount;
 
-			AddEvent(new CompanyInfoUpdatedEvent(this.Id));
+			//AddEvent(new CompanyInfoUpdatedEvent(this.Id));
 		}
 
 		public void UpdateLogo(string logoUrl)
@@ -72,7 +72,7 @@ namespace Jobs.Domain.Entities
 
 			_employees.Add(employee);
 
-			AddEvent(new CompanyEmployeeAddedDomainEvent(employee.Id));
+			//AddEvent(new CompanyEmployeeAddedDomainEvent(employee.Id));
 		}
 
 		public void RemoveEmployee(string employeeId)
@@ -90,7 +90,7 @@ namespace Jobs.Domain.Entities
 
 			_employees.Remove(employee);
 
-			AddEvent(new CompanyEmployeeRemovedDomainEvent(employeeId));
+			//AddEvent(new CompanyEmployeeRemovedDomainEvent(employeeId));
 
 		}
 	}

@@ -24,14 +24,14 @@ namespace Jobs.Application.Features.Applications.Commands.RerankJobApplicantsJob
 			if (Application is null)
 			{
 				_logger.LogWarning("Application {ApplicationId} not found for AI scoring.", request.ApplicationId);
-				return Result.Failure(" not found.");
+				throw new Exception($"Application with ID {request.ApplicationId} not found.");
 			}
 
 			var JobRecommendation = await _unitOfWork.CVJobRecommendations.GetByCvIdAndJobIdAsync(Application.CvId!, Application.JobId, cancellationToken);
 			if (JobRecommendation is null)
 			{
 				_logger.LogWarning("No job recommendation found for CV {CvId} and Job {JobId}.", Application.CvId, Application.JobId);
-				return Result.Failure("No job recommendation found.");
+				throw new Exception($"No job recommendation found for CV {Application.CvId} and Job {Application.JobId}.");
 			}
 
 			Application.AddMatchScore(JobRecommendation.Score);

@@ -1,8 +1,6 @@
 ﻿using Jobs.API.Controllers.Abstractions;
-using Jobs.API.DTOs;
 using Jobs.API.Extensions;
 using Jobs.Application.Common.DTOs;
-using Jobs.Application.Features.CV.Command.CreateOrUpdateResume;
 using Jobs.Application.Features.Users.Commands.UpdateUserImage;
 using Jobs.Application.Features.Users.Commands.UpdateUserProfile;
 using Jobs.Application.Features.Users.Queries.GetUserProfile;
@@ -31,12 +29,13 @@ namespace Jobs.API.Controllers.Users
 		/// <response code="401">Unauthorized - user is not authenticated.</response>
 		// GET: api/UserProfile/me
 		[HttpGet("me")]
+		[Authorize(Policy = Permissions.Users_View)]
 		public async Task<IActionResult> GetMyProfile()
 		{
 			string userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
-			//if (CompanyId == null || CompanyId != id) return Unauthorized();
 
 			var query = new GetUserByIdQuery(userId);
+
 			var result = await Sender.Send(query);
 
 			return result.IsSuccess ? Ok(result) : BadRequest(result.Error);

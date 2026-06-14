@@ -3,6 +3,7 @@ using Jobs.API.Extensions;
 using Jobs.Application.Features.Skills.Commands.AddUserSkill;
 using Jobs.Application.Features.Skills.Commands.DeleteUserSkill;
 using Jobs.Application.Features.Skills.Queries.GetUserSkills;
+using Jobs.Domain.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -25,14 +26,18 @@ namespace Jobs.API.Controllers.Users
 		/// <response code="401">Unauthorized - user is not authenticated.</response>
 		// GET /api/userSkills
 		[HttpGet]
+		[Authorize(Policy = Permissions.Users_View)]
 		public async Task<IActionResult> Get()
 		{
-			var result = await Sender.Send(new GetUserSkillsQuery());
+			string seekerId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
 
-			var response = result.ToApiResponse<object>();
+			var result = await Sender.Send(new GetUserSkillsQuery(seekerId));
+
+			var response = result.ToApiResponse();
 
 			return StatusCode(response.StatusCode, response);
 		}
+
 
 		/// <summary>
 		/// Adds a skill to the currently authenticated user.
