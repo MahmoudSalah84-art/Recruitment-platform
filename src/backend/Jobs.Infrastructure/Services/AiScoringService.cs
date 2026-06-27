@@ -12,8 +12,8 @@ namespace Jobs.Infrastructure.Services
 	{
 		private readonly HttpClient _httpClient;
 		private readonly ILogger<AiScoringService> _logger;
-		private readonly string _url = "https://jeanne-unaddled-shawnee.ngrok-free.dev/api/ai/match-job";
-
+		//private readonly string _url = "https://jeanne-unaddled-shawnee.ngrok-free.dev/api/ai/match-job";
+		private readonly string _url = "http://44.203.101.21:8000/api/ai/match-job";
 		public AiScoringService(HttpClient httpClient, ILogger<AiScoringService> logger)
 		{
 			_httpClient = httpClient;
